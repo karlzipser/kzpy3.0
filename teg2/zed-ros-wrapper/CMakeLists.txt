@@ -28,7 +28,7 @@ elseif(CMAKE_SYSTEM_NAME2 MATCHES "armv7l" ) # Jetson TK1
     SET(CUDA_VERSION "6.5")
     set(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 else() # Ubuntu Desktop
-    SET(OCV_VERSION "3.1")
+    SET(OCV_VERSION "2.4")
     SET(CUDA_VERSION "8.0")
     message("*** On Ubuntu 14, change line 30 of CMakeLists.txt to CUDA 7.5")
 endif()

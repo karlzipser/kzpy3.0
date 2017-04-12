@@ -6,8 +6,9 @@ Created on Apr 11, 2017
 import cv2
 import cv2.aruco as aruco
 from Board import Board
+import sys
 import zed_parameter
-
+from draw_markers import drawPointAtSingleMarker
 
 class Video_Marker(object):
     
@@ -27,27 +28,28 @@ class Video_Marker(object):
        
     def get_next_image(self, cv_image = None):
         if(self.capture_device == None):
-            return mark_next_image(cv_image)
+            return self.mark_next_image(cv_image)
         else:
             ret, frame = self.capture_device.read()
-            return mark_next_image(frame) 
+            return self.mark_next_image(frame) 
          
     def read_next_image(self):
         return self.capture_device.read()
 
-    def mark_next_image(self, cv_image):
+    def mark_next_image(self, cv_image, crop=False):
                 
         height, width, channel  = cv_image.shape
 
         yMin=0
-        yMax=heigth
+        yMax=height
         xMin=0
         xMax = width/2
         # Capture frame-by-frame
         #ret, frame = self.capture_device.read()
         frame = cv_image
     
-        frame = frame[yMin:yMax,xMin:xMax] # this is all there is to cropping
+        if(crop):
+            frame = frame[yMin:yMax,xMin:xMax] #
         
         aruco_dict = self.board.get_dictionary()
         parameters =  aruco.DetectorParameters_create()
