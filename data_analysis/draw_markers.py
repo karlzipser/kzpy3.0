@@ -2,16 +2,15 @@ import cv2
 import numpy as np
 from zed_parameter import *
 
-def drawPointAtSingleMarker(image,rvec,tvec,rvecOld,tvecOld,camMat,camDist):
+def drawPointAtSingleMarker(image,rvec,tvec,camMat,camDist):
     #cv2.circle(image,(x,y), 40, (0,0,255), -1)
     #imgpts, jac = cv2.projectPoints(axis, rvec, tvec, mtx, dist)
 
     length = 0.2
     axisPoints = np.array([[-length/2, -length/2, 0],[-length/2, length/2, 0],[length/2, -length/2,0],[length/2,length/2, 0]])
-    
-    imgpts, jac  = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
     #print(rvec)
-    #print(tvec)
+    imgpts, jac  = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
+    
     x = imgpts[0][0][0]
     y = imgpts[0][0][1]
 

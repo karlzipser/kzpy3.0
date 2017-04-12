@@ -5,30 +5,33 @@ import sys
 import cv2.aruco as aruco
 import rosbag
 from cv_bridge import CvBridge, CvBridgeError
-
-from board_definition import dictionary
+from draw_markers import *
+from Board import dictionary
+from zed_parameter import *
 
 bridge = CvBridge()
-bag = rosbag.Bag('/home/picard/hddPlatte/caffe2_z2_color_direct_local_05Apr17_22h10m13s_Mr_Yellow/bair_car_2017-04-05-22-11-00_1.bag')
+#bag = rosbag.Bag('/home/picard/hddPlatte/caffe2_z2_color_direct_local_05Apr17_22h10m13s_Mr_Yellow/bair_car_2017-04-05-22-11-00_1.bag')
+#bag = rosbag.Bag('/home/picard/2ndDisk/caffe2_z2_color_direct_local_09Apr17_16h40m09s_Mr_Black/bair_car_2017-04-09-16-43-33_7.bag')
+bag = rosbag.Bag('/media/picard/rosbags/direct_Fern_aruco_1_11Apr17_22h59m32s_Mr_Yellow/bair_car_2017-04-11-23-07-52_16.bag')
+
+#ids = {}
+
 
 for topic, msg, t in bag.read_messages(topics=['/bair_car/zed/right/image_rect_color']):#, '/bair_car/encoder']):
     cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
-#    cv2.imshow("Video",cv_image)
-#    
-#    if cv2.waitKey(1000/60) & 0xFF == ord('q'):
-#        cv2.destroyAllWindows()
-#        break
 
     aruco_dict = dictionary
     parameters =  aruco.DetectorParameters_create()
 
+    # See which markers are there
     res = aruco.detectMarkers(cv_image, aruco_dict, parameters=parameters)
-    
-    
-    
 
     corners = res[0]
     ids = res[1]
+    
+    #for i in range(0,len(ids)):
+    #    ids[i]
+        
     gray = cv_image
     if len(corners)>0:
         gray = aruco.drawDetectedMarkers(cv_image, corners)
@@ -44,19 +47,17 @@ for topic, msg, t in bag.read_messages(topics=['/bair_car/zed/right/image_rect_c
             tvecOld = tvec
         except:
             pass
-            #rvec, tvec = aruco.estimatePoseSingleMarkers(corners, markerLength, camera_matrix, dist_coeffs
+        
 
         rvec, tvec = aruco.estimatePoseSingleMarkers(corners,0.20,cameraMatrix,distCoeffs)
         
         if rvecOld == None:
             rvecOld = rvec
             tvecOld = tvec
-            
-        drawPointAtSingleMarker(gray,rvec,tvec,rvecOld,tvecOld,cameraMatrix,distCoeffs)
+         
+           
+        #drawPointAtSingleMarker(gray,rvec,tvec,rvecOld,tvecOld,cameraMatrix,distCoeffs)
        
-          
-    #other_format = cv2.cvtColor(gray,cv2.COLOR_BGR2RGB)
-
     cv2.imshow('frame',gray)
     if cv2.waitKey(1000/30) & 0xFF == ord('q'):
         break

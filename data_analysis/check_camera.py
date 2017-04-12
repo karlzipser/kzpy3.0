@@ -6,12 +6,12 @@ import cv2.aruco as aruco
 from zed_parameter import *
 from draw_markers import *
 
-arucoType = aruco.DICT_4X4_250 # Markers on the side boundary
+#arucoType = aruco.DICT_4X4_250 # Markers on the side boundary
 
 #arucoBoard = aruco.CharthuucoBoard_create(4,5,0.7,0.5,aruco.Dictionary_get(arucoType))
 #arucoBoard = aruco.CharucoBoard_create(2,2,0.7,0.5,aruco.Dictionary_get(arucoType))
 #arucoBoard = aruco.CharucoBoard_create(9,5,0.7,0.5,aruco.Dictionary_get(arucoType))
-dictionary = cv2.aruco.getPredefinedDictionary(arucoType)
+#dictionary = cv2.aruco.getPredefinedDictionary(arucoType)
 
 cap = cv2.VideoCapture(1)
 
@@ -51,8 +51,6 @@ while(True):
     
     frame = frame[yMin:yMax,xMin:xMax] # this is all there is to cropping
     
-    
-    #
     aruco_dict = dictionary
     parameters =  aruco.DetectorParameters_create()
 
