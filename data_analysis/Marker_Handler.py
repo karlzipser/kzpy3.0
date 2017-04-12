@@ -22,5 +22,8 @@ class Marker_Handler:
             if cv2.waitKey(1000/30) & 0xFF == ord('q'):
                 break
 
-
-Marker_Handler(sys.argv[1])
+if len(sys.argv) < 2:
+    print("Please provide the path to the bagfile")
+else:
+    print("Processing bag files")
+    Marker_Handler(sys.argv[1])

@@ -20,12 +20,6 @@ class Bagfile_Handler(object):
         self.bag.close()
 
     def get_image(self):
-        
         topic, msg, t = self.bag_access.next() 
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         return cv_image
-
-#test = Bagfile_Handler("/home/picard/2ndDisk/caffe2_z2_color_direct_local_09Apr17_16h40m09s_Mr_Black/bair_car_2017-04-09-16-43-05_6.bag")
-
-#cv2.imshow('frame',test.get_image())
-#cv2.waitKey(6000)
