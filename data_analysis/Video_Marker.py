@@ -120,7 +120,7 @@ class Video_Marker(object):
         if text_zoomfactor > 1:
             text_zoomfactor = 1
         
-        cv2.putText(image, str(angle), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
+        cv2.putText(image, str(distance), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
         #cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
 
         return distance, angle
@@ -142,8 +142,6 @@ class Video_Marker(object):
         
         x_mid = camMat[0][2]
         y_mid = camMat[1][2]        
-        
-       
         
         #angle =  np.rad2deg(np.arctan2(y_mid - py, x_mid - px))
         angle =  np.arctan2(y_mid - py, x_mid - px)

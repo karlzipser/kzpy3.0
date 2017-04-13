@@ -30,7 +30,6 @@ class Marker_Handler:
           
         paused_video = False
         
-        
         while True:
             if not paused_video:
                 gray,markers = image_marker.get_next_image(bagfile_handler.get_image()) 
