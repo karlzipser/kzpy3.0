@@ -76,7 +76,7 @@ class Video_Marker(object):
             for i in range(0,len(rvec)):
                 distance, angle, fov = self.drawPointAtSingleMarker(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs, ids[i])
                 # It is a bit uninuitive that these information are calculated in a "draw" function. Needs redesign
-                markers[str(ids[i])]={'distance':distance,'angle':angle}
+                markers[str(ids[i])]={'distance':distance,'angle':angle,'confidence':1.0}
             
         
     

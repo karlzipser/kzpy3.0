@@ -50,7 +50,11 @@ class Marker_Handler:
             # factor is chosen
             scale_factor = 300.0 * (1.0/8.0)
             shift_factor = 300.0
+            turn_factor = 2*np.pi/3
             
+            for marker in persistent_markers:
+                persistent_markers[marker]['confidence']=persistent_markers[marker]['confidence']/2.0
+                
             persistent_markers.update(markers)
             
             for marker_id in persistent_markers:
@@ -58,14 +62,14 @@ class Marker_Handler:
                 #print(x)#xy_marker_positions.append(())
                 marker_data = persistent_markers[marker_id]
                 
-                x,y = cv2.polarToCart(marker_data['distance'],marker_data['angle']-np.pi)
+                x,y = cv2.polarToCart(marker_data['distance'],marker_data['angle']-turn_factor)
                 x[0] = x[0] * scale_factor + shift_factor
                 y[0] = y[0] * scale_factor + shift_factor
-                cv2.circle(img2,(x[0],y[0]),5,(0,0,255),-1)
+                cv2.circle(img2,(x[0],y[0]),5,(0,0,255*marker_data['confidence']),-1)
                 
                 # draw viewport lines
-                x_orig,y_orig = cv2.polarToCart(0.0,0.0-np.pi)
-                x_dest,y_dest = cv2.polarToCart(8.0,0.0-np.pi)
+                x_orig,y_orig = cv2.polarToCart(0.0,0.0-turn_factor)
+                x_dest,y_dest = cv2.polarToCart(8.0,0.0-turn_factor)
                 x_orig[0] = x_orig[0] * scale_factor + shift_factor
                 y_orig[0] = y_orig[0] * scale_factor + shift_factor
                 x_dest[0] = x_dest[0] * scale_factor + shift_factor
@@ -76,8 +80,8 @@ class Marker_Handler:
                 if(fov != 0.0):
                     cv2.line(img2,(x_orig[0],y_orig[0]),(x_dest[0],y_dest[0]),(255,255,255),1)
                 
-                    x_orig_max,y_orig_max = cv2.polarToCart(0.0,fov-np.pi)
-                    x_dest_max,y_dest_max = cv2.polarToCart(8.0,fov-np.pi)
+                    x_orig_max,y_orig_max = cv2.polarToCart(0.0,fov-turn_factor)
+                    x_dest_max,y_dest_max = cv2.polarToCart(8.0,fov-turn_factor)
                     x_orig_max[0] = x_orig_max[0] * scale_factor + shift_factor
                     y_orig_max[0] = y_orig_max[0] * scale_factor + shift_factor
                     x_dest_max[0] = x_dest_max[0] * scale_factor + shift_factor
