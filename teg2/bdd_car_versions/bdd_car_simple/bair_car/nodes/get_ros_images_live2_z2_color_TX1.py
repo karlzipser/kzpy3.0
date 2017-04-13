@@ -22,18 +22,17 @@ try:
 
 	#solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 	#weights_file_path = opjh('kzpy3/caf5/z2_color/z2_color.caffemodel') #
-	if use_caffe:
-		def setup_solver():
-			solver = caffe.SGDSolver(solver_file_path)
-			for l in [(k, v.data.shape) for k, v in solver.net.blobs.items()]:
-				print(l)
-			for l in [(k, v[0].data.shape) for k, v in solver.net.params.items()]:
-				print(l)
-			return solver
-		solver = setup_solver()
-		if weights_file_path != None:
-			print "loading " + weights_file_path
-			solver.net.copy_from(weights_file_path)
+	def setup_solver():
+		solver = caffe.SGDSolver(solver_file_path)
+		for l in [(k, v.data.shape) for k, v in solver.net.blobs.items()]:
+			print(l)
+		for l in [(k, v[0].data.shape) for k, v in solver.net.params.items()]:
+			print(l)
+		return solver
+	solver = setup_solver()
+	if weights_file_path != None:
+		print "loading " + weights_file_path
+		solver.net.copy_from(weights_file_path)
 	#
 	########################################################
 
@@ -179,96 +178,96 @@ try:
 	
 	while not rospy.is_shutdown():
 		if state in [3,5,6,7]:
-			if use_caffe:
-				if (previous_state not in [3,5,6,7]):
-					previous_state = state
-					caffe_enter_timer.reset()
-				if not caffe_enter_timer.check():
-					#print caffe_enter_timer.check()
-					print "waiting before entering caffe mode..."
-					steer_cmd_pub.publish(std_msgs.msg.Int32(49))
-					motor_cmd_pub.publish(std_msgs.msg.Int32(49))
-					time.sleep(0.1)
-					continue
-				else:
-					if len(left_list) > 4:
-						l0 = left_list[-2]
-						l1 = left_list[-1]
-						r0 = right_list[-2]
-						r1 = right_list[-1]
+			
+			if (previous_state not in [3,5,6,7]):
+				previous_state = state
+				caffe_enter_timer.reset()
+			if not caffe_enter_timer.check():
+				#print caffe_enter_timer.check()
+				print "waiting before entering caffe mode..."
+				steer_cmd_pub.publish(std_msgs.msg.Int32(49))
+				motor_cmd_pub.publish(std_msgs.msg.Int32(49))
+				time.sleep(0.1)
+				continue
+			else:
+				if len(left_list) > 4:
+					l0 = left_list[-2]
+					l1 = left_list[-1]
+					r0 = right_list[-2]
+					r1 = right_list[-1]
 
-						solver.net.blobs['ZED_data'].data[0,0,:,:] = l0[:,:,0]
-						solver.net.blobs['ZED_data'].data[0,1,:,:] = l1[:,:,0]
-						solver.net.blobs['ZED_data'].data[0,2,:,:] = r0[:,:,0]
-						solver.net.blobs['ZED_data'].data[0,3,:,:] = r1[:,:,0]
-						solver.net.blobs['ZED_data'].data[0,4,:,:] = l0[:,:,1]
-						solver.net.blobs['ZED_data'].data[0,5,:,:] = l1[:,:,1]
-						solver.net.blobs['ZED_data'].data[0,6,:,:] = r0[:,:,1]
-						solver.net.blobs['ZED_data'].data[0,7,:,:] = r1[:,:,1]
-						solver.net.blobs['ZED_data'].data[0,8,:,:] = l0[:,:,2]
-						solver.net.blobs['ZED_data'].data[0,9,:,:] = l1[:,:,2]
-						solver.net.blobs['ZED_data'].data[0,10,:,:] = r0[:,:,2]
-						solver.net.blobs['ZED_data'].data[0,11,:,:] = r1[:,:,2]
-							
-
-						solver.net.blobs['metadata'].data[0,0,:,:] = Racing#target_data[0]/99. #current steer
-						solver.net.blobs['metadata'].data[0,1,:,:] = 0#target_data[len(target_data)/2]/99. #current motor
-						solver.net.blobs['metadata'].data[0,2,:,:] = Follow
-						solver.net.blobs['metadata'].data[0,3,:,:] = Direct
-						solver.net.blobs['metadata'].data[0,4,:,:] = Play
-						solver.net.blobs['metadata'].data[0,5,:,:] = Furtive
+					solver.net.blobs['ZED_data'].data[0,0,:,:] = l0[:,:,0]
+					solver.net.blobs['ZED_data'].data[0,1,:,:] = l1[:,:,0]
+					solver.net.blobs['ZED_data'].data[0,2,:,:] = r0[:,:,0]
+					solver.net.blobs['ZED_data'].data[0,3,:,:] = r1[:,:,0]
+					solver.net.blobs['ZED_data'].data[0,4,:,:] = l0[:,:,1]
+					solver.net.blobs['ZED_data'].data[0,5,:,:] = l1[:,:,1]
+					solver.net.blobs['ZED_data'].data[0,6,:,:] = r0[:,:,1]
+					solver.net.blobs['ZED_data'].data[0,7,:,:] = r1[:,:,1]
+					solver.net.blobs['ZED_data'].data[0,8,:,:] = l0[:,:,2]
+					solver.net.blobs['ZED_data'].data[0,9,:,:] = l1[:,:,2]
+					solver.net.blobs['ZED_data'].data[0,10,:,:] = r0[:,:,2]
+					solver.net.blobs['ZED_data'].data[0,11,:,:] = r1[:,:,2]
 						
 
-						solver.net.forward(start='ZED_data',end='ZED_data_pool2_scale')
+					solver.net.blobs['metadata'].data[0,0,:,:] = Racing#target_data[0]/99. #current steer
+					solver.net.blobs['metadata'].data[0,1,:,:] = 0#target_data[len(target_data)/2]/99. #current motor
+					solver.net.blobs['metadata'].data[0,2,:,:] = Follow
+					solver.net.blobs['metadata'].data[0,3,:,:] = Direct
+					solver.net.blobs['metadata'].data[0,4,:,:] = Play
+					solver.net.blobs['metadata'].data[0,5,:,:] = Furtive
+					
 
-						#solver.net.blobs['ZED_data_pool2'].data[:,:,:,:] /= 255.0
-						#solver.net.blobs['ZED_data_pool2'].data[:,:,:,:] -= 0.5
+					solver.net.forward(start='ZED_data',end='ZED_data_pool2_scale')
 
-						solver.net.forward(start='conv1',end='ip2')
+					#solver.net.blobs['ZED_data_pool2'].data[:,:,:,:] /= 255.0
+					#solver.net.blobs['ZED_data_pool2'].data[:,:,:,:] -= 0.5
 
-						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
-						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
+					solver.net.forward(start='conv1',end='ip2')
 
-						"""
-						if caf_motor > 60:
-							caf_motor = (caf_motor-60)/39.0*10.0 + 60
-						"""
+					caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
+					caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
-						caf_motor = int((caf_motor-49.) * motor_gain + 49)
-						caf_steer = int((caf_steer-49.) * steer_gain + 49)
+					"""
+					if caf_motor > 60:
+						caf_motor = (caf_motor-60)/39.0*10.0 + 60
+					"""
 
-
-
-						if caf_motor > 99:
-							caf_motor = 99
-						if caf_motor < 0:
-							caf_motor = 0
-						if caf_steer > 99:
-							caf_steer = 99
-						if caf_steer < 0:
-							caf_steer = 0
-
-						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
-						caf_steer_previous = caf_steer
-						caf_motor = int((caf_motor+caf_motor_previous)/2.0)
-						caf_motor_previous = caf_motor
+					caf_motor = int((caf_motor-49.) * motor_gain + 49)
+					caf_steer = int((caf_steer-49.) * steer_gain + 49)
 
 
-						if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
-							freeze = True
 
-						if freeze:
-							print "######### FREEZE ###########"
-							caf_steer = 49
-							caf_motor = 49
+					if caf_motor > 99:
+						caf_motor = 99
+					if caf_motor < 0:
+						caf_motor = 0
+					if caf_steer > 99:
+						caf_steer = 99
+					if caf_steer < 0:
+						caf_steer = 0
 
-						if verbose:
-							print caf_motor,caf_steer,motor_gain,steer_gain,state
-						
-						if state in [3,6]:			
-							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
-						if state in [6,7]:
-							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
+					caf_steer = int((caf_steer+caf_steer_previous)/2.0)
+					caf_steer_previous = caf_steer
+					caf_motor = int((caf_motor+caf_motor_previous)/2.0)
+					caf_motor_previous = caf_motor
+
+
+					if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
+						freeze = True
+
+					if freeze:
+						print "######### FREEZE ###########"
+						caf_steer = 49
+						caf_motor = 49
+
+					if verbose:
+						print caf_motor,caf_steer,motor_gain,steer_gain,state
+					
+					if state in [3,6]:			
+						steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
+					if state in [6,7]:
+						motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
 
 		else:
 			caffe_enter_timer.reset()
