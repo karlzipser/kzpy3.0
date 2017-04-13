@@ -36,7 +36,7 @@ class Marker_Handler:
                 gray,markers,fov = image_marker.get_next_image(bagfile_handler.get_image()) 
             
             cv2.imshow('frame',gray)
-            key = cv2.waitKey(1000/30) & 0xFF
+            key = cv2.waitKey(1000/60) & 0xFF
             if key == ord('q'):
                 break
             if key == ord(' '):
