@@ -33,7 +33,7 @@ class Marker_Handler:
         
         while True:
             if not paused_video:
-                gray,markers,fov = image_marker.get_next_image(bagfile_handler.get_image()) 
+                gray,markers = image_marker.get_next_image(bagfile_handler.get_image()) 
             
             cv2.imshow('frame',gray)
             key = cv2.waitKey(1000/60) & 0xFF
@@ -50,12 +50,12 @@ class Marker_Handler:
             # factor is chosen
             scale_factor = 300.0 * (1.0/8.0)
             shift_factor = 300.0
-            turn_factor = 2*np.pi/3
+            turn_factor = np.deg2rad(110.0/2.0)+np.pi/2
             
-            for marker in persistent_markers:
-                persistent_markers[marker]['confidence']=persistent_markers[marker]['confidence']/2.0
-                
-            persistent_markers.update(markers)
+            if not paused_video:
+                for marker in persistent_markers:
+                    persistent_markers[marker]['confidence']=persistent_markers[marker]['confidence']/2.0
+                persistent_markers.update(markers)
             
             for marker_id in persistent_markers:
                 #x = marker['distance']
@@ -77,19 +77,16 @@ class Marker_Handler:
                 
                 cv2.line(img2,(x_orig[0],y_orig[0]),(x_dest[0],y_dest[0]),(255,255,255),1)
                 
-                if(fov != 0.0):
-                    cv2.line(img2,(x_orig[0],y_orig[0]),(x_dest[0],y_dest[0]),(255,255,255),1)
-                
-                    x_orig_max,y_orig_max = cv2.polarToCart(0.0,fov-turn_factor)
-                    x_dest_max,y_dest_max = cv2.polarToCart(8.0,fov-turn_factor)
-                    x_orig_max[0] = x_orig_max[0] * scale_factor + shift_factor
-                    y_orig_max[0] = y_orig_max[0] * scale_factor + shift_factor
-                    x_dest_max[0] = x_dest_max[0] * scale_factor + shift_factor
-                    y_dest_max[0] = y_dest_max[0] * scale_factor + shift_factor
+                fov = np.deg2rad(110)
                     
-                    cv2.line(img2,(x_orig_max[0],y_orig_max[0]),(x_dest_max[0],y_dest_max[0]),(255,255,255),1)
+                x_orig_max,y_orig_max = cv2.polarToCart(0.0,fov-turn_factor)
+                x_dest_max,y_dest_max = cv2.polarToCart(8.0,fov-turn_factor)
+                x_orig_max[0] = x_orig_max[0] * scale_factor + shift_factor
+                y_orig_max[0] = y_orig_max[0] * scale_factor + shift_factor
+                x_dest_max[0] = x_dest_max[0] * scale_factor + shift_factor
+                y_dest_max[0] = y_dest_max[0] * scale_factor + shift_factor
                 
-                
+                cv2.line(img2,(x_orig_max[0],y_orig_max[0]),(x_dest_max[0],y_dest_max[0]),(255,255,255),1)
                 
                 
             cv2.imshow('topView',img2)

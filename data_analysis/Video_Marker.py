@@ -62,7 +62,6 @@ class Video_Marker(object):
         corners = res[0]
         ids = res[1]
         gray = frame
-        fov = 0
         markers = {}
         
         if len(corners) > 0:
@@ -74,13 +73,11 @@ class Video_Marker(object):
                 pass
             
             for i in range(0,len(rvec)):
-                distance, angle, fov = self.drawPointAtSingleMarker(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs, ids[i])
+                distance, angle = self.drawPointAtSingleMarker(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs, ids[i])
                 # It is a bit uninuitive that these information are calculated in a "draw" function. Needs redesign
                 markers[str(ids[i])]={'distance':distance,'angle':angle,'confidence':1.0}
             
-        
-    
-        return gray, markers, fov
+        return gray, markers
     
     
     
@@ -125,13 +122,8 @@ class Video_Marker(object):
         
         cv2.putText(image, str(angle), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
         #cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
-        
-      
-        height, width, channel = image.shape
-        
-        fov = 2*np.arctan(width/(2*(camMat[0][0] + camMat[1][1]) / 2))
-        
-        return distance, angle, fov
+
+        return distance, angle
 
     def get_distance_and_angle_of_line(self, real_object_width_m, (px, py), (px_, py_), camMat, camDist):
         '''
