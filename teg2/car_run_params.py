@@ -40,7 +40,7 @@ solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf7/z2_color/solver_state_1_5_6_7_plus_extra_Smyth_racing_iter_400000.caffemodel")
 weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
 verbose = False
-use_caffe = False
+use_caffe = True
 steer_gain = 1.0
 
 gyro_freeze_threshold = 500
