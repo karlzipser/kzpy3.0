@@ -4,15 +4,16 @@ Created on Apr 12, 2017
 @author: Sascha Hornauer
 '''
 import numpy as np
+import sys
 import cv2
+from Marker import Marker
 
 
 class Area_Visualizer(object):
     
     
     persistent_markers = {}
-    
-    
+        
     def __init__(self):
         pass      
 
@@ -27,19 +28,27 @@ class Area_Visualizer(object):
         shift_factor = 300.0
         turn_factor = np.deg2rad(110.0/2.0)+np.pi/2
         
-        
-        for marker in self.persistent_markers:
-            self.persistent_markers[marker]['confidence']=self.persistent_markers[marker]['confidence']/2.0
-        self.persistent_markers.update(markers)
-    
+        # Reduce confidence for each marker in the persistent list, if there are any yet
         for marker_id in self.persistent_markers:
-
-            marker_data = self.persistent_markers[marker_id]
+            self.persistent_markers[marker_id].confidence = self.persistent_markers[marker_id].confidence-0.1
             
-            x,y = cv2.polarToCart(marker_data['distance'],marker_data['angle']-turn_factor)
+        # Add markers to list, overwriting old markers and thereby increasing confidence levels
+        for marker in markers:
+            self.persistent_markers[marker.id]=marker
+        
+        # Now draw lines onto new window
+        for marker_id in self.persistent_markers:
+            
+            marker = self.persistent_markers[marker_id]
+            
+            # Two points from the corners will be drawn as a line.
+            distance = marker.corners_distances_angles['corner_id' == 0]['distance']
+            angle = marker.corners_distances_angles['corner_id' == 0]['angle']
+            
+            x,y = cv2.polarToCart(distance,angle-turn_factor)
             x[0] = x[0] * scale_factor + shift_factor
             y[0] = y[0] * scale_factor + shift_factor
-            cv2.circle(img2,(x[0],y[0]),5,(0,0,255*marker_data['confidence']),-1)
+            cv2.circle(img2,(x[0],y[0]),5,(0,0,255*marker.confidence),-1)
             
             # draw viewport lines
             x_orig,y_orig = cv2.polarToCart(0.0,0.0-turn_factor)

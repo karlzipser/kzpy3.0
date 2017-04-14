@@ -11,12 +11,13 @@ import zed_parameter
 import numpy as np
 from _socket import AF_X25
 from cv2 import polarToCart
+from Marker import Marker
 
 class Video_Marker(object):
     
     capture_device = None
     board = Board()
-    markers = {}
+    markers = []
 
     def __init__(self, capture_device=None):
         
@@ -41,17 +42,14 @@ class Video_Marker(object):
 
     def mark_next_image(self, cv_image, crop=False):
                 
-        height, width, channel = cv_image.shape
-
-        yMin = 0
-        yMax = height
-        xMin = 0
-        xMax = width / 2
-        # Capture frame-by-frame
-        # ret, frame = self.capture_device.read()
         frame = cv_image
     
         if(crop):
+            height, width, channel = cv_image.shape
+            yMin = 0
+            yMax = height
+            xMin = 0
+            xMax = width / 2
             frame = frame[yMin:yMax, xMin:xMax]  
         
         aruco_dict = self.board.get_dictionary()
@@ -62,35 +60,30 @@ class Video_Marker(object):
         corners = res[0]
         ids = res[1]
         gray = frame
-        markers = {}
+        markers = []
         
         if len(corners) > 0:
-            gray = aruco.drawDetectedMarkers(frame, corners)
-            
+            gray = aruco.drawDetectedMarkers(frame, corners)            
             try:
                 rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.20, zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
             except:
                 pass
             
             for i in range(0,len(rvec)):
-                distance, angle = self.drawPointAtSingleMarker(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs, ids[i])
-                # It is a bit uninuitive that these information are calculated in a "draw" function. Needs redesign
-                markers[str(ids[i])]={'distance':distance,'angle':angle,'confidence':1.0}
+                # Get two dictionaries with xy positions about the corners of one marker and calculate also distance and angle to them
+                corner_xy, corner_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
+                # They are drawn onto the current image
+                self.drawPointAtSingleMarker(gray, corner_xy, corner_dist_ang)
+                # Finally they are filled in the marker data object
+                marker = Marker(i,confidence=1.0,corners_xy_pos=corner_xy,corners_distances_angles=corner_dist_ang)
+                markers.append(marker)
             
         return gray, markers
     
-    
-    
-    
-    def drawPointAtSingleMarker(self, image, rvec, tvec, camMat, camDist, id):
-        '''
-        This method draws single markers and their distances 
-        '''
-    
-        length = 0.2
+    def get_corners_xy(self, image, rvec,tvec, camMat, camDist):
         
+        length = 0.2
         axisPoints = np.array([[-length / 2, -length / 2, 0], [-length / 2, length / 2, 0], [length / 2, -length / 2, 0], [length / 2, length / 2, 0]])
-    
         imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
         
         xy1 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
@@ -98,21 +91,74 @@ class Video_Marker(object):
         xy3 = (int(imgpts[2][0][0]), int(imgpts[2][0][1]))
         xy4 = (int(imgpts[3][0][0]), int(imgpts[3][0][1]))
         
+        return [xy1,xy2,xy3,xy4]
+        
+    def get_corners_polar(self, corners_xy, camMat, camDist):
+        
+        corners_dist_ang = []
+        
         # distance D from our camera.
         # object width in pixels P
         # Focal length F
         
         W = 0.2  # meter size of marker
       
-        x = xy1[0]
-        x_ = xy2[0]
-        y = xy1[1]
-        y_ = xy2[1]
+        for i in range(0,len(corners_xy)-1):
+            
+            # A complete line is needed for distance calculation
+            # because we compare the size of that found line with
+            # the known size of the line
+            
+            x = corners_xy[i][0]
+            x_ = corners_xy[i+1][0]
+            y = corners_xy[i][1]
+            y_ = corners_xy[i+1][1]
+      
+            distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
+            distance = np.round(distance,1)
+            # The method returns the angle to point x,y
+            angle = np.round(angle,1)
+            corners_dist_ang.append({'corner_id':i,'distance':distance,'angle':angle})
+            
+        # We do the calculation again for the final distance, we did not do before in the loop
+        # which goes from the last to the first corner    
+        x = corners_xy[3][0]
+        x_ = corners_xy[0][0]
+        y = corners_xy[3][1]
+        y_ = corners_xy[0][1]
         
         distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
-        distance = np.round(distance,3)
-        angle = np.round(angle,3)
+        distance = np.round(distance,1)
+        # The method returns the angle to point x,y
+        angle = np.round(angle,1)
+        corners_dist_ang.append({'corner_id':3,'distance':distance,'angle':angle})        
+            
+        return corners_dist_ang
+          
+    def get_marker_from_image(self, image, rvec, tvec, camMat, camDist):
+        '''
+        Method to compute the position, distance and angle to the markers
+        '''
         
+        corners_xy = self.get_corners_xy(image, rvec,tvec, camMat, camDist)
+        # Now we need the distance and angle to determine the appropriate size of 
+        # text, drawn onto the markers. 
+        corners_dist_ang = self.get_corners_polar(corners_xy, camMat, camDist)  
+        
+        return corners_xy, corners_dist_ang
+    
+    def drawPointAtSingleMarker(self,image,corners_xy,corners_dist_ang):
+        '''
+        This method draws single markers and their distances 
+        '''        
+        # Just draw something on one corner because otherwise the screen will be too cluttered
+        xy1 = (corners_xy[0][0],corners_xy[0][1])
+        
+        # Again the distance and angle of the first
+        # marker is used here because for the textsize, this is adequate  
+        distance = corners_dist_ang['corner_id'==0]['distance']
+        angle = corners_dist_ang['corner_id'==0]['angle']
+          
         # 8 is arbitrary and here approximately the biggest measured distance
         text_zoomfactor = 1 - (distance/(8-distance))
         if text_zoomfactor < 0.5:
@@ -123,8 +169,6 @@ class Video_Marker(object):
         cv2.putText(image, str(distance), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
         #cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
 
-        return distance, angle
-
     def get_distance_and_angle_of_line(self, real_object_width_m, (px, py), (px_, py_), camMat, camDist):
         '''
         Returns distance to a line, given by px,py and px_,py_ and the angle in degree to 
@@ -134,6 +178,7 @@ class Video_Marker(object):
         # The focal length is averaged over fx and fy, which might decrease
         # the accuracy. This could be corrected in the future
         F = (camMat[0][0] + camMat[1][1]) / 2   
+        
         P_x = (px_ - px)
         P_y = (py_ - py)     
         P = np.hypot(P_x, P_y)
