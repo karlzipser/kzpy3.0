@@ -75,6 +75,7 @@ class Video_Marker(object):
                 # They are drawn onto the current image
                 self.drawPointAtSingleMarker(gray, corner_xy, corner_dist_ang)
                 # Finally they are filled in the marker data object
+                
                 marker = Marker(i,confidence=1.0,corners_xy_pos=corner_xy,corners_distances_angles=corner_dist_ang)
                 markers.append(marker)
             
@@ -95,7 +96,7 @@ class Video_Marker(object):
         
     def get_corners_polar(self, corners_xy, camMat, camDist):
         
-        corners_dist_ang = []
+        corners_dist_ang = {}
         
         # distance D from our camera.
         # object width in pixels P
@@ -114,11 +115,11 @@ class Video_Marker(object):
             y = corners_xy[i][1]
             y_ = corners_xy[i+1][1]
       
+            # The method returns the angle to point x,y    
             distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
-            distance = np.round(distance,1)
-            # The method returns the angle to point x,y
-            angle = np.round(angle,1)
-            corners_dist_ang.append({'corner_id':i,'distance':distance,'angle':angle})
+            
+            
+            corners_dist_ang[i]={'corner_id':i,'distance':distance,'angle':angle}
             
         # We do the calculation again for the final distance, we did not do before in the loop
         # which goes from the last to the first corner    
@@ -127,11 +128,10 @@ class Video_Marker(object):
         y = corners_xy[3][1]
         y_ = corners_xy[0][1]
         
-        distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
-        distance = np.round(distance,1)
         # The method returns the angle to point x,y
-        angle = np.round(angle,1)
-        corners_dist_ang.append({'corner_id':3,'distance':distance,'angle':angle})        
+        distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
+
+        corners_dist_ang[3]={'corner_id':3,'distance':distance,'angle':angle}        
             
         return corners_dist_ang
           
