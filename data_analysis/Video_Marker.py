@@ -100,7 +100,7 @@ class Video_Marker(object):
         
         mX = sum(x[0] for x in corners_xy) / len(corners_xy)
         mY = sum(x[1] for x in corners_xy) / len(corners_xy)
-        
+    
         def rectangle_sort(x):
             return (np.arctan2(x[0] - mY, x[1] - mX) + 2.0 * np.pi) % (2.0*np.pi)
     
