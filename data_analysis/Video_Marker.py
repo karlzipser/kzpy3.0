@@ -98,26 +98,14 @@ class Video_Marker(object):
         
 
     def order_corners(self, corners_xy):
-        
-        
-        # Get the rectangle in a standard form. Intermediate variables
-        # are nw for north west, sw for south west ...
-        ax = corners_xy[0][0]
-        bx = corners_xy[1][0]
-        cx = corners_xy[2][0]
-        dx = corners_xy[3][0]
-        
-        ay = corners_xy[0][1]
-        by = corners_xy[1][1]
-        cy = corners_xy[2][1]
-        dy = corners_xy[3][1]
-        
-        nw = (min([ax,bx,cx,dx]),min(ay,by,cy,dy))
-        ne = (max([ax,bx,cx,dx]),min(ay,by,cy,dy))
-        se = (max([ax,bx,cx,dx]),max(ay,by,cy,dy))
-        sw = (min([ax,bx,cx,dx]),max(ay,by,cy,dy))
-        
-        corners_xy = [nw,ne,se,sw]
+        '''
+        The order in which the corners are presented is not
+        good to loop over so this is corrected so the corners
+        are in a rectangle
+        '''
+        tmp = corners_xy[2]
+        corners_xy[2] = corners_xy[3]
+        corners_xy[3] = tmp
         
     
     def get_corners_polar(self, rvec, tvec, corners_xy, camMat, camDist):
@@ -143,7 +131,7 @@ class Video_Marker(object):
             x_ = corners_xy[i + 1][0]
             y = corners_xy[i][1]
             y_ = corners_xy[i + 1][1]
-            print(corners_xy)
+            
             # The method returns the angle to point x,y    
             distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
         
@@ -209,7 +197,7 @@ class Video_Marker(object):
         P_x = (px_ - px)
         P_y = (py_ - py)     
         P = np.hypot(P_x, P_y)
-        print((P_x,P_y))
+        
         distance = (real_object_width_m * F) / P
         
         x_mid = camMat[0][2]
