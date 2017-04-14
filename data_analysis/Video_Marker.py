@@ -13,6 +13,7 @@ from _socket import AF_X25
 from cv2 import polarToCart
 from Marker import Marker
 
+
 class Video_Marker(object):
     
     capture_device = None
@@ -76,7 +77,7 @@ class Video_Marker(object):
                 self.drawPointAtSingleMarker(gray, corner_xy, corner_dist_ang)
                 # Finally they are filled in the marker data object
                 
-                marker = Marker(i,confidence=1.0,corners_xy_pos=corner_xy,corners_distances_angles=corner_dist_ang)
+                marker = Marker(ids[i],confidence=1.0,corners_xy_pos=corner_xy,corners_distances_angles=corner_dist_ang)
                 markers.append(marker)
             
         return gray, markers
@@ -94,6 +95,20 @@ class Video_Marker(object):
         
         return [xy1,xy2,xy3,xy4]
         
+
+    def order_corners(self, corners_xy):
+        
+        mX = sum(x[0] for x in corners_xy) / len(corners_xy)
+        mY = sum(x[1] for x in corners_xy) / len(corners_xy)
+        
+        def rectangle_sort(x):
+            return (np.arctan2(x[0] - mY, x[1] - mX) + 2.0 * np.pi) % (2.0*np.pi)
+    
+        corners_xy.sort(key=rectangle_sort)
+        
+    
+
+    
     def get_corners_polar(self, corners_xy, camMat, camDist):
         
         corners_dist_ang = {}
@@ -104,12 +119,15 @@ class Video_Marker(object):
         
         W = 0.2  # meter size of marker
       
+        # The corners are not always ordered in the expected way. To standardise this
+        # they are ordered in the next method
+        #self.order_corners(corners_xy)
+        
         for i in range(0,len(corners_xy)-1):
             
             # A complete line is needed for distance calculation
             # because we compare the size of that found line with
             # the known size of the line
-            
             x = corners_xy[i][0]
             x_ = corners_xy[i+1][0]
             y = corners_xy[i][1]
@@ -117,20 +135,18 @@ class Video_Marker(object):
       
             # The method returns the angle to point x,y    
             distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
-            
-            
+        
             corners_dist_ang[i]={'corner_id':i,'distance':distance,'angle':angle}
             
+        
         # We do the calculation again for the final distance, we did not do before in the loop
         # which goes from the last to the first corner    
         x = corners_xy[3][0]
         x_ = corners_xy[0][0]
         y = corners_xy[3][1]
         y_ = corners_xy[0][1]
-        
         # The method returns the angle to point x,y
         distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
-
         corners_dist_ang[3]={'corner_id':3,'distance':distance,'angle':angle}        
             
         return corners_dist_ang

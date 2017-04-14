@@ -31,49 +31,70 @@ class Area_Visualizer(object):
         # Reduce confidence for each marker in the persistent list, if there are any yet
         for marker_id in self.persistent_markers:
             self.persistent_markers[marker_id].confidence = self.persistent_markers[marker_id].confidence-0.1
-            
+        
+        
+        
         # Add markers to list, overwriting old markers and thereby increasing confidence levels
         for marker in markers:
-            self.persistent_markers[marker.id]=marker
+            self.persistent_markers[str(marker.id)]=marker
+        
+        
         
         # Now draw lines onto new window
         for marker_id in self.persistent_markers:
             
-            marker = self.persistent_markers[marker_id]
-     
-    
+            marker = self.persistent_markers[marker_id] 
+            
             # Draw marker outline at the bottom of the screen
             xy1 = marker.corners_xy_pos[0]
             xy2 = marker.corners_xy_pos[1]
-            xy3 = marker.corners_xy_pos[3]
-            xy4 = marker.corners_xy_pos[2]
+            xy3 = marker.corners_xy_pos[2]
+            xy4 = marker.corners_xy_pos[3]
             
             cv2.line(img2,(xy1[0],xy1[1]+shift_factor),(xy2[0],xy2[1]+shift_factor),(0,0,255*marker.confidence),1)
             cv2.line(img2,(xy2[0],xy2[1]+shift_factor),(xy3[0],xy3[1]+shift_factor),(0,0,255*marker.confidence),1)
             cv2.line(img2,(xy3[0],xy3[1]+shift_factor),(xy4[0],xy4[1]+shift_factor),(0,0,255*marker.confidence),1)
             cv2.line(img2,(xy4[0],xy4[1]+shift_factor),(xy1[0],xy1[1]+shift_factor),(0,0,255*marker.confidence),1)
-            
-            
+
             # Draw top view outline
-            distance_a = marker.corners_distances_angles[0]['distance']
-            angle_a = marker.corners_distances_angles[0]['angle']
             
-            distance_b = marker.corners_distances_angles[1]['distance']
-            angle_b = marker.corners_distances_angles[1]['angle']
+            if marker_id=='[159]':
+                distance_a = marker.corners_distances_angles[0]['distance']
+                angle_a = marker.corners_distances_angles[0]['angle']
             
-            print(np.abs(distance_a - distance_b))
-            #
-            x_a,y_a = cv2.polarToCart(distance_a,angle_a-turn_factor)
+                distance_b = marker.corners_distances_angles[1]['distance']
+                angle_b = marker.corners_distances_angles[1]['angle']
             
-            x_a[0] = x_a[0] * scale_factor + shift_factor
-            y_a[0] = y_a[0] * scale_factor + shift_factor
+                distance_c = marker.corners_distances_angles[2]['distance']
+                angle_c = marker.corners_distances_angles[2]['angle']
             
-            x_b,y_b = cv2.polarToCart(distance_b,angle_b-turn_factor)
-            x_b[0] = x_b[0] * scale_factor + shift_factor
-            y_b[0] = y_b[0] * scale_factor + shift_factor
-            cv2.line(img2,(x_a[0],y_a[0]),(x_b[0],y_b[0]),(0,0,255*marker.confidence),1)
+                distance_d = marker.corners_distances_angles[3]['distance']
+                angle_d = marker.corners_distances_angles[3]['angle']
             
-            
+                x_a,y_a = cv2.polarToCart(distance_a,angle_a-turn_factor)
+                x_a[0] = x_a[0] * scale_factor + shift_factor
+                y_a[0] = y_a[0] * scale_factor + shift_factor
+                
+                x_b,y_b = cv2.polarToCart(distance_b,angle_b-turn_factor)
+                x_b[0] = x_b[0] * scale_factor + shift_factor
+                y_b[0] = y_b[0] * scale_factor + shift_factor
+                
+                x_c,y_c = cv2.polarToCart(distance_c,angle_c-turn_factor)
+                x_c[0] = x_c[0] * scale_factor + shift_factor
+                y_c[0] = y_c[0] * scale_factor + shift_factor
+                
+                x_d,y_d = cv2.polarToCart(distance_d,angle_d-turn_factor)
+                x_d[0] = x_d[0] * scale_factor + shift_factor
+                y_d[0] = y_d[0] * scale_factor + shift_factor
+                
+                
+                #print(x_a[0],y_a[0])
+                #cv2.line(img2,(x_a[0],y_a[0]),(x_b[0],y_b[0]),(0,0,255*marker.confidence),1)
+                cv2.circle(img2,(x_a[0],y_a[0]),2,(0,0,255*marker.confidence),-1)
+                cv2.circle(img2,(x_b[0],y_b[0]),2,(0,0,255*marker.confidence),-1)
+                cv2.circle(img2,(x_c[0],y_c[0]),2,(0,0,255*marker.confidence),-1)
+                cv2.circle(img2,(x_d[0],y_d[0]),2,(0,0,255*marker.confidence),-1)
+                #circle(img, center, radius, color[, thickness[, lineType[, shift]]]) 
             # Draw outer viewport lines
             x_orig,y_orig = cv2.polarToCart(0.0,0.0-turn_factor)
             x_dest,y_dest = cv2.polarToCart(8.0,0.0-turn_factor)
