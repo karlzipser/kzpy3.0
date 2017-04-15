@@ -35,18 +35,18 @@ class Marker_Handler:
         while True:
             if not paused_video:
                 image = bagfile_handler.get_image()
-                gray,markers = image_marker.process_next_image( image) 
+                gray,markers = image_marker.process_next_image(image) 
             
-            cv2.imshow('frame',gray)
-            key = cv2.waitKey(1000/60) & 0xFF
-            if key == ord('q'):
-                break
-            if key == ord(' '):
-                paused_video = not paused_video
-            if key == ord('w'):
-                bagfile_handler.fast_forward()
-            if not paused_video:
-                self.area_visualizer.visualize_markers_center_line(markers)
+            #cv2.imshow('frame',gray)
+            #key = cv2.waitKey(1000/60) & 0xFF
+            #if key == ord('q'):
+            #    break
+            #if key == ord(' '):
+            #    paused_video = not paused_video
+            #if key == ord('w'):
+            #    bagfile_handler.fast_forward()
+            #if not paused_video:
+            #    self.area_visualizer.visualize_markers_center_line(markers)
             
 
 if len(sys.argv) < 2:
