@@ -44,9 +44,10 @@ use_caffe = True
 steer_gain = 1.0
 motor_gain = 1.0
 gyro_freeze_threshold = 500
-acc_freeze_threshold_x = 10
-acc_freeze_threshold_y = 10
-acc_freeze_threshold_z = 10
+acc_freeze_threshold_x = 12
+acc_freeze_threshold_y = 12
+acc_freeze_threshold_z = 12
+acc_freeze_threshold_z_neg = -7
 motor_freeze_threshold = 60
 #
 ###################################################################
