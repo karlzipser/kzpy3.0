@@ -26,6 +26,8 @@ class Marker_Handler:
         # create persistent aruco marker dict                       
         self.play_video(bagfile_handler,image_marker)
 
+    
+
     def play_video(self,bagfile_handler,image_marker):
           
         paused_video = False
@@ -41,7 +43,8 @@ class Marker_Handler:
                 break
             if key == ord(' '):
                 paused_video = not paused_video
-            
+            if key == ord('w'):
+                bagfile_handler.fast_forward()
             if not paused_video:
                 self.area_visualizer.visualize_markers_center_line(markers)
             

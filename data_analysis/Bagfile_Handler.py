@@ -24,3 +24,8 @@ class Bagfile_Handler(object):
         topic, msg, t = self.bag_access.next() 
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         return t, cv_image
+
+    
+    def fast_forward(self):
+        for i in range(0,60):
+            self.bag_access.next()
