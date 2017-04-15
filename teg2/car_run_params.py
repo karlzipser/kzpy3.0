@@ -40,7 +40,7 @@ solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf7/z2_color/solver_state_1_5_6_7_plus_extra_Smyth_racing_iter_400000.caffemodel")
 weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
 verbose = False
-use_caffe = False
+use_caffe = True
 steer_gain = 1.0
 
 gyro_freeze_threshold = 500
@@ -58,7 +58,7 @@ if computer_name == 'Mr_Silver':
 	motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue':
-	motor_gain = 1.0
+	motor_gain = 0.8
 	pass
 if computer_name == 'Mr_Blue_Original':
 	motor_gain = 0.5
@@ -82,7 +82,7 @@ if computer_name == 'Mr_LightBlue':
 	motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Yellow':
-	motor_gain = 1.2
+	motor_gain = 0.8
 	pass
 
 #
