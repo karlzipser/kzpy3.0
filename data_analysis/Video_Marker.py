@@ -13,10 +13,10 @@ from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
-from bakKzpy3.caf6.z2_color.train2 import steer
 
 
-safety_distance = 2.0 # meter
+
+safety_distance = 1.0 # meter
 
 
 class Video_Marker(object):
@@ -24,9 +24,12 @@ class Video_Marker(object):
     capture_device = None
     board = Board()
     markers = []
+    bagfile_handler = None
+    
 
-    def __init__(self, capture_device=None):
+    def __init__(self, bagfile_handler, capture_device=None):
         
+        self.bagfile_handler = bagfile_handler
         if capture_device != None:
             self.capture_device = capture_device
             
@@ -36,7 +39,7 @@ class Video_Marker(object):
             self.capture_device = capture_device    
             
        
-    def process_next_image(self, timestamp, cv_image=None):
+    def process_next_image(self, cv_image=None):
         
         if(self.capture_device == None):
             return self.mark_next_image(cv_image)
@@ -59,8 +62,8 @@ class Video_Marker(object):
         
         '''
         motor_command = -1
-        max_left_steering_angle = np.deg2rad(-180)
-        max_right_steering_angle = np.deg2rad(180)
+        max_left_steering_angle = np.deg2rad(-130)
+        max_right_steering_angle = np.deg2rad(130)
         
         max_left_command = 0
         max_right_command = 100
@@ -69,6 +72,12 @@ class Video_Marker(object):
         right_range = 50
         
         min_distance = 9999
+        
+        critical_distance = 1.0
+        stop_distance = 0.5
+        
+        max_motor = 100
+        forward_range = 51
         
         # Lets just say it is not straightforward to calculate an
         # average angle
@@ -88,22 +97,20 @@ class Video_Marker(object):
         else:
             # Opposite angle is within our steerable area
             # It is necessary to know if left or right to go though
+            mid_steering_command = (max_right_command-max_left_command)/2.0
             
             if opposite_angle < 0:
-                steering_command = (opposite_angle / np.pi)*left_range              
+                steering_command = (opposite_angle / np.pi)*left_range
+                           
             else:
                 steering_command = (opposite_angle / np.pi)*right_range 
             
             # Finally change the mapping from -50,50 to 0,100
-            
-            steering_command = max_right_command-steering_command 
+            steering_command = steering_command + mid_steering_command
+            #steering_command = 
         # Next, calculate a safe motor command
         
-        critical_distance = 1.5
-        stop_distance = 0.5
-        
-        max_motor = 100
-        forward_range = 51
+       
         
         # If the average obstacle is in front of us....
         if(np.deg2rad(-45) < average_angle < np.deg2rad(45)):
@@ -169,6 +176,8 @@ class Video_Marker(object):
             # If an evasion is needed draw onto the image safe values
             if(evasion_needed):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
+                self.bagfile_handler.evasion_data.append({'timestamp':self.bagfile_handler.timestamp,'motor_command':safe_motor,'steering_command':safe_steer})
+                
                 cv2.putText(gray, str(np.round(safe_motor,2)) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
         return gray, markers

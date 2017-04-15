@@ -20,7 +20,7 @@ class Marker_Handler:
     def __init__(self, arguments):
         
         bagfile_handler = Bagfile_Handler(arguments)
-        image_marker = Video_Marker() 
+        image_marker = Video_Marker(bagfile_handler) 
         self.area_visualizer = Area_Visualizer()
 
         # create persistent aruco marker dict                       
@@ -34,8 +34,8 @@ class Marker_Handler:
         
         while True:
             if not paused_video:
-                timestamp, image = bagfile_handler.get_image()
-                gray,markers = image_marker.process_next_image(timestamp, image) 
+                image = bagfile_handler.get_image()
+                gray,markers = image_marker.process_next_image( image) 
             
             cv2.imshow('frame',gray)
             key = cv2.waitKey(1000/60) & 0xFF
