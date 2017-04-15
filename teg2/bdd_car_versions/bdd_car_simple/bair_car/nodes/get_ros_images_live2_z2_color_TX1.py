@@ -129,7 +129,7 @@ try:
 		acc = msg
 		if np.abs(acc.z) > acc_freeze_threshold_z:
 			freeze = True
-		if acc.y < 0:
+		if acc.y < -5:
 			freeze = True
 		if np.abs(acc.x) > acc_freeze_threshold_x:
 			freeze = True
