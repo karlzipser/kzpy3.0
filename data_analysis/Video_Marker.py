@@ -13,6 +13,7 @@ from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
+from bakKzpy3.caf6.z2_color.train2 import steer
 
 
 safety_distance = 2.0 # meter
@@ -58,8 +59,8 @@ class Video_Marker(object):
         
         '''
         motor_command = -1
-        max_left_steering_angle = np.deg2rad(-90)
-        max_right_steering_angle = np.deg2rad(90)
+        max_left_steering_angle = np.deg2rad(-180)
+        max_right_steering_angle = np.deg2rad(180)
         
         max_left_command = 0
         max_right_command = 100
@@ -84,15 +85,18 @@ class Video_Marker(object):
             steering_command = max_left_command
         elif opposite_angle > max_right_steering_angle:
             steering_command = max_right_command
-
-        # Opposite angle is within our steerable area
-        # It is necessary to know if left or right to go though
-        
-        if opposite_angle < 0:
-            steering_command = (opposite_angle / np.pi)*left_range              
         else:
-            steering_command = (opposite_angle / np.pi)*right_range 
-        
+            # Opposite angle is within our steerable area
+            # It is necessary to know if left or right to go though
+            
+            if opposite_angle < 0:
+                steering_command = (opposite_angle / np.pi)*left_range              
+            else:
+                steering_command = (opposite_angle / np.pi)*right_range 
+            
+            # Finally change the mapping from -50,50 to 0,100
+            
+            steering_command = max_right_command-steering_command 
         # Next, calculate a safe motor command
         
         critical_distance = 1.5
@@ -106,7 +110,8 @@ class Video_Marker(object):
             if(min_distance < 0.5):
                 motor_command = 49.0
             elif (min_distance < 1.5):
-                motor_command = (min_distance/1.5)*forward_range
+                motor_command = max_motor-(min_distance/1.5)*forward_range
+        
         
         
         #safe_motor, safe_steer
@@ -164,7 +169,7 @@ class Video_Marker(object):
             # If an evasion is needed draw onto the image safe values
             if(evasion_needed):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
-                cv2.putText(gray, str(safe_motor) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 0, 255), 3)
+                cv2.putText(gray, str(np.round(safe_motor,2)) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
         return gray, markers
     
