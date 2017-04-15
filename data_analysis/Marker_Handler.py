@@ -32,7 +32,8 @@ class Marker_Handler:
         
         while True:
             if not paused_video:
-                gray,markers = image_marker.get_next_image(bagfile_handler.get_image()) 
+                timestamp, image = bagfile_handler.get_image()
+                gray,markers = image_marker.process_next_image(timestamp, image) 
             
             cv2.imshow('frame',gray)
             key = cv2.waitKey(1000/60) & 0xFF
@@ -42,7 +43,7 @@ class Marker_Handler:
                 paused_video = not paused_video
             
             if not paused_video:
-                self.area_visualizer.visualize_markers(markers)
+                self.area_visualizer.visualize_markers_center_line(markers)
             
 
 if len(sys.argv) < 2:

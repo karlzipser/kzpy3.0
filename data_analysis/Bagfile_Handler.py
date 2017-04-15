@@ -5,6 +5,7 @@ Created on Apr 11, 2017
 '''
 import rosbag
 from cv_bridge import CvBridge
+import sys
 
 class Bagfile_Handler(object):
     
@@ -22,4 +23,4 @@ class Bagfile_Handler(object):
     def get_image(self):
         topic, msg, t = self.bag_access.next() 
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-        return cv_image
+        return t, cv_image

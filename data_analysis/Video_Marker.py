@@ -13,6 +13,10 @@ from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
+from bakKzpy3.RPi3.drive_server_RPi import left_range
+
+
+safety_distance = 2.0 # meter
 
 
 class Video_Marker(object):
@@ -32,7 +36,8 @@ class Video_Marker(object):
             self.capture_device = capture_device    
             
        
-    def get_next_image(self, cv_image=None):
+    def process_next_image(self, timestamp, cv_image=None):
+        
         if(self.capture_device == None):
             return self.mark_next_image(cv_image)
         else:
@@ -42,6 +47,45 @@ class Video_Marker(object):
     def read_next_image(self):
         return self.capture_device.read()
 
+
+    def get_safe_commands(self, critical_dist_angle_pairs):
+        
+        max_left_steering_angle = np.deg2rad(-90)
+        max_right_steering_angle = np.deg2rad(90)
+        
+        max_left_command = 0
+        max_right_command = 100
+        
+        left_range = 50
+        right_range = 50
+        
+        # Lets just say it is not straightforward to calculate an
+        # average angle
+        for crit_pair in critical_dist_angle_pairs:
+            sum_sinuses = np.sin(crit_pair['angle'])
+            sum_cosinuses = np.cos(crit_pair['angle'])
+            
+        average_angle = np.arctan(sum_sinuses/sum_cosinuses)    
+            
+        opposite_angle =( (average_angle + np.pi) + np.pi) % (2 * np.pi ) - np.pi 
+        
+        if opposite_angle < max_left_steering_angle:
+            steering_command = max_left_command
+        elif opposite_angle > max_right_steering_angled:
+            steering_command = max_right_command
+
+        # Opposite angle is within our steerable area
+        # It is necessary to know if left or right to go though
+        
+        if opposite_angle < 0:
+            steering_command = (opposite_angle / np.pi)*left_range              
+        else:
+            steering_command = (opposite_angle / np.pi)*right_range 
+        
+        
+        return 0.0,0.0
+    
+    
     def mark_next_image(self, cv_image, crop=False):
                 
         frame = cv_image
@@ -64,6 +108,8 @@ class Video_Marker(object):
         gray = frame
         markers = []
         
+        evasion_needed = False
+        
         if len(corners) > 0:
             gray = aruco.drawDetectedMarkers(frame, corners)            
             try:
@@ -71,20 +117,53 @@ class Video_Marker(object):
             except:
                 pass
             
+            critical_dist_angle_pairs = []
+            
             for i in range(0, len(rvec)):
                 # Get two dictionaries with xy positions about the corners of one marker and calculate also distance and angle to them
-                corner_xy, corner_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
+                center_line_xy, center_line_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
                 # They are drawn onto the current image
-                self.drawPointAtSingleMarker(gray, corner_xy, corner_dist_ang)
-                # Finally they are filled in the marker data object
+                self.drawPointAtSingleMarker(gray, center_line_xy, center_line_dist_ang)
                 
-                marker = Marker(ids[i], confidence=1.0, corners_xy_pos=corner_xy, corners_distances_angles=corner_dist_ang)
+                if(center_line_dist_ang['distance'] < safety_distance):
+                    critical_dist_angle_pairs.append(center_line_dist_ang)
+                    evasion_needed = True
+                
+                # Finally they are filled in the marker data object
+                # PUT DICT SAVING HERE
+                marker = Marker(ids[i], confidence=1.0, center_line_xy=center_line_xy, center_line_dist_ang=center_line_dist_ang)
                 markers.append(marker)
+            
+            # If an evasion is needed draw onto the image safe values
+            if(evasion_needed):
+                safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
+                cv2.putText(gray, str(str(safe_motor) + "," + str(safe_steer)), [300,300], cv2.FONT_HERSHEY_SIMPLEX, 6, (255, 255, 255), 2)
             
         return gray, markers
     
-    def get_corners_xy(self, image, rvec, tvec, camMat, camDist):
+    def get_center_line_xy(self,image,rvec,tvec,camMat,camDist):
+        length = 0.2
+        axisPoints = np.array([[-length/2.0, 0, 0],[length/2.0, 0, 0]])
+        imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
         
+        # The points will be ordered according to their y axis so that even markers which are upside down
+        # look the same to the algorithm
+        
+        if(int(imgpts[0][0][1]) < int(imgpts[1][0][1])):
+            xy1 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
+            xy2 = (int(imgpts[1][0][0]), int(imgpts[1][0][1]))
+        else:
+            xy2 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
+            xy1 = (int(imgpts[1][0][0]), int(imgpts[1][0][1]))
+  
+        return [xy1,xy2]
+    
+    def get_corners_xy(self, image, rvec, tvec, camMat, camDist):
+        '''
+        Returns four different points for each corner right now in a 
+        strange order. This is a bug in general it works though.
+        Working on a different method now so this have to be improved later
+        '''
         length = 0.2
         axisPoints = np.array([[-length / 2, -length / 2, 0], [-length / 2, length / 2, 0], [length / 2, -length / 2, 0], [length / 2, length / 2, 0]])
         imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
@@ -107,6 +186,26 @@ class Video_Marker(object):
         corners_xy[2] = corners_xy[3]
         corners_xy[3] = tmp
         
+    
+    def get_center_line_polar(self, rvec, tvec, center_line_xy, camMat, camDist):
+        center_line_dist_ang = []
+        
+        # distance D from our camera.
+        # object width in pixels P
+        # Focal length F
+        
+        W = 0.2  # meter size of marker
+      
+        x = center_line_xy[0][0]
+        x_ = center_line_xy[1][0]
+        y = center_line_xy[0][1]
+        y_ = center_line_xy[1][1]
+        
+        # The method returns the angle to point x,y    
+        distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
+        center_line_dist_ang = {'distance':distance, 'angle':angle}        
+            
+        return center_line_dist_ang
     
     def get_corners_polar(self, rvec, tvec, corners_xy, camMat, camDist):
         
@@ -154,25 +253,29 @@ class Video_Marker(object):
         '''
         Method to compute the position, distance and angle to the markers
         '''
+        # Changed the approach to mark only the middle
+        # corners_xy = self.get_corners_xy(image, rvec, tvec, camMat, camDist)
         
-        corners_xy = self.get_corners_xy(image, rvec, tvec, camMat, camDist)
+        center_line_xy = self.get_center_line_xy(image, rvec, tvec, camMat, camDist)
+        
         # Now we need the distance and angle to determine the appropriate size of 
         # text, drawn onto the markers. 
-        corners_dist_ang = self.get_corners_polar(rvec, tvec, corners_xy, camMat, camDist)  
+        center_line_dist_ang = self.get_center_line_polar(rvec, tvec, center_line_xy, camMat, camDist)  
         
-        return corners_xy, corners_dist_ang
+        return center_line_xy, center_line_dist_ang
     
-    def drawPointAtSingleMarker(self, image, corners_xy, corners_dist_ang):
+    def drawPointAtSingleMarker(self, image, center_line_xy, center_line_dist_ang):
         '''
         This method draws single markers and their distances 
         '''        
         # Just draw something on one corner because otherwise the screen will be too cluttered
-        xy1 = (corners_xy[0][0], corners_xy[0][1])
-        
+        xy1 = (center_line_xy[0][0], center_line_xy[1][1])
+    
         # Again the distance and angle of the first
         # marker is used here because for the textsize, this is adequate  
-        distance = corners_dist_ang['corner_id' == 0]['distance']
-        angle = corners_dist_ang['corner_id' == 0]['angle']
+        
+        distance = center_line_dist_ang['distance']
+        angle = center_line_dist_ang['angle']
           
         # 8 is arbitrary and here approximately the biggest measured distance
         text_zoomfactor = 1 - (distance / (12 - distance))
@@ -181,7 +284,8 @@ class Video_Marker(object):
         if text_zoomfactor > 1:
             text_zoomfactor = 1
         
-        cv2.putText(image, str(np.round(distance,1)), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
+        cv2.putText(image, str(np.round(distance,2)), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
+        
         # cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
 
     def get_distance_and_angle_of_line(self, real_object_width_m, (px, py), (px_, py_), camMat, camDist):
