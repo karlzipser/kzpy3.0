@@ -571,6 +571,8 @@ def nvidia_smi_continuous(t=0.1):
         unix('nvidia-smi')
         time.sleep(t)
 
+
+
 class Timer:
     def __init__(self, time_s):
         self.time_s = time_s
@@ -580,8 +582,13 @@ class Timer:
             return True
         else:
             return False
+    def time(self):
+        return time.time() - self.start_time
     def reset(self):
         self.start_time = time.time()
+
+  
+
 
 def fname(path):
     return path.split('/')[-1]
