@@ -15,7 +15,7 @@ BUTTON_DELTA = 50
 
 
 
-ACM_port='/dev/ttyACM1'
+ACM_port='/dev/ttyACM0'
 baudrate=115200
 timeout=0.25
 Arduinos = {}
