@@ -39,6 +39,9 @@ steer_pwm_lst = []
 steer_pwm_out_lst = []
 motor_pwm_lst = []
 motor_pwm_out_lst = []
+steer_pwm_write_lst = []
+motor_pwm_write_lst = []
+encoder_lst = []
 
 n_avg_steer_pwm_out = 50
 n_avg_motor_pwm_out = 50
@@ -67,8 +70,8 @@ motor_max = buttons[4]
 steer_min = buttons[1]
 motor_min = buttons[1]
 
-steer_null = 0
-motor_null = 0
+steer_null = 1400
+motor_null = 1500
 
 if GRAPHICS:
     steer_max_lst = []
@@ -90,16 +93,19 @@ while True:
 
         t1 = time.time()
         t0 = t1
-        try:
-            exec('motor_data = list({0})'.format(read_str))
-        except:
-            pass
+        
+        exec('motor_data = list({0})'.format(read_str))
+
         #print len(motor_data)
-        if len(motor_data) == 4:
+        if len(motor_data) == 7:
             button_pwm_lst.append(motor_data[1])
             steer_pwm_lst.append(motor_data[2])
             motor_pwm_lst.append(motor_data[3])
+            steer_pwm_write_lst.append(motor_data[4])
+            motor_pwm_write_lst.append(motor_data[5])
+            encoder_lst.append(motor_data[6])
         else:
+            print "not 6"
             continue
 
 
@@ -134,6 +140,12 @@ while True:
             motor_pwm_out_lst = motor_pwm_out_lst[-n_lst_steps:]
         if len(button_pwm_out_lst) > n_lst_steps*1.2:
             button_pwm_out_lst = button_pwm_out_lst[-n_lst_steps:]        
+        if len(steer_pwm_write_lst) > n_lst_steps*1.2:
+            steer_pwm_write_lst = steer_pwm_write_lst[-n_lst_steps:]        
+        if len(motor_pwm_write_lst) > n_lst_steps*1.2:
+            motor_pwm_write_lst = motor_pwm_write_lst[-n_lst_steps:]        
+        if len(encoder_lst) > n_lst_steps*1.2:
+            encoder_lst = encoder_lst[-n_lst_steps:]        
 
 
         if state == 4:
@@ -190,7 +202,7 @@ while True:
                 plot(steer_max_lst[-1000:],'r:'); plot(motor_max_lst[-1000:],'b:');
                 plot(steer_pwm_out_lst[-1000:],'k'); plot(motor_pwm_out_lst[-1000:],'k'); plot(button_pwm_out_lst[-1000:],'k')
                 plot(steer_pwm_lst[-1000:],'r'); plot(motor_pwm_lst[-1000:],'b'); plot(button_pwm_lst[-1000:],'g')
-                
+                plot(steer_pwm_write_lst[-1000:],'g'); plot(motor_pwm_write_lst[-1000:],'g'); plot(array(encoder_lst[-1000:])*300+800,'c')                
                 pause(0.0000000001)            
                 steer_motor_timer.reset()
 
