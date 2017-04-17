@@ -25,7 +25,7 @@ class Area_Visualizer(object):
         # factor is chosen
         scale_factor = 300.0 * (1.0/8.0)
         shift_factor = 300
-        turn_factor = np.deg2rad(110.0/2.0)+np.pi/2
+        turn_factor = np.deg2rad(110.0/2.0)+np.pi/2.0 # division by int gives integer
         
         # Reduce confidence for each marker in the persistent list, if there are any yet
         for marker_id in self.persistent_markers:
