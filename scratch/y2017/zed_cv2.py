@@ -1,10 +1,13 @@
 #use 1 for usb camera, 0 for internal macbook webcam
-cap = cv2.VideoCapture(1)
+from kzpy3.utils import *
+import cv2
+
+cap = cv2.VideoCapture(0)
 cap.set(3, 672*2/4)
 cap.set(4, 376/4)
 cap.set(15,-8)
 deltas = []
-cap2 = cv2.VideoCapture(1)
+cap2 = cv2.VideoCapture(0)
 cap2.set(3, 672*2) # 2560x720
 cap2.set(4, 376)
 cap2.set(11,30)
@@ -23,7 +26,7 @@ while(True):
 
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 	    break
-	cv2.imwrite(opjD('images',d2n(ctr,'.jpg')),frame)
+	#cv2.imwrite(opjD('images',d2n(ctr,'.jpg')),frame)
 	t1 = time.time()
 	while t1-t0 < 0.030:
 		t1 = time.time()
