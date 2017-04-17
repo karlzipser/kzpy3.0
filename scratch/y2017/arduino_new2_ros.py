@@ -1,11 +1,32 @@
 import os, serial, threading, Queue
 import threading
 from kzpy3.vis import *
+import std_msgs.msg
+import rospy
 
-"""
-sudo chmod 666 /dev/ttyACM*
 
-"""
+button_in = 0
+def button_in_callback(msg):
+    global button_in
+    button_in = msg.data
+steer_in = 0
+def steer_in_callback(msg):
+    global steer_in
+    steer_in = msg.data
+motor_in = 0
+def motor_in_callback(msg):
+    global motor_in
+    motor_in = msg.data
+
+
+rospy.init_node('listener',anonymous=True)
+
+rospy.Subscriber('bair_car/button_in', std_msgs.msg.Int32, callback=button_in_callback)
+rospy.Subscriber('bair_car/steer_in', std_msgs.msg.Int32, callback=steer_in_callback)
+rospy.Subscriber('bair_car/motor_in', std_msgs.msg.Int32, callback=motor_in_callback)
+
+
+
 
 buttons = [0,1900,1700,1424,870]
 BUTTON_DELTA = 50
@@ -47,8 +68,8 @@ n_avg_button_pwm_out = 4
 
 
 hist_timer = Timer(30)
-steer_motor_timer = Timer(1)
-state_timer = Timer(1)
+steer_motor_timer = Timer(0.1)
+state_timer = Timer(0.1)
 
 
 
@@ -84,23 +105,13 @@ mse = 'mse'
 
 while True:
 
-    try:        
-        read_str = Arduinos['motor'].readline()
-        #print read_str
+       
 
-        t1 = time.time()
-        t0 = t1
-        try:
-            exec('motor_data = list({0})'.format(read_str))
-        except:
-            pass
-        #print len(motor_data)
-        if len(motor_data) == 4:
-            button_pwm_lst.append(motor_data[1])
-            steer_pwm_lst.append(motor_data[2])
-            motor_pwm_lst.append(motor_data[3])
-        else:
-            continue
+
+        button_pwm_lst.append(button_in)
+        steer_pwm_lst.append(steer_in)
+        motor_pwm_lst.append(motor_in)
+
 
 
         if len(steer_pwm_out_lst) >= n_avg_steer_pwm_out:
@@ -191,15 +202,14 @@ while True:
                 plot(steer_pwm_out_lst[-1000:],'k'); plot(motor_pwm_out_lst[-1000:],'k'); plot(button_pwm_out_lst[-1000:],'k')
                 plot(steer_pwm_lst[-1000:],'r'); plot(motor_pwm_lst[-1000:],'b'); plot(button_pwm_lst[-1000:],'g')
                 
-                pause(0.0000000001)            
+                pause(0.0001)            
                 steer_motor_timer.reset()
 
 
 
 
     
-    except Exception as e:
-        print e
+
     
 
 
