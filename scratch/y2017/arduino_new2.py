@@ -86,7 +86,7 @@ while True:
 
     try:        
         read_str = Arduinos['motor'].readline()
-        #print read_str
+        print read_str
 
         t1 = time.time()
         t0 = t1
