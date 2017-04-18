@@ -25,7 +25,7 @@ class Area_Visualizer(object):
         # factor is chosen
         scale_factor = 300.0 * (1.0/8.0)
         shift_factor = 300
-        turn_factor = np.deg2rad(110.0/2.0)+np.pi/2.0 # division by int gives integer
+        turn_factor = np.deg2rad(110.0/2.0)+np.pi/4.0 # division by int gives integer
         
         # Reduce confidence for each marker in the persistent list, if there are any yet
         for marker_id in self.persistent_markers:
@@ -60,6 +60,7 @@ class Area_Visualizer(object):
             #ircle(img, center, radius, color[, thickness[, lineType[, shift]]]) 
                 
             # Draw outer viewport lines
+            '''
             x_orig,y_orig = cv2.polarToCart(0.0,0.0-turn_factor)
             x_dest,y_dest = cv2.polarToCart(8.0,0.0-turn_factor)
             x_orig[0] = x_orig[0] * scale_factor + shift_factor
@@ -79,7 +80,7 @@ class Area_Visualizer(object):
             y_dest_max[0] = y_dest_max[0] * scale_factor + shift_factor
             
             cv2.line(img2,(x_orig_max[0],y_orig_max[0]),(x_dest_max[0],y_dest_max[0]),(255,255,255),1)
-            
+            '''
             
         cv2.imshow('topView',img2)
         cv2.moveWindow('topView',700,0)

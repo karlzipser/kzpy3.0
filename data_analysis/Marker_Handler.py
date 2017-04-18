@@ -18,16 +18,18 @@ class Marker_Handler:
     detected_markers = {}
     area_visualizer = None
     source_local_camera = True
+    show_video = True
     
     def __init__(self, arguments):
         
         
-        # bagfile_handler = Bagfile_Handler(arguments)#
-        capture_device = cv2.VideoCapture(1)
-        image_marker = Video_Marker(None,capture_device) 
+        bagfile_handler = Bagfile_Handler(arguments)#
+        #capture_device = cv2.VideoCapture(1)
+        #image_marker = Video_Marker(None,capture_device) 
+        image_marker = Video_Marker(bagfile_handler,None)
         self.area_visualizer = Area_Visualizer()
                     
-        self.play_video(None,capture_device,image_marker)
+        self.play_video(bagfile_handler,None,image_marker)
 
     
 
@@ -43,18 +45,18 @@ class Marker_Handler:
                     ret, image = capture_device.read()
                    
                 
-                cv_image, markers = image_marker.process_next_image(True,image) 
-            
-            cv2.imshow('frame',cv_image)
-            key = cv2.waitKey(1000/60) & 0xFF
-            if key == ord('q'):
-                break
-            if key == ord(' '):
-                paused_video = not paused_video
-            if key == ord('w'):
-                bagfile_handler.fast_forward()
-            if not paused_video:
-                self.area_visualizer.visualize_markers_center_line(markers)
+                cv_image, markers = image_marker.process_next_image(False,image) 
+            if(self.show_video):
+                cv2.imshow('frame',cv_image)
+                key = cv2.waitKey(1000/30) & 0xFF
+                if key == ord('q'):
+                    break
+                if key == ord(' '):
+                    paused_video = not paused_video
+                if key == ord('w'):
+                    bagfile_handler.fast_forward()
+                if not paused_video:
+                    self.area_visualizer.visualize_markers_center_line(markers)
             
 
 if len(sys.argv) < 2:
