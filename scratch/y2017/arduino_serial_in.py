@@ -1,7 +1,8 @@
-from kzpy3.utils import *
+from kzpy3.vis import *
 import arduino_MSE
 import arduino_IMU
 import arduino_SIG
+import arduino_motor_control
 import threading
 
 baudrate=115200
@@ -75,10 +76,13 @@ while not rospy.is_shutdown():
             pass
 """
 
-
+M = messages_dic
 
 def arduino_mse_thread():
     arduino_MSE.run_loop(Arduinos,messages_dic)
+
+def arduino_motor_control_thread():
+    arduino_motor_control.run_loop(messages_dic)
 
 def arduino_imu_thread():
     arduino_IMU.run_loop(Arduinos,messages_dic)
@@ -88,13 +92,28 @@ def arduino_sig_thread():
 
 def arduino_master_thread():
     while messages_dic['Stop_Arduinos'] == False:
-        #if False:#'state' in messages_dic:
-        #    print messages_dic['state']
+        try:
+            print messages_dic['steer_pwm_lst'][-1],M['steer_pwm_smooth_lst'][-1]
+            figure(1)
+            clf()
+            plot(M['steer_pwm_lst'][-100:],'b')
+            plot(M['steer_pwm_smooth_lst'][-100:],'r')
+            plot(M['motor_pwm_lst'][-100:],'b')
+            plot(M['motor_pwm_smooth_lst'][-100:],'r')
+            ylim(500,3000)
+            pause(0.0001)
+        except:
+            pass
+        #if 'acc' in messages_dic:
+        #    print messages_dic['acc']
         #else:
         #    messages_dic['state'] = np.random.choice([1,2,3,4])
         time.sleep(0.1)
 
+arduino_MSE.setup(messages_dic)
+#arduino_motor_control.setup(messages_dic)
 threading.Thread(target=arduino_mse_thread).start()
+#threading.Thread(target=arduino_motor_control_thread).start()
 threading.Thread(target=arduino_imu_thread).start()
 threading.Thread(target=arduino_sig_thread).start()
 threading.Thread(target=arduino_master_thread).start()
