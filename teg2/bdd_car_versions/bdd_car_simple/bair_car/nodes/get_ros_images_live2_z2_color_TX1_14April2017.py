@@ -127,14 +127,8 @@ try:
 	def acc_callback(msg):
 		global freeze
 		acc = msg
-		if np.abs(acc.z) > acc_freeze_threshold_z:
+		if np.abs(acc.z) > acc_freeze_threshold:
 			freeze = True
-		if acc.y < acc_freeze_threshold_z_neg:
-			freeze = True
-		if np.abs(acc.x) > acc_freeze_threshold_x:
-			freeze = True
-		#if np.abs(acc.y) > acc_freeze_threshold_y:
-		#	freeze = True
 
 	encoder_list = []
 	def encoder_callback(msg):
@@ -156,7 +150,6 @@ try:
 	rospy.Subscriber('/bair_car/state_transition_time_s', std_msgs.msg.Int32, state_transition_time_s_callback)
 	steer_cmd_pub = rospy.Publisher('cmd/steer', std_msgs.msg.Int32, queue_size=100)
 	motor_cmd_pub = rospy.Publisher('cmd/motor', std_msgs.msg.Int32, queue_size=100)
-	freeze_cmd_pub = rospy.Publisher('cmd/freeze', std_msgs.msg.Int32, queue_size=100)
 	model_name_pub = rospy.Publisher('/bair_car/model_name', std_msgs.msg.String, queue_size=10)
 	#rospy.Subscriber('/bair_car/GPS2_lat', std_msgs.msg.Float32, callback=GPS2_lat_callback)
 	#rospy.Subscriber('/bair_car/GPS2_long', std_msgs.msg.Float32, callback=GPS2_long_callback)
@@ -269,15 +262,13 @@ try:
 							caf_steer = 49
 							caf_motor = 49
 
-						freeze_cmd_pub.publish(std_msgs.msg.Int32(freeze))
-
+						if verbose:
+							print caf_motor,caf_steer,motor_gain,steer_gain,state
+						
 						if state in [3,6]:			
 							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
 						if state in [6,7]:
 							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
-
-						if verbose:
-							print caf_motor,caf_steer,motor_gain,steer_gain,state
 
 		else:
 			caffe_enter_timer.reset()

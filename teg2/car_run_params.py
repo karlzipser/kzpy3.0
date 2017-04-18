@@ -27,7 +27,7 @@ Play = 0.
 Furtive = 0.
 Caf = 0.0
 Racing = 0.0
-Location =  'Fern_aruco_1' # 'local' #'Smyth_tape'
+Location =  'caffe_Fern_aruco' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more.caffemodel")
@@ -42,9 +42,12 @@ weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
 verbose = False
 use_caffe = True
 steer_gain = 1.0
-
+motor_gain = 0.9
 gyro_freeze_threshold = 500
-acc_freeze_threshold = 10
+acc_freeze_threshold_x = 12
+acc_freeze_threshold_y = 12
+acc_freeze_threshold_z = 12
+acc_freeze_threshold_z_neg = -7
 motor_freeze_threshold = 60
 #
 ###################################################################
@@ -52,38 +55,41 @@ motor_freeze_threshold = 60
 ####################### specific car settings ################
 #
 if computer_name == 'Mr_Orange':
-	motor_gain = 1.0
+	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Silver':
-	motor_gain = 1.0
+	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue':
-	motor_gain = 0.8
+	motor_gain = 1.0
+	motor_freeze_threshold = 65
+	pass
+if computer_name == 'Mr_Yellow':
+	#motor_gain = 0.9
+	pass
+if computer_name == 'Mr_Black':
+	#motor_gain = 1.0
+	pass
+if computer_name == 'Mr_White':
+	#motor_gain = 1.0
+	pass
+
+if computer_name == 'Mr_Teal':
+	#motor_gain = 1.0
+	pass
+if computer_name == 'Mr_Audi':
+	#motor_gain = 1.0
+	pass
+if computer_name == 'Mr_Purple':
+	#motor_gain = 1.0
+	pass
+if computer_name == 'Mr_LightBlue':
+	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue_Original':
 	motor_gain = 0.5
 	pass
-if computer_name == 'Mr_White':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_Black':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_Teal':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_Audi':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_Purple':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_LightBlue':
-	motor_gain = 1.0
-	pass
-if computer_name == 'Mr_Yellow':
-	motor_gain = 0.8
-	pass
+
 
 #
 ###################################################################
