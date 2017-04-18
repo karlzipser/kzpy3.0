@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 
 from kzpy3.utils import *
-import arduino_MSE
-import arduino_IMU
-import arduino_SIG
-import arduino_serial_in
+import ard_MSE
+import ard_IMU
+import ard_SIG
+import ard_ser_in
 import threading
 
 
 
 def arduino_mse_thread():
-    arduino_MSE.run_loop(Arduinos,M)
+    ard_MSE.run_loop(Arduinos,M)
 
 def arduino_motor_control_thread():
-    arduino_motor_control.run_loop(M)
+    ard_motor_control.run_loop(M)
 
 def arduino_imu_thread():
-    arduino_IMU.run_loop(Arduinos,M)
+    ard_IMU.run_loop(Arduinos,M)
 
 def arduino_sig_thread():
-    arduino_SIG.run_loop(Arduinos,M)
+    ard_SIG.run_loop(Arduinos,M)
 
 def arduino_master_thread():
     while M['Stop_Arduinos'] == False:
@@ -37,8 +37,10 @@ def arduino_master_thread():
         except:
             pass
         """
-        #if 'acc' in M:
-        #    print M['acc']
+        try:
+            print((M['steer_percent'],M['motor_percent']))
+        except:
+            pass
         #else:
         #    M['state'] = np.random.choice([1,2,3,4])
         time.sleep(0.1)
@@ -49,8 +51,8 @@ M['Stop_Arduinos'] = False
 baudrate = 115200
 timeout = 0.1
 
-Arduinos = arduino_serial_in.assign_serial_connections(arduino_serial_in.get_arduino_serial_connections(baudrate,timeout))
-arduino_MSE.setup(M)
+Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
+ard_MSE.setup(M)
 threading.Thread(target=arduino_mse_thread).start()
 threading.Thread(target=arduino_imu_thread).start()
 threading.Thread(target=arduino_sig_thread).start()
