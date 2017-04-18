@@ -58,10 +58,10 @@ def run_loop(Arduinos,messages_dic,BUTTON_DELTA=50,n_lst_steps=100):
             continue
 
         if M['state'] == 3:
-            if M['encoder_lst'][-1] > 2:
-                M['motor_pwm_smooth_lst'][-1] -= 10*np.abs(M['encoder_lst'][-1]-2.5)/10.0
-            elif M['encoder_lst'][-1] < 1:
-                M['motor_pwm_smooth_lst'][-1] += 10*np.abs(M['encoder_lst'][-1]-1.5)/10.0
+            if M['encoder_lst'][-1] > 1:
+                M['motor_pwm_smooth_lst'][-1] -= 10*np.abs(M['encoder_lst'][-1]-0.75)/10.0
+            elif M['encoder_lst'][-1] < 0.5:
+                M['motor_pwm_smooth_lst'][-1] += 10*np.abs(M['encoder_lst'][-1]-0.75)/10.0
             print M['motor_pwm_smooth_lst'][-1],M['encoder_lst'][-1]
             M['external_write_str_B'] = d2n( '(', int(M['steer_pwm_smooth_lst'][-1]), ',', int(M['motor_pwm_smooth_lst'][-1]+10000), ')')
                 #print M['external_write_str_B']
