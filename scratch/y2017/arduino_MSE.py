@@ -1,16 +1,17 @@
 import threading
 from kzpy3.utils import *
 
-state_transition_timer = Timer(0)
-n_avg_steer = 25
-n_avg_motor = 15
-n_avg_button = 15
-n_avg_encoder = 15
+
+
 ##############################################################3
 #
-def setup(messages_dic,buttons=[0,1900,1700,1424,870]):
+def setup(M,buttons=[0,1900,1700,1424,870]):
 
-    M = messages_dic
+    M['state_transition_timer'] = Timer(0)
+    M['n_avg_steer'] = 20
+    M['n_avg_motor'] = 20
+    M['n_avg_button'] = 15
+    M['n_avg_encoder'] = 15
     M['steer_max'] = buttons[4]
     M['motor_max'] = buttons[4]
     M['steer_min'] = buttons[1]
@@ -39,22 +40,21 @@ def setup(messages_dic,buttons=[0,1900,1700,1424,870]):
 ##############################################################3
 #
 
-def run_loop(Arduinos,messages_dic,BUTTON_DELTA=50,n_lst_steps=100):
-    M = messages_dic
+def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
     lock = threading.Lock()
     while M['Stop_Arduinos'] == False:
 
         if not serial_data_to_messages(Arduinos,M):
             continue
 
-        buttons_to_state(Arduinos,M,BUTTON_DELTA,state_transition_timer)
+        buttons_to_state(Arduinos,M,BUTTON_DELTA)
 
         manage_list_lengths(M,n_lst_steps)
 
-        smooth_raw_data(M,n_avg_steer,n_avg_motor,n_avg_button,n_avg_encoder,pid=(M['state']==3))
+        smooth_raw_data(M,pid=(M['state']==3))
         
         if M['state'] == 4:
-            process_state_4(M,n_lst_steps,state_transition_timer)
+            process_state_4(M,n_lst_steps)
             continue
 
         if M['state'] == 3:
@@ -106,13 +106,13 @@ def serial_data_to_messages(Arduinos,M):
 
 
 
-def buttons_to_state(Arduinos,M,BUTTON_DELTA,state_transition_timer):
+def buttons_to_state(Arduinos,M,BUTTON_DELTA):
     for s in range(1,5):
         if np.abs(M['button_pwm_lst'][-1]-M['buttons'][s]) < BUTTON_DELTA:
             if M['state'] != s:
                 M['previous_state'] = M['state']
                 M['state'] = s
-                state_transition_timer.reset()
+                M['state_transition_timer'].reset()
                 M['LED_signal'] = d2n('(',M['state']*100+M['state']*10+1001,')')
                 Arduinos['SIG'].write(M['LED_signal'])
             return
@@ -126,15 +126,15 @@ def manage_list_lengths(M,n_lst_steps):
 
 
 
-def smooth_raw_data(M,n_avg_steer,n_avg_motor,n_avg_button,n_avg_encoder,pid=False):
-    if len(M['steer_pwm_lst']) >= n_avg_steer:
-        M['steer_pwm_smooth_lst'].append(array(M['steer_pwm_lst'][-n_avg_steer:]).mean())
+def smooth_raw_data(M,pid=False):
+    if len(M['steer_pwm_lst']) >= M['n_avg_steer']:
+        M['steer_pwm_smooth_lst'].append(array(M['steer_pwm_lst'][-M['n_avg_steer']:]).mean())
         if not pid:
-            M['motor_pwm_smooth_lst'].append(array(M['motor_pwm_lst'][-n_avg_motor:]).mean())
+            M['motor_pwm_smooth_lst'].append(array(M['motor_pwm_lst'][-M['n_avg_motor']:]).mean())
         else:
-            M['motor_pwm_smooth_lst'].append((array(M['motor_pwm_smooth_lst'][-n_avg_motor:]).mean()))
-        M['button_pwm_smooth_lst'].append(array(M['button_pwm_lst'][-n_avg_button:]).mean())
-        M['encoder_smooth_lst'].append(array(M['encoder_lst'][-n_avg_encoder:]).mean())
+            M['motor_pwm_smooth_lst'].append((array(M['motor_pwm_smooth_lst'][-M['n_avg_motor']:]).mean()))
+        M['button_pwm_smooth_lst'].append(array(M['button_pwm_lst'][-M['n_avg_button']:]).mean())
+        M['encoder_smooth_lst'].append(array(M['encoder_lst'][-M['n_avg_encoder']:]).mean())
     else:
         M['steer_pwm_smooth_lst'].append(M['steer_pwm_lst'][-1])
         M['motor_pwm_smooth_lst'].append(M['motor_pwm_lst'][-1])
@@ -143,8 +143,8 @@ def smooth_raw_data(M,n_avg_steer,n_avg_motor,n_avg_button,n_avg_encoder,pid=Fal
 
 
 
-def process_state_4(M,n_lst_steps,state_transition_timer):
-        if state_transition_timer.time() < 0.5:
+def process_state_4(M,n_lst_steps):
+        if M['state_transition_timer'].time() < 0.5:
             M['set_null'] = False
         else:
             if M['set_null'] == False:

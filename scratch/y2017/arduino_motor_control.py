@@ -12,41 +12,11 @@ def run_loop(Arduinos,messages_dic):
     M = messages_dic
     while M['Stop_Arduinos'] == False:
 
-        if len(M['steer_pwm_lst']) >= n_avg_steer:
-            M['steer_pwm_smooth_lst'].append(array(M['steer_pwm_lst'][-n_avg_steer:]).mean())
-            M['motor_pwm_smooth_lst'].append(array(M['motor_pwm_lst'][-n_avg_motor:]).mean())
-            M['button_pwm_smooth_lst'].append(array(M['button_pwm_lst'][-n_avg_button:]).mean())
-            M['encoder_pwm_smooth_lst'].append(array(M['encoder_lst'][-n_avg_encoder:]).mean())
-        else:
-            M['steer_pwm_smooth_lst'].append(M['steer_pwm_lst'][-1])
-            M['motor_pwm_smooth_lst'].append(M['motor_pwm_lst'][-1])
-            M['button_pwm_smooth_lst'].append(M['button_pwm_lst'][-1])
+
 
 
         if M['state'] == 4:
-            if state_transition_timer.time() < 0.25: #????????????????????
-                set_null = False
-            else:
-                if set_null == False:
-                    M['steer_null'] = array(M['steer_pwm_lst'][-n_lst_steps:]).mean()
-                    M['motor_null'] = array(M['motor_pwm_lst'][-n_lst_steps:]).mean()
-                    set_null = True
-                    M['steer_max'] = M['steer_null']
-                    M['motor_max'] = M['motor_null']
-                    M['steer_min'] = M['steer_null']
-                    M['motor_min'] = M['motor_null']
-                else:
-                    if M['steer_pwm_smooth_lst'][-1] > M['steer_max']:
-                        M['steer_max'] = M['steer_pwm_smooth_lst'][-1]
-                    if M['motor_pwm_smooth_lst'][-1] > M['motor_max']:
-                        M['motor_max'] = M['motor_pwm_smooth_lst'][-1]
-                    if M['steer_pwm_smooth_lst'][-1] < M['steer_min']:
-                        M['steer_min'] = M['steer_pwm_smooth_lst'][-1]
-                    if M['motor_pwm_smooth_lst'][-1] < M['motor_min']:
-                        M['motor_min'] = M['motor_pwm_smooth_lst'][-1]
-                M['write_str'] = d2n( '(', int(M['steer_null']), ',', int(M['motor_null']+10000), ')')
-                Arduinos['MSE'].write(M['write_str'])
-                continue
+
 
             
 
