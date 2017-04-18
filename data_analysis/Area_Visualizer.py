@@ -69,7 +69,7 @@ class Area_Visualizer(object):
             
             cv2.line(img2,(x_orig[0],y_orig[0]),(x_dest[0],y_dest[0]),(255,255,255),1)
             
-            fov = np.deg2rad(110)
+            fov = np.deg2rad(110/2.0)
                 
             x_orig_max,y_orig_max = cv2.polarToCart(0.0,fov-turn_factor)
             x_dest_max,y_dest_max = cv2.polarToCart(8.0,fov-turn_factor)

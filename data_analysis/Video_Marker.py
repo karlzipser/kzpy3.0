@@ -16,7 +16,7 @@ from Marker import Marker
 
 
 
-safety_distance = 1.0 # meter
+safety_distance = 0.1 # meter
 
 
 class Video_Marker(object):
@@ -336,7 +336,7 @@ class Video_Marker(object):
                        
         # The focal length is averaged over fx and fy, which might decrease
         # the accuracy. This could be corrected in the future
-        F = (camMat[0][0] + camMat[1][1]) / 2   
+        F = (camMat[0][0] + camMat[1][1]) / 2.0
         
         P_x = (px_ - px)
         P_y = (py_ - py)     
@@ -350,11 +350,17 @@ class Video_Marker(object):
        # print( (real_object_width_m * F) / P_y)
        ## sys.exit(0)
         
-        x_mid = camMat[0][2]
-        y_mid = camMat[1][2]        
-        #print(camMat)
-        #sys.exit(0)
-        # angle =  np.rad2deg(np.arctan2(y_mid - py, x_mid - px))
-        angle = np.arctan2(y_mid - py, x_mid - px)
+        #x_mid = camMat[0][2]
+        #y_mid = camMat[1][2]
         
+        x_mid= 1344/4.0
+        y_mid = 376/4.0        
+
+        angle = np.arctan((px-x_mid)/F)
+        #print((px-x_mid))
+        
+        # angle =  np.rad2deg(np.arctan2(y_mid - py, x_mid - px))
+        #angle = np.arctan2(y_mid - py, x_mid - px)
+        #print(np.rad2deg(angle))
+        #sys.exit(0
         return distance, angle
