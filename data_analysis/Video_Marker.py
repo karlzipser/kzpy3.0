@@ -7,7 +7,7 @@ import cv2
 import cv2.aruco as aruco
 from Board import Board
 import sys
-import zed_parameter
+from zed_parameter import Zed_Parameter
 import numpy as np
 from _socket import AF_X25
 from cv2 import polarToCart
@@ -25,27 +25,27 @@ class Video_Marker(object):
     board = Board()
     markers = []
     bagfile_handler = None
-    
+    zed_parameters = Zed_Parameter()
 
-    def __init__(self, bagfile_handler, capture_device=None):
+    def __init__(self, bagfile_handler=None, capture_device=None):
         
         self.bagfile_handler = bagfile_handler
         if capture_device != None:
             self.capture_device = capture_device
-            
-            capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
-            capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            capture_device.set(cv2.CAP_PROP_AUTOFOCUS,1)
+            #capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
+            #capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            #1344x376
+            capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 1344)
+            capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
         else:
             self.capture_device = capture_device    
             
        
-    def process_next_image(self, cv_image=None):
+    def process_next_image(self, crop, cv_image=None):
         
-        if(self.capture_device == None):
-            return self.mark_next_image(cv_image)
-        else:
-            ret, frame = self.capture_device.read()
-            return self.mark_next_image(frame) 
+            return self.mark_next_image(cv_image,crop)
+
          
     def read_next_image(self):
         return self.capture_device.read()
@@ -151,16 +151,14 @@ class Video_Marker(object):
         
         if len(corners) > 0:
             gray = aruco.drawDetectedMarkers(frame, corners)            
-            try:
-                rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.20, zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
-            except:
-                pass
+        
+            rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.20, self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
             
             critical_dist_angle_pairs = []
             
             for i in range(0, len(rvec)):
                 # Get two dictionaries with xy positions about the corners of one marker and calculate also distance and angle to them
-                center_line_xy, center_line_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], zed_parameter.cameraMatrix, zed_parameter.distCoeffs)
+                center_line_xy, center_line_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
                 # They are drawn onto the current image
                 self.drawPointAtSingleMarker(gray, center_line_xy, center_line_dist_ang)
                 
@@ -236,12 +234,13 @@ class Video_Marker(object):
         # Focal length F
         
         W = 0.2  # meter size of marker
-      
+
         x = center_line_xy[0][0]
         x_ = center_line_xy[1][0]
         y = center_line_xy[0][1]
         y_ = center_line_xy[1][1]
         
+        #print center_line_xy
         # The method returns the angle to point x,y    
         distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
         center_line_dist_ang = {'distance':distance, 'angle':angle}        
@@ -344,10 +343,17 @@ class Video_Marker(object):
         P = np.hypot(P_x, P_y)
         
         distance = (real_object_width_m * F) / P
+       #print(distance)
+       # print( (real_object_width_m * F) / P_x)
+       # print(str(np.abs(px_-px)) + " and " + str(P_x))
+       # print(str(np.abs(py_-py)) + " and " + str(P_y))
+       # print( (real_object_width_m * F) / P_y)
+       ## sys.exit(0)
         
         x_mid = camMat[0][2]
         y_mid = camMat[1][2]        
-        
+        #print(camMat)
+        #sys.exit(0)
         # angle =  np.rad2deg(np.arctan2(y_mid - py, x_mid - px))
         angle = np.arctan2(y_mid - py, x_mid - px)
         
