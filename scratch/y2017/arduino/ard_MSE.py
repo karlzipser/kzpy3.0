@@ -76,14 +76,15 @@ class PID_Motor(Computer_Control):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def enter(self):
         Computer_Control.enter(self)
-        if self.M['previous_state'].button_pwm_peak != self.button_pwm_peak: 
+        if self.M['previous_state'] == None:
+            self.M['pid_motor_pwm'] = self.M['smooth_motor']
+        elif self.M['previous_state'].button_pwm_peak != self.button_pwm_peak: 
             self.M['pid_motor_pwm'] = self.M['smooth_motor']
     def process(self):
             if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
                 self.M['PID'] = [1,2]
                 pid_processing(self.M)
                 self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-                print self.M['pid_write_str']
                 self.Arduinos['MSE'].write(self.M['pid_write_str'])
             else:
                 self.Arduinos['MSE'].write(self.M['smooth_write_str'])
@@ -127,7 +128,10 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             M['previous_state'].leave()
             return
 
+
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
+        if M['current_state'] == None:
+            return
         if M['current_state'] == None:
             M['current_state'] = M['state_six']
             M['current_state'].enter()
@@ -186,7 +190,7 @@ def setup(M,Arduinos):
         M[q] = []
 
     #M['state'] = 2
-    #M['previous_state'] = 1
+    M['previous_state'] = None
     M['calibrated'] = False
     M['PID'] = [-1,-1]
 
@@ -251,7 +255,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
         M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
         
         
-        if M['acc'][0] < -1:
+        if M['acc'][0] < -4:
             print 'rock!'
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                 M['previous_state'] = M['current_state']
@@ -264,9 +268,9 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
         elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
             human_motor = False
             human_steer = False
-            if np.abs(M['steer_percent'] - 49) > 2:
+            if np.abs(M['steer_percent'] - 49) > 10:
                 human_steer = True
-            if np.abs(M['motor_percent'] - 49) > 2:
+            if np.abs(M['motor_percent'] - 49) > 10:
                 human_motor = True
             if human_motor and human_steer:
                 if M['current_state'] != M['state_five']:
@@ -303,6 +307,8 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
             #print((M['current_state'].number,M['steer_percent'],M['motor_percent'],M['state_transition_timer'].time()))
             Arduinos['MSE'].write(M['smooth_write_str'])
         """
+    LED_signal = d2n('(',3,')')
+    Arduinos['SIG'].write(LED_signal)
 
 #        
 ##############################################################3

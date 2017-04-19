@@ -44,6 +44,7 @@ def arduino_master_thread():
         #else:
         #    M['state'] = np.random.choice([1,2,3,4])
         time.sleep(0.5)
+    
 
 
 M['Stop_Arduinos'] = False
