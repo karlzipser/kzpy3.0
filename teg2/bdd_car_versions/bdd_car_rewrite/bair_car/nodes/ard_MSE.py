@@ -109,7 +109,7 @@ class Hum_Steer_PID_Motor(PID_Motor):
     def process(self):
         self.M['PID'] = [1,2]
         pid_processing(self.M)
-        self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_motor']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+        self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
         self.Arduinos['MSE'].write(self.M['pid_write_str'])
 
 
