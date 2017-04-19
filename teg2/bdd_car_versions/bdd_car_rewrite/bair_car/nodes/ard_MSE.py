@@ -105,20 +105,21 @@ class Freeze(Run_State):
 
 
 
+class Hum_Steer_PID_Motor(PID_Motor):
+    def process(self):
+        self.M['PID'] = [1,2]
+        pid_processing(self.M)
+        self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_motor']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+        self.Arduinos['MSE'].write(self.M['pid_write_str'])
 
 
 class Net_Steer_PID_Motor(PID_Motor):
     def process(self):
-#        if self.M['smooth_motor'] < 5 + self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
         self.M['PID'] = [1,2]
         pid_processing(self.M)
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-        #print self.M['caffe_steer_pwm']
         self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-       # self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
         self.Arduinos['MSE'].write(self.M['pid_write_str'])
-#        else:
-#            self.Arduinos['MSE'].write(self.M['smooth_write_str'])
 
 
 
@@ -219,7 +220,7 @@ def setup(M,Arduinos):
     state_six = Net_Steer_PID_Motor('state 6',6,1424,M,Arduinos)
     state_three = Net_Steer_PID_Motor('state 3',3,1424,M,Arduinos)
     state_five = Net_Steer_PID_Motor('state 5',5,1424,M,Arduinos)
-    state_seven = Net_Steer_PID_Motor('state 7',7,1424,M,Arduinos)
+    state_seven = Hum_Steer_PID_Motor('state 7',7,1424,M,Arduinos)
     state_eight = Net_Steer_PID_Motor('state 8',8,1424,M,Arduinos)
     state_nine = Freeze('state 9',9,1424,M,Arduinos)
     state_four = Calibration_State('state 4',4,870,M,Arduinos)
