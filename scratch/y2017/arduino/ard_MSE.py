@@ -124,6 +124,45 @@ class Hum_Steer_Hum_Motor(Computer_Control):
 
 
 def buttons_to_state(Arduinos,M,BUTTON_DELTA):
+    
+    if np.abs(M['button_pwm_lst'][-1] - M['state_four'].button_pwm_peak) < BUTTON_DELTA:
+        if M['current_state'] == None:
+            M['current_state'] = M['state_four']
+            M['current_state'].enter()
+            return
+        if M['current_state'] == M['state_four']:
+            return
+        M['previous_state'] = M['current_state']
+        M['current_state'] = M['state_four']
+        M['current_state'].enter()
+        M['previous_state'].leave()
+
+    if M['current_state'] == None:
+        return
+
+    for s in [M['state_one'],M['state_two']]:
+        if np.abs(M['button_pwm_lst'][-1] - s.button_pwm_peak) < BUTTON_DELTA:  
+            if M['current_state'] == s:
+                return
+            M['previous_state'] = M['current_state']
+            M['current_state'] = s
+            M['current_state'].enter()
+            M['previous_state'].leave()
+            return
+
+    if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
+        if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
+            return
+        M['previous_state'] = M['current_state']
+        M['current_state'] = M['state_six']
+        M['current_state'].enter()
+        M['previous_state'].leave()
+        return
+
+
+
+"""
+def buttons_to_state(Arduinos,M,BUTTON_DELTA):
     for s in [M['state_one'],M['state_two']]:
         if np.abs(M['button_pwm_lst'][-1] - s.button_pwm_peak) < BUTTON_DELTA:
             if M['current_state'] == None:
@@ -160,8 +199,7 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
         M['current_state'] = M['state_four']
         M['current_state'].enter()
         M['previous_state'].leave()
-
-
+"""
 
 
 
