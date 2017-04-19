@@ -1,6 +1,7 @@
 import threading
 from kzpy3.utils import *
-
+import std_msgs.msg
+import rospy
 
 
 class State():
@@ -102,8 +103,24 @@ class Freeze(Run_State):
         self.Arduinos['MSE'].write(self.M['freeze_str'])
 
 
+
+
+
 class Net_Steer_PID_Motor(PID_Motor):
-    pass
+    def process(self):
+        if self.M['smooth_motor'] < 5 + self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
+            self.M['PID'] = [1,2]
+            pid_processing(self.M)
+            self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
+            #print self.M['caffe_steer_pwm']
+            self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+           # self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+            self.Arduinos['MSE'].write(self.M['pid_write_str'])
+        else:
+            self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+
+
+
 
 
 class Hum_Steer_PID_Motor(PID_Motor):
@@ -161,54 +178,13 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
 
 
 
-"""
-def buttons_to_state(Arduinos,M,BUTTON_DELTA):
-    for s in [M['state_one'],M['state_two']]:
-        if np.abs(M['button_pwm_lst'][-1] - s.button_pwm_peak) < BUTTON_DELTA:
-            if M['current_state'] == None:
-                M['current_state'] = s
-                M['current_state'].enter()
-                return    
-            if M['current_state'] == s:
-                return
-            M['previous_state'] = M['current_state']
-            M['current_state'] = s
-            M['current_state'].enter()
-            M['previous_state'].leave()
-            return
-
-    if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
-        if M['current_state'] == None:
-            return
-        if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
-            return
-        M['previous_state'] = M['current_state']
-        M['current_state'] = M['state_six']
-        M['current_state'].enter()
-        M['previous_state'].leave()
-        return
-
-    if np.abs(M['button_pwm_lst'][-1] - M['state_four'].button_pwm_peak) < BUTTON_DELTA:
-        if M['current_state'] == None:
-            M['current_state'] = M['state_four']
-            M['current_state'].enter()
-            return
-        if M['current_state'] == M['state_four']:
-            return
-        M['previous_state'] = M['current_state']
-        M['current_state'] = M['state_four']
-        M['current_state'].enter()
-        M['previous_state'].leave()
-"""
-
-
 
 
 ##############################################################3
 #
 def setup(M,Arduinos):
 
-    M['state_transition_timer'] = Timer(0)
+    #M['state_transition_timer'] = Timer(0)
     M['n_avg_steer'] = 20
     M['n_avg_motor'] = 20
     M['n_avg_button'] = 15
@@ -257,7 +233,9 @@ def setup(M,Arduinos):
     M['state_nine'] = state_nine
 
     M['current_state'] = None
-
+    M['caffe_steer'] = 49
+    M['caffe_steer_pwm'] = M['steer_null']
+    print("MSE setup")
 
 calibration_signal_timer = Timer(0.01)
 #        
@@ -343,6 +321,8 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
 
         M['current_state'].process()
 
+        M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+
         """
 
 
@@ -387,7 +367,7 @@ def pid_processing(M):
     if M['PID'][0] < 0:
         M['pid_motor_pwm'] = M['smooth_motor']
     else:
-        if M['state_transition_timer'].time()>0.5:
+        if M['current_state'].state_transition_timer.time() > 0.0:
             if not 'pid_motor_pwm' in M:
                 M['pid_motor_pwm'] = M['smooth_motor']
             pid_low = M['PID'][0]
@@ -473,6 +453,14 @@ def pwm_to_percent(M,null_pwm,current_pwm,max_pwm,min_pwm):
         p = 99
     if p < 0:
         p = 0      
+    return p
+
+
+def percent_to_pwm(percent,null_pwm,max_pwm,min_pwm):
+    if percent >= 49:
+        p = (percent-50)/50.0 * (max_pwm-null_pwm) + null_pwm
+    else:
+        p = (percent-50)/50.0 * (null_pwm-min_pwm) + null_pwm
     return p
 
 
