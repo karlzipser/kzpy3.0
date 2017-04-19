@@ -75,7 +75,7 @@ class Net_Steer_PID_Motor(Computer_Control):
             self.M['PID'] = [1,2]
             pid_processing(self.M)
             self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-            Arduinos['MSE'].write(M['pid_write_str'])
+            self.Arduinos['MSE'].write(M['pid_write_str'])
 
 class Hum_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
