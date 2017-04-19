@@ -58,6 +58,8 @@ class Calibration_State(Run_State):
 class Computer_Control(Run_State):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Run_State.__init__(self,name,number,button_pwm_peak,M,Arduinos)
+    def enter(self):
+        Run_State.enter(self)
 
 class Net_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -66,16 +68,27 @@ class Net_Steer_Net_Motor(Computer_Control):
 class Net_Steer_Hum_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
+    def process(self):
+        self.Arduinos['MSE'].write(self.M['smooth_write_str'])
 
-class Net_Steer_PID_Motor(Computer_Control):
+class PID_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
+    def enter(self):
+        Computer_Control.enter(self)
+        self.M['pid_motor_pwm'] = self.M['smooth_motor']
     def process(self):
         if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
             self.M['PID'] = [1,2]
             pid_processing(self.M)
             self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-            self.Arduinos['MSE'].write(M['pid_write_str'])
+            self.Arduinos['MSE'].write(self.M['pid_write_str'])
+
+class Net_Steer_PID_Motor(PID_Motor):
+    pass
+
+class Hum_Steer_PID_Motor(PID_Motor):
+    pass
 
 class Hum_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -157,8 +170,8 @@ def setup(M,Arduinos):
     M['calibrated'] = False
     M['PID'] = [-1,-1]
 
-    state_one = Human_Control('state 1',1,1900,M,Arduinos)
-    state_two = Human_Control('state 2',2,1700,M,Arduinos)
+    state_one = Hum_Steer_PID_Motor('state 1',1,1900,M,Arduinos)
+    state_two = Smooth_Human_Control('state 2',2,1700,M,Arduinos)
     state_six = Net_Steer_PID_Motor('state 6',6,1424,M,Arduinos)
     state_three = Net_Steer_Hum_Motor('state 3',3,1424,M,Arduinos)
     state_five = Hum_Steer_Net_Motor('state 5',5,1424,M,Arduinos)
