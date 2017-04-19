@@ -3,6 +3,7 @@ from kzpy3.utils import *
 import std_msgs.msg
 import rospy
 
+lock = threading.Lock()
 
 class State():
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -235,6 +236,7 @@ def setup(M,Arduinos):
     M['current_state'] = None
     M['caffe_steer'] = 49
     M['caffe_steer_pwm'] = M['steer_null']
+    M['n_lst_steps'] = 30
     print("MSE setup")
 
 calibration_signal_timer = Timer(0.01)
@@ -242,7 +244,7 @@ calibration_signal_timer = Timer(0.01)
 ##############################################################3
 #
 
-def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
+def run_loop(Arduinos,M,BUTTON_DELTA=50,):
     lock = threading.Lock()
     if 'MSE' not in Arduinos:
         M['Stop_Arduinos'] = True
@@ -260,12 +262,12 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
         if M['current_state'] == None:
             continue
 
-        manage_list_lengths(M,n_lst_steps)
+        manage_list_lengths(M)
 
         smooth_data(M)
         
         if M['current_state'] == M['state_four']:
-            process_state_4(M,n_lst_steps)
+            process_state_4(M)
             continue
         else:
             if not calibrated(Arduinos,M):
@@ -400,22 +402,24 @@ def serial_data_to_messages(Arduinos,M):
 
 
 
-def manage_list_lengths(M,n_lst_steps):
+def manage_list_lengths(M):
+    lock.acquire()
     for k in M:
         if type(M[k]) == list:        
-            if len(M[k]) > 1.2 * n_lst_steps:
-                M[k] = M[k][-n_lst_steps:]   
+            if len(M[k]) > 1.2 * M['n_lst_steps']:
+                M[k] = M[k][-M['n_lst_steps']:]
+    lock.release() 
 
 
 
-def process_state_4(M,n_lst_steps):
+def process_state_4(M):
     M['calibrated'] = False
     if M['current_state'].state_transition_timer.time() < 0.5:
         M['set_null'] = False
     else:
         if M['set_null'] == False:
-            M['steer_null'] = array(M['steer_pwm_lst'][-n_lst_steps:]).mean()
-            M['motor_null'] = array(M['motor_pwm_lst'][-n_lst_steps:]).mean()
+            M['steer_null'] = array(M['steer_pwm_lst'][-M['n_lst_steps']:]).mean()
+            M['motor_null'] = array(M['motor_pwm_lst'][-M['n_lst_steps']:]).mean()
             M['set_null'] = True
             M['steer_max'] = M['steer_null']
             M['motor_max'] = M['motor_null']

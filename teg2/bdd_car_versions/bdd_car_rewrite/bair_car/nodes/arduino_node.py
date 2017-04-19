@@ -22,10 +22,9 @@ def caffe_motor_callback(msg):
     M['caffe_motor'] = msg.data
 
 rospy.init_node('run_arduino',anonymous=True)
-rospy.Subscriber('/cmd/steer', std_msgs.msg.Int32, callback=caffe_steer_callback)
-rospy.Subscriber('/cmd/motor', std_msgs.msg.Int32, callback=caffe_motor_callback)
-M['state_pub'] = rospy.Publisher('/bair_car/state', std_msgs.msg.Int32, queue_size=5) 
-
+rospy.Subscriber('cmd/steer', std_msgs.msg.Int32, callback=caffe_steer_callback)
+rospy.Subscriber('cmd/motor', std_msgs.msg.Int32, callback=caffe_motor_callback)
+M['state_pub'] = rospy.Publisher('state', std_msgs.msg.Int32, queue_size=5) 
 
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)

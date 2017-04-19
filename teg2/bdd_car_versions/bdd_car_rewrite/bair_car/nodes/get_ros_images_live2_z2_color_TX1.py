@@ -47,7 +47,7 @@ try:
 	import rospy
 	from sensor_msgs.msg import Image
 	bridge = CvBridge()
-	rospy.init_node('listener',anonymous=True)
+	rospy.init_node('run_caffe',anonymous=True)
 
 	left_list = []
 	right_list = []
