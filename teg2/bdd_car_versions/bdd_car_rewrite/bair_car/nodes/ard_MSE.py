@@ -66,7 +66,7 @@ class Computer_Control(Run_State):
     def enter(self):
         Run_State.enter(self)
 
-
+"""
 class Net_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
@@ -77,7 +77,7 @@ class Net_Steer_Hum_Motor(Computer_Control):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def process(self):
         self.Arduinos['MSE'].write(self.M['smooth_write_str'])
-
+"""
 
 class PID_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -109,20 +109,20 @@ class Freeze(Run_State):
 
 class Net_Steer_PID_Motor(PID_Motor):
     def process(self):
-        if self.M['smooth_motor'] < 5 + self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
-            self.M['PID'] = [1,2]
-            pid_processing(self.M)
-            self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-            #print self.M['caffe_steer_pwm']
-            self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-           # self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-            self.Arduinos['MSE'].write(self.M['pid_write_str'])
-        else:
-            self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+#        if self.M['smooth_motor'] < 5 + self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
+        self.M['PID'] = [1,2]
+        pid_processing(self.M)
+        self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
+        #print self.M['caffe_steer_pwm']
+        self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+       # self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+        self.Arduinos['MSE'].write(self.M['pid_write_str'])
+#        else:
+#            self.Arduinos['MSE'].write(self.M['smooth_write_str'])
 
 
 
-
+"""
 
 class Hum_Steer_PID_Motor(PID_Motor):
     pass
@@ -136,7 +136,7 @@ class Hum_Steer_Net_Motor(Computer_Control):
 class Hum_Steer_Hum_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
-
+"""
 
 
 
