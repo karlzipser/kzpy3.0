@@ -83,3 +83,7 @@ q = raw_input('')
 while q not in ['q','Q']:
     q = raw_input('')
 M['Stop_Arduinos'] = True
+rospy.signal_shutdown("""M['Stop_Arduinos'] = True""")
+
+
+

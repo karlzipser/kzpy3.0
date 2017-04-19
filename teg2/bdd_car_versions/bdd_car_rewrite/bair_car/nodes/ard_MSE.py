@@ -121,6 +121,12 @@ class Net_Steer_PID_Motor(PID_Motor):
         self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
         self.Arduinos['MSE'].write(self.M['pid_write_str'])
 
+class Net_Steer_Hum_Motor(PID_Motor):
+    def process(self):
+        self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
+        self.M['write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['smooth_motor']+10000), ')')
+        self.Arduinos['MSE'].write(self.M['write_str'])
+
 
 
 """
@@ -218,8 +224,8 @@ def setup(M,Arduinos):
     state_one = Human_Control('state 1',1,1900,M,Arduinos)
     state_two = Smooth_Human_Control('state 2',2,1700,M,Arduinos)
     state_six = Net_Steer_PID_Motor('state 6',6,1424,M,Arduinos)
-    state_three = Net_Steer_PID_Motor('state 3',3,1424,M,Arduinos)
-    state_five = Net_Steer_PID_Motor('state 5',5,1424,M,Arduinos)
+    state_three = Net_Steer_Hum_Motor('state 3',3,1424,M,Arduinos)
+    state_five = Human_Control('state 5',5,1424,M,Arduinos)
     state_seven = Hum_Steer_PID_Motor('state 7',7,1424,M,Arduinos)
     state_eight = Net_Steer_PID_Motor('state 8',8,1424,M,Arduinos)
     state_nine = Freeze('state 9',9,1424,M,Arduinos)
