@@ -7,7 +7,7 @@ import ard_SIG
 import ard_ser_in
 import threading
 
-
+M = {}
 
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)
@@ -38,21 +38,21 @@ def arduino_master_thread():
             pass
         """
         try:
-            print((M['steer_percent'],M['motor_percent']))
+            print(M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'])
         except:
             pass
         #else:
         #    M['state'] = np.random.choice([1,2,3,4])
-        time.sleep(0.1)
+        time.sleep(0.5)
 
-M = {}
+
 M['Stop_Arduinos'] = False
 
 baudrate = 115200
 timeout = 0.1
 
 Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
-ard_MSE.setup(M)
+ard_MSE.setup(M,Arduinos)
 threading.Thread(target=arduino_mse_thread).start()
 threading.Thread(target=arduino_imu_thread).start()
 threading.Thread(target=arduino_sig_thread).start()
