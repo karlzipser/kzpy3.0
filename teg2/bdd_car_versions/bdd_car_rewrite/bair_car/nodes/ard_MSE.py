@@ -287,6 +287,8 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                     M['current_state'] = M['state_nine']
                     M['current_state'].enter()
                     M['previous_state'].leave()
+        else:
+            print 'acc not in M'
         
         if M['current_state'] == M['state_nine']:
             pass
