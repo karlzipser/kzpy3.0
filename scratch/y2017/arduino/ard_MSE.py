@@ -76,13 +76,23 @@ class PID_Motor(Computer_Control):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def enter(self):
         Computer_Control.enter(self)
-        self.M['pid_motor_pwm'] = self.M['smooth_motor']
+        if self.M['previous_state'].button_pwm_peak != self.button_pwm_peak: 
+            self.M['pid_motor_pwm'] = self.M['smooth_motor']
     def process(self):
-        if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
-            self.M['PID'] = [1,2]
-            pid_processing(self.M)
-            self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-            self.Arduinos['MSE'].write(self.M['pid_write_str'])
+            if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
+                self.M['PID'] = [1,2]
+                pid_processing(self.M)
+                self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
+                print self.M['pid_write_str']
+                self.Arduinos['MSE'].write(self.M['pid_write_str'])
+            else:
+                self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+
+class Freeze(Run_State):
+    def process(self):
+        self.M['freeze_str'] = d2n( '(', int(self.M['steer_null']), ',', int(self.M['motor_null']+10000), ')')
+        self.Arduinos['MSE'].write(self.M['freeze_str'])
+
 
 class Net_Steer_PID_Motor(PID_Motor):
     pass
@@ -105,7 +115,10 @@ class Hum_Steer_Hum_Motor(Computer_Control):
 def buttons_to_state(Arduinos,M,BUTTON_DELTA):
     for s in [M['state_one'],M['state_two']]:
         if np.abs(M['button_pwm_lst'][-1] - s.button_pwm_peak) < BUTTON_DELTA:
-            M['current_state'].name
+            if M['current_state'] == None:
+                M['current_state'] = s
+                M['current_state'].enter()
+                return    
             if M['current_state'] == s:
                 return
             M['previous_state'] = M['current_state']
@@ -115,16 +128,23 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             return
 
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
-        if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight']]:
+        if M['current_state'] == None:
+            M['current_state'] = M['state_six']
+            M['current_state'].enter()
+            return
+        if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
             return
         M['previous_state'] = M['current_state']
         M['current_state'] = M['state_six']
         M['current_state'].enter()
         M['previous_state'].leave()
-
         return
 
     if np.abs(M['button_pwm_lst'][-1] - M['state_four'].button_pwm_peak) < BUTTON_DELTA:
+        if M['current_state'] == None:
+            M['current_state'] = M['state_four']
+            M['current_state'].enter()
+            return
         if M['current_state'] == M['state_four']:
             return
         M['previous_state'] = M['current_state']
@@ -170,13 +190,14 @@ def setup(M,Arduinos):
     M['calibrated'] = False
     M['PID'] = [-1,-1]
 
-    state_one = Hum_Steer_PID_Motor('state 1',1,1900,M,Arduinos)
+    state_one = Human_Control('state 1',1,1900,M,Arduinos)
     state_two = Smooth_Human_Control('state 2',2,1700,M,Arduinos)
     state_six = Net_Steer_PID_Motor('state 6',6,1424,M,Arduinos)
-    state_three = Net_Steer_Hum_Motor('state 3',3,1424,M,Arduinos)
-    state_five = Hum_Steer_Net_Motor('state 5',5,1424,M,Arduinos)
-    state_seven = Hum_Steer_Hum_Motor('state 7',7,1424,M,Arduinos)
+    state_three = Net_Steer_PID_Motor('state 3',3,1424,M,Arduinos)
+    state_five = Net_Steer_PID_Motor('state 5',5,1424,M,Arduinos)
+    state_seven = Net_Steer_PID_Motor('state 7',7,1424,M,Arduinos)
     state_eight = Net_Steer_PID_Motor('state 8',8,1424,M,Arduinos)
+    state_nine = Freeze('state 9',9,1424,M,Arduinos)
     state_four = Calibration_State('state 4',4,870,M,Arduinos)
     M['state_one'] = state_one
     M['state_two'] = state_two
@@ -186,7 +207,9 @@ def setup(M,Arduinos):
     M['state_six'] = state_six
     M['state_seven'] = state_seven
     M['state_eight'] = state_eight
-    M['current_state'] = state_one
+    M['state_nine'] = state_nine
+
+    M['current_state'] = None
 
 
 calibration_signal_timer = Timer(0.01)
@@ -227,16 +250,23 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
         M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
         M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
         
-
-
-
         
-        if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+        if M['acc'][0] < -1:
+            print 'rock!'
+            if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+                M['previous_state'] = M['current_state']
+                M['current_state'] = M['state_nine']
+                M['current_state'].enter()
+                M['previous_state'].leave()
+        
+        if M['current_state'] == M['state_nine']:
+            pass
+        elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
             human_motor = False
             human_steer = False
-            if np.abs(M['steer_percent'] - 49) > 8:
+            if np.abs(M['steer_percent'] - 49) > 2:
                 human_steer = True
-            if np.abs(M['motor_percent'] - 49) > 8:
+            if np.abs(M['motor_percent'] - 49) > 2:
                 human_motor = True
             if human_motor and human_steer:
                 if M['current_state'] != M['state_five']:
@@ -390,9 +420,9 @@ def pwm_to_percent(M,null_pwm,current_pwm,max_pwm,min_pwm):
         p = int(99*(1.0 + current_pwm/max_pwm)/2.0)
     else:
         p = int(99*(1.0 - current_pwm/min_pwm)/2.0)
-    if p > 110 or p < -10:
-        M['calibrated'] = False
-        return 49
+    #if p > 110 or p < -10:
+    #    M['calibrated'] = False
+    #    return 49
     if p > 99:
         p = 99
     if p < 0:

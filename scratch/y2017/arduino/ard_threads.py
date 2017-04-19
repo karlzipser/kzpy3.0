@@ -38,7 +38,7 @@ def arduino_master_thread():
             pass
         """
         try:
-            print(M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'])
+            print(M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])
         except:
             pass
         #else:
