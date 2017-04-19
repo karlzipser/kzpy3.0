@@ -35,15 +35,18 @@ class Run_State(State):
         LED_signal = d2n('(',n*100+n*10+1001,')')
         self.Arduinos['SIG'].write(LED_signal)
 
+
 class Human_Control(Run_State):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Run_State.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def process(self):
         self.Arduinos['MSE'].write(self.M['raw_write_str'])
 
+
 class Smooth_Human_Control(Human_Control):
     def process(self):
         self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+
 
 class Calibration_State(Run_State):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -61,15 +64,18 @@ class Computer_Control(Run_State):
     def enter(self):
         Run_State.enter(self)
 
+
 class Net_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
+
 
 class Net_Steer_Hum_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def process(self):
         self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+
 
 class PID_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -89,6 +95,7 @@ class PID_Motor(Computer_Control):
             else:
                 self.Arduinos['MSE'].write(self.M['smooth_write_str'])
 
+
 class Freeze(Run_State):
     def process(self):
         self.M['freeze_str'] = d2n( '(', int(self.M['steer_null']), ',', int(self.M['motor_null']+10000), ')')
@@ -98,12 +105,15 @@ class Freeze(Run_State):
 class Net_Steer_PID_Motor(PID_Motor):
     pass
 
+
 class Hum_Steer_PID_Motor(PID_Motor):
     pass
+
 
 class Hum_Steer_Net_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
+
 
 class Hum_Steer_Hum_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -128,13 +138,8 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             M['previous_state'].leave()
             return
 
-
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
         if M['current_state'] == None:
-            return
-        if M['current_state'] == None:
-            M['current_state'] = M['state_six']
-            M['current_state'].enter()
             return
         if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
             return
@@ -250,13 +255,11 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,n_lst_steps=30):
         M['steer_percent'] = pwm_to_percent(M,M['steer_null'],M['steer_pwm_lst'][-1],M['steer_max'],M['steer_min'])
         M['motor_percent'] = pwm_to_percent(M,M['motor_null'],M['motor_pwm_lst'][-1],M['motor_max'],M['motor_min'])
 
-
         M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
         M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
         
-        
-        if M['acc'][0] < -4:
-            print 'rock!'
+        acc2rd = M['acc'][0]**2+M['acc'][2]**2
+        if acc2rd > 20:
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                 M['previous_state'] = M['current_state']
                 M['current_state'] = M['state_nine']
@@ -381,10 +384,6 @@ def manage_list_lengths(M,n_lst_steps):
         if type(M[k]) == list:        
             if len(M[k]) > 1.2 * n_lst_steps:
                 M[k] = M[k][-n_lst_steps:]   
-
-
-
-
 
 
 
