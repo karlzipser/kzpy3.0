@@ -9,7 +9,7 @@ def run_loop(Arduinos,M):
 
         try:        
             read_str = Arduinos['IMU'].readline()
-            #print read_str
+            print read_str
             exec('imu_input = list({0})'.format(read_str))
             #print imu_input
             #print len(mse_input)
