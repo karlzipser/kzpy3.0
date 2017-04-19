@@ -280,7 +280,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
         
         if 'acc' in M:
-            acc2rd = M['acc'][-1][0]**2+M['acc'][-1][2]**2
+            acc2rd = M['acc'][0]**2+M['acc'][2]**2
             if acc2rd > 20:
                 if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                     M['previous_state'] = M['current_state']

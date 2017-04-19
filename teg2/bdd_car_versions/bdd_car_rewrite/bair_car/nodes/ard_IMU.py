@@ -9,12 +9,12 @@ def run_loop(Arduinos,M):
 
         try:        
             read_str = Arduinos['IMU'].readline()
-            print read_str
+            #print read_str
             exec('imu_input = list({0})'.format(read_str))
             #print imu_input
             #print len(mse_input)
             if imu_input[0] in ['gyro','acc','head']:
-                M[imu_input[0]].append(imu_input[1:4])
+                M[imu_input[0]] = imu_input[1:4]
             else:
                 print '***'+read_str + "*** is not imu"
                 continue
