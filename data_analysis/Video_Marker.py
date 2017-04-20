@@ -13,6 +13,7 @@ from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
+from Map import Map
 
 
 
@@ -20,7 +21,7 @@ safety_distance = 0.1 # meter
 
 
 class Video_Marker(object):
-    
+    map = Map()
     capture_device = None
     board = Board()
     markers = []
@@ -32,7 +33,8 @@ class Video_Marker(object):
         self.bagfile_handler = bagfile_handler
         if capture_device != None:
             self.capture_device = capture_device
-            capture_device.set(cv2.CAP_PROP_AUTOFOCUS,1)
+            #capture_device.set(cv2.CAP_PROP_AUTOFOCUS,1)
+            #capture_device.set(cv2.CAP_PROP_AUTO_EXPOSURE,-1)
             #capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
             #capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
             #1344x376
@@ -154,11 +156,26 @@ class Video_Marker(object):
         
             rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.20, self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
             
+            
+            
+            
             critical_dist_angle_pairs = []
             
             for i in range(0, len(rvec)):
+               
+                
+                
+                
+                
                 # Get two dictionaries with xy positions about the corners of one marker and calculate also distance and angle to them
                 center_line_xy, center_line_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
+                
+                
+                 # map test code
+                
+                self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
+                # map test code
+                
                 # They are drawn onto the current image
                 self.drawPointAtSingleMarker(gray, center_line_xy, center_line_dist_ang)
                 
@@ -172,7 +189,7 @@ class Video_Marker(object):
                 markers.append(marker)
             
             # If an evasion is needed draw onto the image safe values
-            if(evasion_needed):
+            if(evasion_needed and self.bagfile_handler != None):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
                 self.bagfile_handler.evasion_data.append({'timestamp':self.bagfile_handler.timestamp,'motor_command':safe_motor,'steering_command':safe_steer})
                 
@@ -186,7 +203,7 @@ class Video_Marker(object):
         imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
         
         # The points will be ordered according to their y axis so that even markers which are upside down
-        # look the same to the algorithm
+        # look the same to the algorself.ithm
         
         if(int(imgpts[0][0][1]) < int(imgpts[1][0][1])):
             xy1 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
@@ -323,7 +340,8 @@ class Video_Marker(object):
             text_zoomfactor = 0.5
         if text_zoomfactor > 1:
             text_zoomfactor = 1
-        
+
+                
         cv2.putText(image, str(np.round(distance,2)), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
         
         # cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
@@ -343,15 +361,6 @@ class Video_Marker(object):
         P = np.hypot(P_x, P_y)
         
         distance = (real_object_width_m * F) / P
-       #print(distance)
-       # print( (real_object_width_m * F) / P_x)
-       # print(str(np.abs(px_-px)) + " and " + str(P_x))
-       # print(str(np.abs(py_-py)) + " and " + str(P_y))
-       # print( (real_object_width_m * F) / P_y)
-       ## sys.exit(0)
-        
-        #x_mid = camMat[0][2]
-        #y_mid = camMat[1][2]
         
         x_mid= 1344/4.0
         y_mid = 376/4.0        
