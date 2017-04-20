@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from cv2 import getDefaultNewCameraMatrix
 from dask.array.ufunc import angle
+import sys
 
 
 class Map(object):
@@ -34,11 +35,22 @@ class Map(object):
         axisPoints = np.array([[0.0,0.0,0.0], [length, 0.0,0.0], [0.0, length, 0.0], [0.0,0.0,length]])
 
 
-        rvec_rodrigues, _ = cv2.Rodrigues(rvec)
-        _, rvecs_trans_rodrigues = cv2.invert(rvec_rodrigues)
-        rvecs_trans, _ = cv2.Rodrigues(rvecs_trans_rodrigues)
-    
-        imagePoints_new, jac = cv2.projectPoints(axisPoints, rvecs_trans, tvec, cameraMatrix, distCoeffs);
+        print(cameraMatrix)
+        
+        
+        sys.exit(0)
+
+
+        #rvec_rodrigues, _ = cv2.Rodrigues(rvec)
+        #_, rvecs_trans_rodrigues = cv2.invert(rvec_rodrigues)
+        #rvecs_trans, _ = cv2.Rodrigues(rvecs_trans_rodrigues)
+        
+        #tvec_rodrigues, _ = cv2.Rodrigues(tvec)
+        #_, tvecs_trans_rodrigues = cv2.invert(tvec_rodrigues)
+        #tvecs_trans, _ = cv2.Rodrigues(tvecs_trans_rodrigues)
+        
+        
+        imagePoints_new, jac = cv2.projectPoints(axisPoints, rvec, tvec, cameraMatrix, distCoeffs);
         
         imagePoints_new = imagePoints_new.astype(int)
         
@@ -54,22 +66,33 @@ class Map(object):
         #cv2.putText(image, str(center_line_dist_ang['angle']) , (10,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 4)
         #cv2.putText(image, str(rvecs_trans) , (10,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 4)
         #print(distCoeffs)
-        angle_a = center_line_dist_ang['angle']
-        angle_b = rvecs_trans[2][0]
+        #angle_a = rvec[1]
+        #angle_b = rvecs_trans[2][0]
         # angle normalisation
-        angle_c = (((angle_b + np.pi/6.0)/(2*np.pi/3.0))*np.pi/3.0)-(np.pi/6.0)
-        print(np.rad2deg(angle_b))
-        print(np.rad2deg(angle_a))
+        #angle_c = (((angle_b + np.pi/6.0)/(2*np.pi/3.0))*np.pi/3.0)-(np.pi/6.0)
+        #print(np.rad2deg(angle_b))
+        #print(np.rad2deg(angle_a))
         
-        angle_c = angle_b + angle_a
+        #angle_c = angle_b + angle_a
+        print("##")
+        angle = rvec[0][0]
+        print(np.rad2deg(angle))
+        stdMat = rvec/np.pi
         
-        x,y = cv2.polarToCart(center_line_dist_ang['distance'],angle_c)
-        xa,ya = cv2.polarToCart(center_line_dist_ang['distance'],angle_a)
-        xb,yb = cv2.polarToCart(center_line_dist_ang['distance'],angle_b)
+        #angle = 0
+        easyMat = np.rad2deg(stdMat-angle)
+        
+        
+        print(easyMat[0][0])
+        print(easyMat[0][1])
+        print(easyMat[0][2])
+        x,y = cv2.polarToCart(center_line_dist_ang['distance'],angle)
+        #xa,ya = cv2.polarToCart(center_line_dist_ang['distance'],angle_a)
+        #xb,yb = cv2.polarToCart(center_line_dist_ang['distance'],angle_b)
         scale_factor = 300
         cv2.circle(self.img2,(x[0]*scale_factor+300,y[0]*scale_factor+300),2,(0,0,255),-1)
-        cv2.circle(self.img2,(xa[0]*scale_factor,ya[0]*scale_factor),2,(0,255,0),-1)
-        cv2.circle(self.img2,(xb[0]*scale_factor,yb[0]*scale_factor),2,(255,0,0),-1)
+        #cv2.circle(self.img2,(xa[0]*scale_factor,ya[0]*scale_factor),2,(0,255,0),-1)
+        #cv2.circle(self.img2,(xb[0]*scale_factor,yb[0]*scale_factor),2,(255,0,0),-1)
         #(img2,(x_a[0],y_a[0]),2,(0,0,255*marker.confidence),-1)
         cv2.imshow('map',self.img2)
         cv2.moveWindow('map',1400,0)
