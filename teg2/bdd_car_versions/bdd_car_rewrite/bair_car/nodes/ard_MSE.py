@@ -6,7 +6,7 @@ import rospy
 lock = threading.Lock()
 
 def apply_steer_pwm_gain(steer_pwm,M):
-    return pwm
+    return steer_pwm
     if steer_pwm >= M['steer_null']:
         pwm = (steer_pwm-M['steer_null']) * M['steer_gain'] + M['steer_null']
     else:
@@ -14,7 +14,7 @@ def apply_steer_pwm_gain(steer_pwm,M):
     return pwm
 
 def apply_motor_pwm_gain(motor_pwm,M):
-    return pwm
+    return motor_pwm
     if motor_pwm >= M['motor_null']:
         pwm = (motor_pwm-M['motor_null']) * M['motor_gain'] + M['motor_null']
     else:
