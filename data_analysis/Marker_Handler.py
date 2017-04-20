@@ -23,14 +23,14 @@ class Marker_Handler:
     def __init__(self, arguments):
         
         
-        #bagfile_handler = Bagfile_Handler(arguments)
-        capture_device = cv2.VideoCapture(1)
-        image_marker = Video_Marker(None,capture_device) 
-        #image_marker = Video_Marker(bagfile_handler,None)
+        bagfile_handler = Bagfile_Handler(arguments)
+        #capture_device = cv2.VideoCapture(1)
+        #image_marker = Video_Marker(None,capture_device) 
+        image_marker = Video_Marker(bagfile_handler,None)
         self.area_visualizer = Area_Visualizer()
                     
-        #self.play_video(bagfile_handler,None,image_marker)
-        self.play_video(None,capture_device,image_marker)
+        self.play_video(bagfile_handler,None,image_marker)
+        #self.play_video(None,capture_device,image_marker)
 
     
 
