@@ -175,7 +175,7 @@ try:
 	t0 = time.time()
 	time_step = Timer(1)
 	caffe_enter_timer = Timer(2)
-	folder_display_timer = Timer(30)
+	folder_display_timer = Timer(10)
 	git_pull_timer = Timer(60)
 	reload_timer = Timer(10)
 	caf_steer_previous = 49
@@ -291,7 +291,7 @@ try:
 				print("Shutting down because in state 4 for 30+ s")
 				#unix('sudo shutdown -h now')
 		if time_step.check():
-			print(d2s("In state",state,"for",state_transition_time_s,"seconds, previous_state =",previous_state))
+			#print(d2s("In state",state,"for",state_transition_time_s,"seconds, previous_state =",previous_state))
 			time_step.reset()
 			if not folder_display_timer.check():
 				print("*** Data foldername = "+foldername+ '***')
