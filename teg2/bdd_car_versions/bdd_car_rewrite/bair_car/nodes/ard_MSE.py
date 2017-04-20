@@ -9,14 +9,14 @@ def apply_steer_pwm_gain(steer_pwm,M):
     if steer_pwm >= M['steer_null']:
         pwm = (M['steer_pwm']-M['steer_null']) * M['steer_gain'] + M['steer_null']
     else:
-        pwm = (M['steer_null']-M['steer_pwm']) * M['steer_gain'] + M['steer_null']
+        pwm = (M['steer_null']-steer_pwm) * M['steer_gain'] + M['steer_null']
     return pwm
 
 def apply_motor_pwm_gain(motor_pwm,M):
     if motor_pwm >= M['motor_null']:
         pwm = (M['motor_pwm']-M['motor_null']) * M['motor_gain'] + M['motor_null']
     else:
-        pwm = (M['motor_null']-M['motor_pwm']) * M['motor_gain'] + M['motor_null']
+        pwm = (M['motor_null']-motor_pwm) * M['motor_gain'] + M['motor_null']
     return pwm
 
 def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
