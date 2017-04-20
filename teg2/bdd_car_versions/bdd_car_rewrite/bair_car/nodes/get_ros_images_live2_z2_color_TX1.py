@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
 from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
+#import aruco_code
 
 try:
 	os.environ['GLOG_minloglevel'] = '2'
@@ -63,6 +64,8 @@ try:
 	rospy.Subscriber("/bair_car/zed/right/image_rect_color",Image,right_callback,queue_size = 1)
 	rospy.Subscriber("/bair_car/zed/left/image_rect_color",Image,left_callback,queue_size = 1)
 	rospy.Subscriber('/bair_car/state', std_msgs.msg.Int32,state_callback)
+	rospy.Subscriber('/bair_car/steer', std_msgs.msg.Int32,steer_callback)
+	rospy.Subscriber('/bair_car/motor', std_msgs.msg.Int32,motor_callback)
 
 	steer_cmd_pub = rospy.Publisher('cmd/steer', std_msgs.msg.Int32, queue_size=100)
 	motor_cmd_pub = rospy.Publisher('cmd/motor', std_msgs.msg.Int32, queue_size=100)
@@ -98,6 +101,11 @@ try:
 						r0 = right_list[-2]
 						r1 = right_list[-1]
 
+						"""
+						if use_aruco:
+							aruco_steer,aruco_motor,aruco_only = aruco_code.do_aruco(left_list[-1],steer,motor)
+						"""
+						
 						solver.net.blobs['ZED_data'].data[0,0,:,:] = l0[:,:,0]
 						solver.net.blobs['ZED_data'].data[0,1,:,:] = l1[:,:,0]
 						solver.net.blobs['ZED_data'].data[0,2,:,:] = r0[:,:,0]
@@ -123,6 +131,14 @@ try:
 						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
+						"""
+						caf_steer += d_aruco_steer
+						caf_motor += d_aruco_motor
+						if aruco_only:
+							caf_steer = aruco_steer
+							caf_motor = aruco_motor
+						"""
+
 						if caf_motor > 99:
 							caf_motor = 99
 						if caf_motor < 0:
@@ -136,6 +152,13 @@ try:
 							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
 						if state in [6,7]:
 							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
+
+						"""
+						aruco_steer_cmd_pub.publish(std_msgs.msg.Int32(aruco_steer))
+						aruco_motor_cmd_pub.publish(std_msgs.msg.Int32(aruco_motor))
+						aruco_only_cmd_pub.publish(std_msgs.msg.Int32(aruco_only))
+						"""
+
 
 
 
