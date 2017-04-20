@@ -5,14 +5,14 @@ import rospy
 
 lock = threading.Lock()
 
-def apply_steer_pwm_gain(steer_pwm):
+def apply_steer_pwm_gain(steer_pwm,M):
     if steer_pwm >= M['steer_null']:
         pwm = (M['steer_pwm']-M['steer_null']) * M['steer_gain'] + M['steer_null']
     else:
         pwm = (M['steer_null']-M['steer_pwm']) * M['steer_gain'] + M['steer_null']
     return pwm
 
-def apply_motor_pwm_gain(motor_pwm):
+def apply_motor_pwm_gain(motor_pwm,M):
     if motor_pwm >= M['motor_null']:
         pwm = (M['motor_pwm']-M['motor_null']) * M['motor_gain'] + M['motor_null']
     else:
@@ -20,8 +20,8 @@ def apply_motor_pwm_gain(motor_pwm):
     return pwm
 
 def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
-    steer_pwm = apply_steer_pwm_gain(steer_pwm)
-    motor_pwm = apply_motor_pwm_gain(motor_pwm)
+    steer_pwm = apply_steer_pwm_gain(steer_pwm,M)
+    motor_pwm = apply_motor_pwm_gain(motor_pwm,M)
     write_str = d2n( '(', int(steer_pwm), ',', int(motor_pwm+10000), ')')
     Arduinos['MSE'].write(write_str)
     steer_percent = pwm_to_percent(M,M['steer_null'],steer_pwm,M['steer_max'],M['steer_min'])
