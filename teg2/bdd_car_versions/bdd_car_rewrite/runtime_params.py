@@ -42,7 +42,7 @@ weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
 verbose = False
 use_caffe = True
 steer_gain = 1.0
-motor_gain = 0.5
+motor_gain = 0.25
 acc2rd_threshold = 100
 if False:
 	gyro_freeze_threshold = 500
