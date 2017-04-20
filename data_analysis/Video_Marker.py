@@ -173,7 +173,7 @@ class Video_Marker(object):
                 
                  # map test code
                 
-                self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
+                #self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
                 # map test code
                 
                 # They are drawn onto the current image
