@@ -9,15 +9,15 @@ from Board import Board
 import sys
 from zed_parameter import Zed_Parameter
 import numpy as np
-from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
 from Map import Map
+from numpy import average
 
 
 
-safety_distance = 1.5 # meter
+safety_distance = 1.5  # meter
 
 
 class Video_Marker(object):
@@ -33,11 +33,15 @@ class Video_Marker(object):
         self.bagfile_handler = bagfile_handler
         if capture_device != None:
             self.capture_device = capture_device
-            #capture_device.set(cv2.CAP_PROP_AUTOFOCUS,1)
-            #capture_device.set(cv2.CAP_PROP_AUTO_EXPOSURE,-1)
-            #capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 2560)
-            #capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-            #1344x376
+            ''' Possible modes according to the zed manufacturer. This relates to the overall
+            image. Our image is half of this width because of the cropping
+
+            Video Mode    Frames per second    Output Resolution (side by side)
+            2.2K          15                     4416x1242 ( NOT AVAILABLE ON JETSON TX1 )
+            1080p         30                     3840x1080
+            720p          60                     2560x720
+            WVGA          100                    1344x376
+            '''
             capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 1344)
             capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
         else:
@@ -46,7 +50,7 @@ class Video_Marker(object):
        
     def process_next_image(self, crop, cv_image=None):
         
-            return self.mark_next_image(cv_image,crop)
+            return self.mark_next_image(cv_image, crop)
 
          
     def read_next_image(self):
@@ -74,24 +78,33 @@ class Video_Marker(object):
         left_range = 50
         right_range = 50
         
-        min_distance = 9999
+        min_perceived_distance = 9999
         
-        critical_distance = 1.0
+        critical_distance = 1.5
         stop_distance = 0.5
         
         max_motor = 100
-        forward_range = 51
+        min_motor = 49  # Full stop. Backwards is not considered
         
+ 
+        
+        # Which area in our viewport is considered "in front"
+        # The viewport is at our angle calculation roughly in between -33 and 33 deg
+        front_left_limit_deg = -25
+        front_right_limit_deg = 25
+        
+        
+        # Calculating the average angle to get away from the wall.
         # Lets just say it is not straightforward to calculate an
         # average angle
         for crit_pair in critical_dist_angle_pairs:
             sum_sinuses = np.sin(crit_pair['angle'])
             sum_cosinuses = np.cos(crit_pair['angle'])
-            min_distance = min(crit_pair['distance'],min_distance)
+            min_perceived_distance = min(crit_pair['distance'], min_perceived_distance)
             
-        average_angle = np.arctan(sum_sinuses/sum_cosinuses)    
+        average_angle = np.arctan(sum_sinuses / sum_cosinuses)    
             
-        opposite_angle =( (average_angle + np.pi) + np.pi) % (2 * np.pi ) - np.pi 
+        opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
         
         if opposite_angle < max_left_steering_angle:
             steering_command = max_left_command
@@ -100,32 +113,33 @@ class Video_Marker(object):
         else:
             # Opposite angle is within our steerable area
             # It is necessary to know if left or right to go though
-            mid_steering_command = (max_right_command-max_left_command)/2.0
+            mid_steering_command = (max_right_command - max_left_command) / 2.0
             
             if opposite_angle < 0:
-                steering_command = (opposite_angle / np.pi)*left_range
+                steering_command = (opposite_angle / np.pi) * left_range
                            
             else:
-                steering_command = (opposite_angle / np.pi)*right_range 
+                steering_command = (opposite_angle / np.pi) * right_range 
             
             # Finally change the mapping from -50,50 to 0,100
             steering_command = steering_command + mid_steering_command
-            #steering_command = 
+            # steering_command = 
+        
+        
         # Next, calculate a safe motor command
-        
-       
-        
         # If the average obstacle is in front of us....
-        if(np.deg2rad(-45) < average_angle < np.deg2rad(45)):
-            if(min_distance < 0.5):
-                motor_command = 49.0
-            elif (min_distance < 1.5):
-                motor_command = max_motor-(min_distance/1.5)*forward_range
         
+        if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):
+            if(min_perceived_distance < stop_distance):
+                motor_command = min_motor
+            elif (min_perceived_distance < critical_distance):
+                distance_norm = ((min_perceived_distance - stop_distance) / (critical_distance - stop_distance))
+                motor_command = min_motor + distance_norm * (max_motor - min_motor)
+                
+                
         
-        
-        #safe_motor, safe_steer
-        return motor_command,steering_command
+        # safe_motor, safe_steer
+        return motor_command, steering_command
     
     
     def mark_next_image(self, cv_image, crop=False):
@@ -177,7 +191,7 @@ class Video_Marker(object):
                 
                  # map test code
                 
-                #self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
+                # self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
                 # map test code
                 
                 # They are drawn onto the current image
@@ -191,25 +205,25 @@ class Video_Marker(object):
                 # PUT DICT SAVING HERE
                 marker = Marker(ids[i], confidence=1.0, center_line_xy=center_line_xy, center_line_dist_ang=center_line_dist_ang)
                 markers.append(marker)
-            #print(self.bagfile_handler)
-            #print(evasion_needed)
+            # print(self.bagfile_handler)
+            # print(evasion_needed)
             
             if(evasion_needed and self.bagfile_handler == None):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
-                cv2.putText(gray, str(np.round(safe_motor,2)) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
+                cv2.putText(gray, str(np.round(safe_motor, 2)) + "," + str(safe_steer), (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
             # If an evasion is needed draw onto the image safe values
             if(evasion_needed and self.bagfile_handler != None):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
-                self.bagfile_handler.evasion_data.append({'timestamp':self.bagfile_handler.timestamp,'motor_command':safe_motor,'steering_command':safe_steer})
+                self.bagfile_handler.evasion_data.append({'timestamp':self.bagfile_handler.timestamp, 'motor_command':safe_motor, 'steering_command':safe_steer})
                 
-                cv2.putText(gray, str(np.round(safe_motor,2)) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
+                cv2.putText(gray, str(np.round(safe_motor, 2)) + "," + str(safe_steer), (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
         return gray, markers
     
-    def get_center_line_xy(self,image,rvec,tvec,camMat,camDist):
+    def get_center_line_xy(self, image, rvec, tvec, camMat, camDist):
         length = 0.2
-        axisPoints = np.array([[-length/2.0, 0, 0],[length/2.0, 0, 0]])
+        axisPoints = np.array([[-length / 2.0, 0, 0], [length / 2.0, 0, 0]])
         imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, camMat, camDist);
         
         # The points will be ordered according to their y axis so that even markers which are upside down
@@ -222,7 +236,7 @@ class Video_Marker(object):
             xy2 = (int(imgpts[0][0][0]), int(imgpts[0][0][1]))
             xy1 = (int(imgpts[1][0][0]), int(imgpts[1][0][1]))
   
-        return [xy1,xy2]
+        return [xy1, xy2]
     
     def get_corners_xy(self, image, rvec, tvec, camMat, camDist):
         '''
@@ -267,7 +281,7 @@ class Video_Marker(object):
         y = center_line_xy[0][1]
         y_ = center_line_xy[1][1]
         
-        #print center_line_xy
+        # print center_line_xy
         # The method returns the angle to point x,y    
         distance, angle = self.get_distance_and_angle_of_line(W, (x, y), (x_, y_), camMat, camDist)
         center_line_dist_ang = {'distance':distance, 'angle':angle}        
@@ -352,7 +366,7 @@ class Video_Marker(object):
             text_zoomfactor = 1
 
                 
-        cv2.putText(image, str(np.round(distance,2)), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
+        cv2.putText(image, str(np.round(distance, 2)), xy1, cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (255, 255, 255), 2)
         
         # cv2.putText(image,str(id),xy2,cv2.FONT_HERSHEY_SIMPLEX, text_zoomfactor, (0,255,0),2)
 
@@ -372,14 +386,14 @@ class Video_Marker(object):
         
         distance = (real_object_width_m * F) / P
         
-        x_mid= 1344/4.0
-        y_mid = 376/4.0        
+        x_mid = 1344 / 4.0
+        y_mid = 376 / 4.0        
 
-        angle = np.arctan((px-x_mid)/F)
-        #print((px-x_mid))
+        angle = np.arctan((px - x_mid) / F)
+        # print((px-x_mid))
         
         # angle =  np.rad2deg(np.arctan2(y_mid - py, x_mid - px))
-        #angle = np.arctan2(y_mid - py, x_mid - px)
-        #print(np.rad2deg(angle))
-        #sys.exit(0
+        # angle = np.arctan2(y_mid - py, x_mid - px)
+        # print(np.rad2deg(angle))
+        # sys.exit(0
         return distance, angle

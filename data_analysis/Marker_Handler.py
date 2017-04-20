@@ -16,21 +16,31 @@ from Map import Map
 class Marker_Handler:
     
     detected_markers = {}
-    area_visualizer = None
+    area_visualizer = None # The choice if there is a visualizer or not is not yet implemented
     source_local_camera = True
+    source_bagfile = False
     show_video = True
-    crop = True
+    crop = True # Should the input video be cropped to the left image input. If false this code might contain errors
+    
+    
     def __init__(self, arguments):
         
+        if(self.source_bagfile):
         
-        #bagfile_handler = Bagfile_Handler(arguments)
-        capture_device = cv2.VideoCapture(1)
-        image_marker = Video_Marker(None,capture_device) 
-        #image_marker = Video_Marker(bagfile_handler,None)
-        self.area_visualizer = Area_Visualizer()
-                    
-        #self.play_video(bagfile_handler,None,image_marker)
-        self.play_video(None,capture_device,image_marker)
+            bagfile_handler = Bagfile_Handler(arguments)
+            image_marker = Video_Marker(bagfile_handler,None) 
+            self.area_visualizer = Area_Visualizer()
+            self.play_video(bagfile_handler,None,image_marker)
+            
+        elif (self.source_local_camera):
+            
+            capture_device = cv2.VideoCapture(2)
+            if(capture_device == None):
+                print("Camera not found")
+                sys.exit(1)
+            image_marker = Video_Marker(None,capture_device) 
+            self.area_visualizer = Area_Visualizer()
+            self.play_video(None,capture_device,image_marker)
 
     
 
@@ -45,7 +55,8 @@ class Marker_Handler:
                 elif(not capture_device == None):
                     ret, image = capture_device.read()
                    
-                
+                if image is None:
+                    print("Error reading image! Wrong number of camera?")
                 cv_image, markers = image_marker.process_next_image(self.crop,image) 
  
                 

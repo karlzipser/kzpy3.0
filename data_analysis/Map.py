@@ -20,7 +20,7 @@ class Map(object):
         
     def __init__(self):
         
-        print("test")
+        pass
         #cv2.imshow('map',self.img2)
         #cv2.moveWindow('map',1400,0)
         #key = cv2.waitKey() & 0xFF
