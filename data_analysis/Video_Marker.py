@@ -9,7 +9,6 @@ from Board import Board
 import sys
 from zed_parameter import Zed_Parameter
 import numpy as np
-from _socket import AF_X25
 from cv2 import polarToCart
 import math
 from Marker import Marker
