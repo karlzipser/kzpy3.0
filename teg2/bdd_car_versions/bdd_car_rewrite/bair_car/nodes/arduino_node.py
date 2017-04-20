@@ -14,6 +14,7 @@ import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
 from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 M = {}
+M['acc2rd_threshold'] = acc2rd_threshold
 M['Stop_Arduinos'] = False
 baudrate = 115200
 timeout = 0.1
