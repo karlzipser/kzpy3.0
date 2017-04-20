@@ -3,7 +3,7 @@ import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
 from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 try:
-
+	os.environ['GLOG_minloglevel'] = '2'
 	import caffe
 	caffe.set_device(0)
 	caffe.set_mode_gpu()
