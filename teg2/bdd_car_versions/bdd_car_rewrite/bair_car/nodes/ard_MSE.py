@@ -420,6 +420,7 @@ def serial_data_to_messages(Arduinos,M):
     except:
         return False
     if len(mse_input) == 5 and mse_input[0] == 'mse':
+        lock.acquire()
         M['button_pwm_lst'].append(mse_input[1])
         M['steer_pwm_lst'].append(mse_input[2])
         M['motor_pwm_lst'].append(mse_input[3])
@@ -427,11 +428,13 @@ def serial_data_to_messages(Arduinos,M):
         #M['motor_pwm_write_lst'].append(mse_input[5])
         M['encoder_lst'].append(mse_input[4])#6])
         M['encoder_pub'].publish(std_msgs.msg.Float32(M['encoder_lst'][-1]))
+        lock.release()
         return True
     else:
         return False
 
-
+    
+     
 
 def manage_list_lengths(M):
     lock.acquire()

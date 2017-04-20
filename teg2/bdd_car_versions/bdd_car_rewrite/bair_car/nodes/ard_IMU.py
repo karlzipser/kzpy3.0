@@ -1,4 +1,5 @@
-
+import threading
+import rospy
 from kzpy3.utils import *
 import geometry_msgs.msg
 
@@ -7,7 +8,7 @@ imu_dic['gyro'] = 'gyro_pub'
 imu_dic['acc'] = 'acc_pub'
 imu_dic['head'] = 'gyro_heading_pub'
 
-
+lock = threading.Lock()
 
 def setup(M,Arduinos):
     for m in ['gyro','acc','head']:
@@ -32,17 +33,23 @@ def run_loop(Arduinos,M):
             if m == 'acc':
                 ctr = 1
                 for n in ['acc_x_lst','acc_y_lst','acc_z_lst'],['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
+                    lock.aquire()
                     M[n].append(imu_input[ctr])
+                    lock.release()
                     ctr += 1
             elif m == 'gyro':
                 ctr = 1
                 for n in ['gyro_x_lst','gyro_y_lst','gyro_z_lst']:
+                    lock.aquire()
                     M[n].append(imu_input[ctr])
+                    lock.release()
                     ctr += 1
             elif m == 'head':
                 ctr = 1
                 for n in ['head_x_lst','head_y_lst','head_z_lst']:
+                    lock.aquire()
                     M[n].append(imu_input[ctr])
+                    lock.release()
                     ctr += 1
             else:
                 print '***'+read_str + "*** is not imu"
