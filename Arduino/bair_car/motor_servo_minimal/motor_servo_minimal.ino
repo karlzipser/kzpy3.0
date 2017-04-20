@@ -19,19 +19,19 @@ in the percent signals, whereas absolute values of the PWM can vary for various 
 //
 // These are the possible states of the control system.
 // States are reached by button presses or drive commands, except for error state.
-#define STATE_HUMAN_FULL_CONTROL_DATA            1
-#define STATE_HUMAN_FULL_CONTROL_NOT_DATA                          2
-#define STATE_CAFFE_CAFFE_STEER_HUMAN_MOTOR 3
-#define STATE_CAFFE_HUMAN_STEER_HUMAN_MOTOR 5
-#define STATE_CAFFE_CAFFE_STEER_CAFFE_MOTOR 6
-#define STATE_CAFFE_HUMAN_STEER_CAFFE_MOTOR 7
-#define STATE_LOCK_CALIBRATE                4
-#define STATE_ERROR                         -1
+//#define STATE_HUMAN_FULL_CONTROL_DATA            1
+//#define STATE_HUMAN_FULL_CONTROL_NOT_DATA                          2
+//#define STATE_CAFFE_CAFFE_STEER_HUMAN_MOTOR 3
+//#define STATE_CAFFE_HUMAN_STEER_HUMAN_MOTOR 5
+//#define STATE_CAFFE_CAFFE_STEER_CAFFE_MOTOR 6
+//#define STATE_CAFFE_HUMAN_STEER_CAFFE_MOTOR 7
+//#define STATE_LOCK_CALIBRATE                4
+//#define STATE_ERROR                         -1
 // Now for the sensors
-#define STATE_GPS                           "'gps'"
-#define STATE_GYRO                          "'gyro'"
-#define STATE_SONAR                         "'sonar'"
-#define STATE_ENCODER                       "'encoder'"
+//#define STATE_GPS                           "'gps'"
+//#define STATE_GYRO                          "'gyro'"
+//#define STATE_SONAR                         "'sonar'"
+//#define STATE_ENCODER                       "'encoder'"
 //
 /////////////////////
 
@@ -92,18 +92,22 @@ in the percent signals, whereas absolute values of the PWM can vary for various 
 
 // These are three key values indicating current incoming signals.
 // These are set in interrupt service routines.
-volatile int button_pwm_value = 1210;
-volatile int servo_pwm_value = 0;
-volatile int motor_pwm_value = 0;
-int servo_command_pwm_value = 0;
-int motor_command_pwm_value = 0;
-int motor_null_pwm_value = 0;
-int servo_null_pwm_value = 0;
+volatile int button_pwm = 1210;
+volatile int servo_pwm = 0;
+volatile int motor_pwm = 0;
+volatile int servo_write_pwm = 0;
+volatile int motor_write_pwm = 0;
+int servo_command_pwm = 0;
+int motor_command_pwm = 0;
+int motor_null_pwm = 1500;
+int servo_null_pwm = 1400;
 // These are used to interpret interrupt signals.
 volatile unsigned long int button_prev_interrupt_time = 0;
 volatile unsigned long int servo_prev_interrupt_time  = 0;
 volatile unsigned long int motor_prev_interrupt_time  = 0;
-volatile unsigned long int state_transition_time_ms = 0;
+//volatile unsigned long int state_transition_time_ms = 0;
+
+int max_communication_delay = 100;
 
 long unsigned int servo_command_time;
 long unsigned int motor_command_time;
@@ -113,7 +117,7 @@ Servo motor;
 
 
 
-
+volatile float rate_1 = 0.0; // for encoder
 //
 ///////////////////
 
@@ -150,11 +154,13 @@ void setup()
     char t = Serial.read();
   }
   
-  while(servo_pwm_value==0 || motor_pwm_value==0) {
+  while(servo_pwm==0 || motor_pwm==0) {
     delay(200);
   }
-  servo_null_pwm_value = servo_pwm_value;
-  motor_null_pwm_value = motor_pwm_value;
+  servo_null_pwm = servo_pwm;
+  motor_null_pwm = motor_pwm;
+
+  encoder_setup();
 }
 
 
@@ -169,7 +175,7 @@ void button_interrupt_service_routine(void) {
   button_prev_interrupt_time = m;
   // Human in full control of driving
   if (dt>BUTTON_MIN && dt<BUTTON_MAX) {
-    button_pwm_value = dt;
+    button_pwm = dt;
   }
 }
 
@@ -184,12 +190,15 @@ void servo_interrupt_service_routine(void) {
   volatile unsigned long int dt = m - servo_prev_interrupt_time;
   servo_prev_interrupt_time = m;
   if (dt>SERVO_MIN && dt<SERVO_MAX) {
-    servo_pwm_value = dt;
-    if(servo_command_pwm_value>0) {
-      servo.writeMicroseconds(servo_command_pwm_value);
-    } else if(servo_null_pwm_value>0) {
-      servo.writeMicroseconds(servo_null_pwm_value);
-    }  } 
+    servo_pwm = dt;
+    if(servo_command_pwm>0) {
+      servo_write_pwm = servo_command_pwm;
+      servo.writeMicroseconds(servo_write_pwm);
+    } else if(servo_null_pwm>0) {
+      servo_write_pwm = servo_null_pwm;
+      servo.writeMicroseconds(servo_write_pwm);
+    }
+  } 
 }
 
 
@@ -201,11 +210,13 @@ void motor_interrupt_service_routine(void) {
   volatile unsigned long int dt = m - motor_prev_interrupt_time;
   motor_prev_interrupt_time = m;
   if (dt>MOTOR_MIN && dt<MOTOR_MAX) {
-    motor_pwm_value = dt;
-    if(motor_command_pwm_value>0) {
-      motor.writeMicroseconds(motor_command_pwm_value);
-    } else if(motor_null_pwm_value>0) {
-      motor.writeMicroseconds(motor_null_pwm_value);
+    motor_pwm = dt;
+    if(motor_command_pwm>0) {
+      motor_write_pwm = motor_command_pwm;
+      motor.writeMicroseconds(motor_write_pwm);
+    } else if(motor_null_pwm>0) {
+      motor_write_pwm = motor_null_pwm;
+      motor.writeMicroseconds(motor_write_pwm);
     }
   }
 }
@@ -218,34 +229,141 @@ void loop() {
   unsigned int A = Serial.parseInt();
   unsigned int B = Serial.parseInt();
 
+   long unsigned int now = millis();
+   
   if (A>500 && A<3000) {
-    servo_command_pwm_value = A;
-    servo_command_time = millis();
+    servo_command_pwm = A;
+    servo_command_time = now;
   } else if (A>10000 && A<30000) {
-    motor_command_pwm_value = A-10000;
-    motor_command_time = millis();
+    motor_command_pwm = A-10000;
+    motor_command_time = now;
   }
   if (B>500 && B<3000) {
-    servo_command_pwm_value = B;
-    servo_command_time = millis();
+    servo_command_pwm = B;
+    servo_command_time = now;
   } else if (B>10000 && B<30000) {
-    motor_command_pwm_value = B-10000;
-    motor_command_time = millis();
-  }
-
-  if(servo_command_time-millis() > 100 || motor_command_time-millis() > 100) {
-    servo_command_pwm_value = 0;
-    motor_command_pwm_value = 0;
+    motor_command_pwm = B-10000;
+    motor_command_time = now;
   }
   
-  Serial.print("(mse,");
-  Serial.print(button_pwm_value);
+  if(now-servo_command_time > max_communication_delay || now-motor_command_time > max_communication_delay) {
+    servo_command_pwm = 0;
+    motor_command_pwm = 0;
+  }
+  
+  encoder_loop();
+
+  Serial.print("('mse',");
+  Serial.print(button_pwm);
   Serial.print(",");
-  Serial.print(servo_pwm_value);
+  Serial.print(servo_pwm);
   Serial.print(",");
-  Serial.print(motor_pwm_value);
+  Serial.print(motor_pwm);
+  Serial.print(",");
+  /*
+  Serial.print(servo_write_pwm);
+  Serial.print(",");
+  Serial.print(motor_write_pwm);
+  Serial.print(",");
+  */
+  Serial.print(rate_1);
   Serial.println(")");
 
   delay(10);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////// ENCODER //////////////////
+//PIN's definition
+#include "RunningAverage.h"
+#define encoder0PinA  2
+#define encoder0PinB  3
+
+RunningAverage enc_avg(10);
+
+volatile int encoder0Pos = 0;
+volatile boolean PastA = 0;
+volatile boolean PastB = 0;
+volatile unsigned long int a = 0;
+volatile unsigned long int b = 0;
+volatile unsigned long int t1 = micros();
+volatile unsigned long int t2 = 0;
+volatile unsigned long int last_t2 = 0;
+volatile unsigned long int dt = 0;
+
+
+void encoder_setup() 
+{
+  //Serial.begin(9600);
+  pinMode(encoder0PinA, INPUT);
+  //turn on pullup resistor
+  //digitalWrite(encoder0PinA, HIGH); //ONLY FOR SOME ENCODER(MAGNETIC)!!!! 
+  pinMode(encoder0PinB, INPUT); 
+  //turn on pullup resistor
+  //digitalWrite(encoder0PinB, HIGH); //ONLY FOR SOME ENCODER(MAGNETIC)!!!! 
+  PastA = (boolean)digitalRead(encoder0PinA); //initial value of channel A;
+  PastB = (boolean)digitalRead(encoder0PinB); //and channel B
+
+//To speed up even more, you may define manually the ISRs
+// encoder A channel on interrupt 0 (arduino's pin 2)
+  attachInterrupt(0, doEncoderA, CHANGE);
+// encoder B channel pin on interrupt 1 (arduino's pin 3)
+  attachInterrupt(1, doEncoderB, CHANGE); 
+
+  enc_avg.clear();
+}
+
+volatile unsigned long int doEncoderAdtSum = 1;
+
+void encoder_loop()
+{  
+  dt = micros()-t1;
+  if (doEncoderAdtSum > 0) {
+    //enc_avg.addValue(1000.0*1000.0/16.0 * a / doEncoderAdtSum);
+    enc_avg.addValue(1000.0*1000.0/12.0 * a / doEncoderAdtSum); //6 magnets
+    rate_1 = enc_avg.getAverage();
+    t1 = micros();
+    a = 0;
+    doEncoderAdtSum = 0;
+  } else if (dt > 100000) {
+    enc_avg.clear();
+    rate_1 = 0;
+    t1 = micros();
+    a = 0;
+    doEncoderAdtSum = 0;
+  }
+}
+
+//you may easily modify the code  get quadrature..
+//..but be sure this whouldn't let Arduino back! 
+volatile float doEncoderAdt = 0.;
+void doEncoderA()
+{
+  t2 = micros();
+  a = a + 1;
+  doEncoderAdtSum += t2 - last_t2; 
+  //doEncoderAdt = float(t2 - last_t2);
+  //enc_avg.addValue(62500. / doEncoderAdt);
+  //rate_1 = enc_avg.getAverage();
+  last_t2 = t2;
+}
+
+void doEncoderB()
+{
+     b += 1;
+}
+//
+///////////////////
 
