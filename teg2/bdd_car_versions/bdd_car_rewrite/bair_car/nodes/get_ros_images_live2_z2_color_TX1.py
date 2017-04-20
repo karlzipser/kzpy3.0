@@ -74,7 +74,7 @@ try:
 	
 	while not rospy.is_shutdown():
 		if state in [3,5,6,7]:
-			if use_caffe:
+			if True: #use_caffe:
 				if solver == None:
 					solver = setup_solver()
 					if weights_file_path != None:
