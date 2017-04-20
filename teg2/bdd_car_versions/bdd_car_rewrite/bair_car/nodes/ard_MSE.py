@@ -2,6 +2,8 @@ import threading
 from kzpy3.utils import *
 import std_msgs.msg
 import rospy
+import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
+from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 lock = threading.Lock()
 
@@ -194,8 +196,8 @@ def setup(M,Arduinos):
     M['motor_min'] = M['motor_null']-1
     #M['buttons'] = [0,1900,1700,1424,870]
     M['set_null'] = False
-    M['steer_gain'] = 1.0
-    M['motor_gain'] = 1.0
+    #M['steer_gain'] = 1.0
+    #M['motor_gain'] = 1.0
 
     for q in ['button_pwm_lst',
         'steer_pwm_lst',
@@ -253,6 +255,9 @@ calibration_signal_timer = Timer(0.01)
 #
 
 def run_loop(Arduinos,M,BUTTON_DELTA=50,):
+    M['steer_gain'] = steer_gain
+    M['motor_gain'] = motor_gain
+
     lock = threading.Lock()
     if 'MSE' not in Arduinos:
         M['Stop_Arduinos'] = True
@@ -260,7 +265,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
     
 
-    while M['Stop_Arduinos'] == False:
+    while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
         
         if not serial_data_to_messages(Arduinos,M):
             continue
@@ -289,7 +294,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         
         if 'acc' in M:
             acc2rd = M['acc'][0]**2+M['acc'][2]**2
-            if acc2rd > 20:
+            if acc2rd > acc2rd_threshold:
                 if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                     M['previous_state'] = M['current_state']
                     M['current_state'] = M['state_nine']
@@ -306,9 +311,9 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
             human_motor = False
             human_steer = False
-            if np.abs(M['steer_percent'] - 49) > 10:
+            if np.abs(M['steer_percent'] - 49) > 5:
                 human_steer = True
-            if np.abs(M['motor_percent'] - 49) > 10:
+            if np.abs(M['motor_percent'] - 49) > 5:
                 human_motor = True
             if human_motor and human_steer:
                 if M['current_state'] != M['state_five']:

@@ -55,7 +55,7 @@ def arduino_sig_thread():
     ard_SIG.run_loop(Arduinos,M)
 
 def arduino_master_thread():
-    while M['Stop_Arduinos'] == False:
+    while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
 
         if time_step.check():
             time_step.reset()

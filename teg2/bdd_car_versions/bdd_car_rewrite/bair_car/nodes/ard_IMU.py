@@ -21,7 +21,7 @@ def setup(M,Arduinos):
 
 def run_loop(Arduinos,M):
 
-    while M['Stop_Arduinos'] == False:
+    while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
 
         try:        
             read_str = Arduinos['IMU'].readline()
