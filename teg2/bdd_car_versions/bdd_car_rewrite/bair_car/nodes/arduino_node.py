@@ -7,6 +7,7 @@ import ard_SIG
 import ard_ser_in
 import threading
 import std_msgs.msg
+import geometry_msgs.msg
 import rospy
 
 M = {}
@@ -27,6 +28,10 @@ rospy.Subscriber('cmd/motor', std_msgs.msg.Int32, callback=caffe_motor_callback)
 M['state_pub'] = rospy.Publisher('state', std_msgs.msg.Int32, queue_size=5) 
 M['steer_pub'] = rospy.Publisher('steer', std_msgs.msg.Int32, queue_size=5) 
 M['motor_pub'] = rospy.Publisher('motor', std_msgs.msg.Int32, queue_size=5) 
+M['encoder_pub'] = self.encoder_pub = rospy.Publisher('encoder', std_msgs.msg.Float32, queue_size=5)
+M['gyro_pub'] = rospy.Publisher('gyro', geometry_msgs.msg.Vector3, queue_size=100)
+M['gyro_heading_pub'] = rospy.Publisher('gyro_heading', geometry_msgs.msg.Vector3, queue_size=100)
+M['acc_pub'] = rospy.Publisher('acc', geometry_msgs.msg.Vector3, queue_size=100)
 
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)
