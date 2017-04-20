@@ -45,15 +45,13 @@ try:
 				previous_state = state
 		state = data.data
 	def right_callback(data):
-		global A,B, left_list, right_list, solver
-		A += 1
+		global left_list, right_list, solver
 		cimg = bridge.imgmsg_to_cv2(data,"bgr8")
 		if len(right_list) > 5:
 			right_list = right_list[-5:]
 		right_list.append(cimg)
 	def left_callback(data):
-		global A,B, left_list, right_list
-		B += 1
+		global left_list, right_list
 		cimg = bridge.imgmsg_to_cv2(data,"bgr8")
 		if len(left_list) > 5:
 			left_list = left_list[-5:]
