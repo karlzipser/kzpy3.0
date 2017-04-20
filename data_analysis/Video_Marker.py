@@ -17,7 +17,7 @@ from Map import Map
 
 
 
-safety_distance = 0.1 # meter
+safety_distance = 1.5 # meter
 
 
 class Video_Marker(object):
@@ -63,6 +63,7 @@ class Video_Marker(object):
         if closer than 0.5 meter
         
         '''
+        
         motor_command = -1
         max_left_steering_angle = np.deg2rad(-130)
         max_right_steering_angle = np.deg2rad(130)
@@ -190,6 +191,12 @@ class Video_Marker(object):
                 # PUT DICT SAVING HERE
                 marker = Marker(ids[i], confidence=1.0, center_line_xy=center_line_xy, center_line_dist_ang=center_line_dist_ang)
                 markers.append(marker)
+            #print(self.bagfile_handler)
+            #print(evasion_needed)
+            
+            if(evasion_needed and self.bagfile_handler == None):
+                safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
+                cv2.putText(gray, str(np.round(safe_motor,2)) + "," + str(safe_steer), (10,300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
             # If an evasion is needed draw onto the image safe values
             if(evasion_needed and self.bagfile_handler != None):

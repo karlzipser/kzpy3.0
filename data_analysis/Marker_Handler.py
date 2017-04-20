@@ -19,18 +19,18 @@ class Marker_Handler:
     area_visualizer = None
     source_local_camera = True
     show_video = True
-    
+    crop = True
     def __init__(self, arguments):
         
         
-        bagfile_handler = Bagfile_Handler(arguments)
-        #capture_device = cv2.VideoCapture(1)
-        #image_marker = Video_Marker(None,capture_device) 
-        image_marker = Video_Marker(bagfile_handler,None)
+        #bagfile_handler = Bagfile_Handler(arguments)
+        capture_device = cv2.VideoCapture(1)
+        image_marker = Video_Marker(None,capture_device) 
+        #image_marker = Video_Marker(bagfile_handler,None)
         self.area_visualizer = Area_Visualizer()
                     
-        self.play_video(bagfile_handler,None,image_marker)
-        #self.play_video(None,capture_device,image_marker)
+        #self.play_video(bagfile_handler,None,image_marker)
+        self.play_video(None,capture_device,image_marker)
 
     
 
@@ -46,7 +46,7 @@ class Marker_Handler:
                     ret, image = capture_device.read()
                    
                 
-                cv_image, markers = image_marker.process_next_image(False,image) 
+                cv_image, markers = image_marker.process_next_image(self.crop,image) 
  
                 
                 
