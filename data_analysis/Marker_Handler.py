@@ -46,7 +46,7 @@ class Marker_Handler:
                     ret, image = capture_device.read()
                    
                 
-                cv_image, markers = image_marker.process_next_image(True,image) 
+                cv_image, markers = image_marker.process_next_image(False,image) 
  
                 
                 
