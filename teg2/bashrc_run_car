@@ -21,19 +21,20 @@ PS1="$COMPUTER_NAME: \W$ "
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
   SESSION_TYPE=remote/ssh
   echo "This is a remote/ssh login"
-        echo "sleep before rstat"
-        sleep 30
-  rstat
+        #echo "sleep before rstat"
+        #sleep 30
+  #rstat
 # many other tests omitted
 else
-        echo "sleep before rla..."
-        sleep 60
-        cd ~/kzpy3
-        git pull
-        cd
-        rrm
-        rlog
-        rla
+        echo "here"
+        #echo "sleep before rla..."
+        #sleep 60
+        #cd ~/kzpy3
+        #git pull
+        #cd
+        #rrm
+        #rlog
+        #rla
         #(rla 3>&1 1>&2 2>&3 | grep -v "slMat2cvMat: mat type currently not supported 0 0") 3>&1 1>&2 2>&3
 
 fi
