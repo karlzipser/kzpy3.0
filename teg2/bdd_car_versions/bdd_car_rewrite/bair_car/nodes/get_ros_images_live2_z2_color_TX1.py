@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
+from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 try:
 
@@ -74,7 +76,7 @@ try:
 	
 	while not rospy.is_shutdown():
 		if state in [3,5,6,7]:
-			if True: #use_caffe:
+			if use_caffe:
 				if solver == None:
 					solver = setup_solver()
 					if weights_file_path != None:
