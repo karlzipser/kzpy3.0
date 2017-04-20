@@ -8,11 +8,14 @@ sudo chmod 666 /dev/ttyACM*
 
 """
 
+def setup(M,Arduinos):
+    pass
 
-def run_loop(Arduinos,messages_dic):
 
-    while messages_dic['Stop_Arduinos'] == False:
-        #messages_dic['Stop_Arduinos'] = True
+def run_loop(Arduinos,M):
+
+    while M['Stop_Arduinos'] == False:
+        #M['Stop_Arduinos'] = True
 
         try:  
 
@@ -25,7 +28,7 @@ def run_loop(Arduinos,messages_dic):
             except:
                 continue
             if sig_input[0] in ['GPS2']:
-                messages_dic[sig_input[0]] = sig_input[1:] # This is just a placeholder for now.
+                M[sig_input[0]] = sig_input[1:] # This is just a placeholder for now.
             else:
                 print '***'+read_str + "*** is not sig"
                 continue

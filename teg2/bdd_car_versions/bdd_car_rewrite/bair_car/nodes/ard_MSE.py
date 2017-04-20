@@ -5,13 +5,30 @@ import rospy
 
 lock = threading.Lock()
 
+def apply_steer_pwm_gain(steer_pwm,M):
+    if steer_pwm >= M['steer_null']:
+        pwm = (steer_pwm-M['steer_null']) * M['steer_gain'] + M['steer_null']
+    else:
+        pwm = (M['steer_null']-steer_pwm) * M['steer_gain'] + M['steer_null']
+    return pwm
+
+def apply_motor_pwm_gain(motor_pwm,M):
+    if motor_pwm >= M['motor_null']:
+        pwm = (motor_pwm-M['motor_null']) * M['motor_gain'] + M['motor_null']
+    else:
+        pwm = (M['motor_null']-motor_pwm) * M['motor_gain'] + M['motor_null']
+    return pwm
+
 def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
+    steer_pwm = apply_steer_pwm_gain(steer_pwm,M)
+    motor_pwm = apply_motor_pwm_gain(motor_pwm,M)
     write_str = d2n( '(', int(steer_pwm), ',', int(motor_pwm+10000), ')')
     Arduinos['MSE'].write(write_str)
     steer_percent = pwm_to_percent(M,M['steer_null'],steer_pwm,M['steer_max'],M['steer_min'])
     motor_percent = pwm_to_percent(M,M['motor_null'],motor_pwm,M['motor_max'],M['motor_min'])
     M['steer_pub'].publish(std_msgs.msg.Int32(steer_percent))
     M['motor_pub'].publish(std_msgs.msg.Int32(motor_percent))
+    M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
 
 class State():
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -198,6 +215,8 @@ def setup(M,Arduinos):
     M['motor_min'] = M['motor_null']-1
     M['buttons'] = [0,1900,1700,1424,870]
     M['set_null'] = False
+    M['steer_gain'] = 1.0
+    M['motor_gain'] = 1.0
 
     for q in ['button_pwm_lst',
         'steer_pwm_lst',
@@ -287,6 +306,9 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                     M['previous_state'].leave()
         else:
             print 'acc not in M'
+        if False:
+            if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
+                freeze = True
         
         if M['current_state'] == M['state_nine']:
             pass
@@ -356,12 +378,17 @@ def smooth_data(M):
     if len(M['steer_pwm_lst']) >= M['n_avg_steer']:
         M['smooth_steer'] = array(M['steer_pwm_lst'][-M['n_avg_steer']:]).mean()
     else:
-        M['smooth_steer'] = M['steer_null']
+        M['smooth_steer'] = M['steer_pwm_lst'][-1]
 
     if len(M['motor_pwm_lst']) >= M['n_avg_motor']:  
         M['smooth_motor'] = array(M['motor_pwm_lst'][-M['n_avg_motor']:]).mean()
     else:
-        M['smooth_motor'] = M['motor_null']
+        M['smooth_motor'] = M['motor_pwm_lst'][-1]
+
+    if len(M['encoder_lst']) >= M['n_avg_encoder']:  
+        M['smooth_encoder'] = array(M['encoder_lst'][-M['n_avg_encoder']:]).mean()
+    else:
+        M['smooth_encoder'] = M['encoder_lst'][-1]
 
 
 
