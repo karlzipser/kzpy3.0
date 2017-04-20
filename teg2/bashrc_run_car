@@ -26,6 +26,7 @@ if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
   #rstat
 # many other tests omitted
 else
+        echo "here"
         #echo "sleep before rla..."
         #sleep 60
         #cd ~/kzpy3

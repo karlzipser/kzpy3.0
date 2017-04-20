@@ -5,11 +5,13 @@ import rospy
 
 lock = threading.Lock()
 
-def mse_write_publish(Arduinos,steer_pwm,motor_pwm,steer_pub,motor_pub):
+def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
     write_str = d2n( '(', int(steer_pwm), ',', int(motor_pwm+10000), ')')
     Arduinos['MSE'].write(write_str)
-    steer_pub.publish(std_msgs.msg.Int32(steer_pwm))
-    motor_pub.publish(std_msgs.msg.Int32(motor_pwm))
+    steer_percent = pwm_to_percent(M,M['steer_null'],steer_pwm,M['steer_max'],M['steer_min'])
+    motor_percent = pwm_to_percent(M,M['motor_null'],steer_pwm,M['motor_max'],M['motor_min'])
+    M['steer_pub'].publish(std_msgs.msg.Int32(steer_percent))
+    M['motor_pub'].publish(std_msgs.msg.Int32(motor_percent))
 
 class State():
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -48,12 +50,12 @@ class Human_Control(Run_State):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Run_State.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def process(self):
-        mse_write_publish(self.Arduinos,self.M['steer_pwm_lst'][-1],self.M['motor_pwm_lst'][-1],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['steer_pwm_lst'][-1],self.M['motor_pwm_lst'][-1])
 
 
 class Smooth_Human_Control(Human_Control):
     def process(self):
-        mse_write_publish(self.Arduinos,self.M['smooth_steer'],self.M['smooth_motor'],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['smooth_motor'])
 
 
 
@@ -87,14 +89,14 @@ class PID_Motor(Computer_Control):
             if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
                 self.M['PID'] = [1,2]
                 pid_processing(self.M)
-                mse_write_publish(self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'],self.M['steer_pub'],self.M['motor_pub'])
+                mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'])
             else:
-                mse_write_publish(self.Arduinos,self.M['smooth_steer'],self.M['smooth_motor'],self.M['steer_pub'],self.M['motor_pub'])
+                mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['smooth_motor'])
 
 
 class Freeze(Run_State):
     def process(self):
-        mse_write_publish(self.Arduinos,self.M['steer_null'],self.M['motor_null'],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['steer_null'],self.M['motor_null'])
 
 
 
@@ -102,19 +104,19 @@ class Hum_Steer_PID_Motor(PID_Motor):
     def process(self):
         self.M['PID'] = [1,2]
         pid_processing(self.M)
-        mse_write_publish(self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'])
 
 class Net_Steer_PID_Motor(PID_Motor):
     def process(self):
         self.M['PID'] = [1,2]
         pid_processing(self.M)
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-        mse_write_publish(self.Arduinos,self.M['caffe_steer_pwm'],self.M['pid_motor_pwm'],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['caffe_steer_pwm'],self.M['pid_motor_pwm'])
 
 class Net_Steer_Hum_Motor(PID_Motor):
     def process(self):
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-        mse_write_publish(self.Arduinos,self.M['caffe_steer_pwm'],self.M['smooth_motor'],self.M['steer_pub'],self.M['motor_pub'])
+        mse_write_publish(self.M,self.Arduinos,self.M['caffe_steer_pwm'],self.M['smooth_motor'])
 
 
 
