@@ -5,6 +5,12 @@ import rospy
 
 lock = threading.Lock()
 
+def mse_write_publish(Arduinos,steer_pwm,motor_pwm,steer_pub,motor_pub):
+    write_str = d2n( '(', int(steer_pwm), ',', int(motor_pwm+10000), ')')
+    Arduinos['MSE'].write(write_str)
+    steer_pub.publish(std_msgs.msg.Int32(steer_pwm))
+    motor_pub.publish(std_msgs.msg.Int32(motor_pwm))
+
 class State():
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         self.name = name
@@ -42,12 +48,13 @@ class Human_Control(Run_State):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
         Run_State.__init__(self,name,number,button_pwm_peak,M,Arduinos)
     def process(self):
-        self.Arduinos['MSE'].write(self.M['raw_write_str'])
+        mse_write_publish(self.Arduinos,M['steer_pwm_lst'][-1],M['motor_pwm_lst'][-1],M['steer_pub'],M['motor_pub'])
 
 
 class Smooth_Human_Control(Human_Control):
     def process(self):
-        self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+        mse_write_publish(self.Arduinos,M['smooth_steer'],M['smooth_motor'],M['steer_pub'],M['motor_pub'])
+
 
 
 class Calibration_State(Run_State):
@@ -66,18 +73,6 @@ class Computer_Control(Run_State):
     def enter(self):
         Run_State.enter(self)
 
-"""
-class Net_Steer_Net_Motor(Computer_Control):
-    def __init__(self,name,number,button_pwm_peak,M,Arduinos):
-        Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
-
-
-class Net_Steer_Hum_Motor(Computer_Control):
-    def __init__(self,name,number,button_pwm_peak,M,Arduinos):
-        Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
-    def process(self):
-        self.Arduinos['MSE'].write(self.M['smooth_write_str'])
-"""
 
 class PID_Motor(Computer_Control):
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -92,16 +87,14 @@ class PID_Motor(Computer_Control):
             if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
                 self.M['PID'] = [1,2]
                 pid_processing(self.M)
-                self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-                self.Arduinos['MSE'].write(self.M['pid_write_str'])
+                mse_write_publish(self.Arduinos,M['smooth_steer'],M['pid_motor_pwm'],M['steer_pub'],M['motor_pub'])
             else:
-                self.Arduinos['MSE'].write(self.M['smooth_write_str'])
+                mse_write_publish(self.Arduinos,M['smooth_steer'],M['smooth_motor'],M['steer_pub'],M['motor_pub'])
 
 
 class Freeze(Run_State):
     def process(self):
-        self.M['freeze_str'] = d2n( '(', int(self.M['steer_null']), ',', int(self.M['motor_null']+10000), ')')
-        self.Arduinos['MSE'].write(self.M['freeze_str'])
+        mse_write_publish(self.Arduinos,M['steer_null'],M['motor_null'],M['steer_pub'],M['motor_pub'])
 
 
 
@@ -109,23 +102,19 @@ class Hum_Steer_PID_Motor(PID_Motor):
     def process(self):
         self.M['PID'] = [1,2]
         pid_processing(self.M)
-        self.M['pid_write_str'] = d2n( '(', int(self.M['smooth_steer']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-        self.Arduinos['MSE'].write(self.M['pid_write_str'])
-
+        mse_write_publish(self.Arduinos,M['smooth_steer'],M['pid_motor_pwm'],M['steer_pub'],M['motor_pub'])
 
 class Net_Steer_PID_Motor(PID_Motor):
     def process(self):
         self.M['PID'] = [1,2]
         pid_processing(self.M)
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-        self.M['pid_write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['pid_motor_pwm']+10000), ')')
-        self.Arduinos['MSE'].write(self.M['pid_write_str'])
+        mse_write_publish(self.Arduinos,M['caffe_steer_pwm'],M['pid_motor_pwm'],M['steer_pub'],M['motor_pub'])
 
 class Net_Steer_Hum_Motor(PID_Motor):
     def process(self):
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
-        self.M['write_str'] = d2n( '(', int(self.M['caffe_steer_pwm']), ',', int(self.M['smooth_motor']+10000), ')')
-        self.Arduinos['MSE'].write(self.M['write_str'])
+        mse_write_publish(self.Arduinos,M['caffe_steer_pwm'],M['smooth_motor'],M['steer_pub'],M['motor_pub'])
 
 
 
