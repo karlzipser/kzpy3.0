@@ -7,19 +7,10 @@ lock = threading.Lock()
 
 def apply_steer_pwm_gain(steer_pwm,M):
     return (steer_pwm-M['steer_null']) * M['steer_gain'] + M['steer_null']
-    if steer_pwm >= M['steer_null']:
-        pwm = (steer_pwm-M['steer_null']) * M['steer_gain'] + M['steer_null']
-    else:
-        pwm = M['steer_null'] - (M['steer_null']-steer_pwm) * M['steer_gain']
-    return pwm
+
 
 def apply_motor_pwm_gain(motor_pwm,M):
-    return motor_pwm
-    if motor_pwm >= M['motor_null']:
-        pwm = (motor_pwm-M['motor_null']) * M['motor_gain'] + M['motor_null']
-    else:
-        pwm = M['motor_null'] - (M['motor_null']-motor_pwm) * M['motor_gain']
-    return pwm
+    return (motor_pwm-M['motor_null']) * M['motor_gain'] + M['motor_null']
 
 def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
     steer_pwm = apply_steer_pwm_gain(steer_pwm,M)
