@@ -247,6 +247,9 @@ def setup(M,Arduinos):
     M['caffe_steer'] = 49
     M['caffe_steer_pwm'] = M['steer_null']
     M['n_lst_steps'] = 30
+    M['steer_gain'] = steer_gain
+    M['motor_gain'] = motor_gain
+    M['acc2rd_threshold'] = acc2rd_threshold
     print("MSE setup")
 
 calibration_signal_timer = Timer(0.01)
@@ -255,8 +258,7 @@ calibration_signal_timer = Timer(0.01)
 #
 
 def run_loop(Arduinos,M,BUTTON_DELTA=50,):
-    M['steer_gain'] = steer_gain
-    M['motor_gain'] = motor_gain
+
 
     lock = threading.Lock()
     if 'MSE' not in Arduinos:
@@ -294,7 +296,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         
         if 'acc' in M:
             acc2rd = M['acc'][0]**2+M['acc'][2]**2
-            if acc2rd > acc2rd_threshold:
+            if acc2rd > M['acc2rd_threshold']:
                 if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                     M['previous_state'] = M['current_state']
                     M['current_state'] = M['state_nine']

@@ -55,7 +55,8 @@ def arduino_sig_thread():
     ard_SIG.run_loop(Arduinos,M)
 
 def arduino_master_thread():
-    while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
+    #while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
+    while not rospy.is_shutdown():
 
         if time_step.check():
             time_step.reset()
@@ -67,7 +68,9 @@ def arduino_master_thread():
             from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
             #model_name_pub.publish(std_msgs.msg.String(weights_file_path))
             reload_timer.reset()
-
+            M['steer_gain'] = steer_gain
+            M['motor_gain'] = motor_gain
+            M['acc2rd_threshold'] = acc2rd_threshold
         if git_pull_timer.check():
             unix(opjh('kzpy3/kzpy3_git_pull.sh'))
             git_pull_timer.reset()
