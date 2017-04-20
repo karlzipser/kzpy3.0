@@ -64,13 +64,13 @@ try:
 	rospy.Subscriber("/bair_car/zed/right/image_rect_color",Image,right_callback,queue_size = 1)
 	rospy.Subscriber("/bair_car/zed/left/image_rect_color",Image,left_callback,queue_size = 1)
 	rospy.Subscriber('/bair_car/state', std_msgs.msg.Int32,state_callback)
-	rospy.Subscriber('/bair_car/steer', std_msgs.msg.Int32,steer_callback)
-	rospy.Subscriber('/bair_car/motor', std_msgs.msg.Int32,motor_callback)
+	#rospy.Subscriber('/bair_car/steer', std_msgs.msg.Int32,steer_callback)
+	#rospy.Subscriber('/bair_car/motor', std_msgs.msg.Int32,motor_callback)
 
 	steer_cmd_pub = rospy.Publisher('cmd/steer', std_msgs.msg.Int32, queue_size=100)
 	motor_cmd_pub = rospy.Publisher('cmd/motor', std_msgs.msg.Int32, queue_size=100)
-	freeze_cmd_pub = rospy.Publisher('cmd/freeze', std_msgs.msg.Int32, queue_size=100)
-	model_name_pub = rospy.Publisher('/bair_car/model_name', std_msgs.msg.String, queue_size=10)
+	#freeze_cmd_pub = rospy.Publisher('cmd/freeze', std_msgs.msg.Int32, queue_size=100)
+	#model_name_pub = rospy.Publisher('/bair_car/model_name', std_msgs.msg.String, queue_size=10)
 
 
 
@@ -105,7 +105,7 @@ try:
 						if use_aruco:
 							aruco_steer,aruco_motor,aruco_only = aruco_code.do_aruco(left_list[-1],steer,motor)
 						"""
-						
+
 						solver.net.blobs['ZED_data'].data[0,0,:,:] = l0[:,:,0]
 						solver.net.blobs['ZED_data'].data[0,1,:,:] = l1[:,:,0]
 						solver.net.blobs['ZED_data'].data[0,2,:,:] = r0[:,:,0]
