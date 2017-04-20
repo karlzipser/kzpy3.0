@@ -130,21 +130,7 @@ class Net_Steer_Hum_Motor(PID_Motor):
 
 
 
-"""
 
-class Hum_Steer_PID_Motor(PID_Motor):
-    pass
-
-
-class Hum_Steer_Net_Motor(Computer_Control):
-    def __init__(self,name,number,button_pwm_peak,M,Arduinos):
-        Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
-
-
-class Hum_Steer_Hum_Motor(Computer_Control):
-    def __init__(self,name,number,button_pwm_peak,M,Arduinos):
-        Computer_Control.__init__(self,name,number,button_pwm_peak,M,Arduinos)
-"""
 
 
 
@@ -206,7 +192,7 @@ def setup(M,Arduinos):
     M['motor_max'] = M['motor_null']+1
     M['steer_min'] = M['motor_null']-1
     M['motor_min'] = M['motor_null']-1
-    M['buttons'] = [0,1900,1700,1424,870]
+    #M['buttons'] = [0,1900,1700,1424,870]
     M['set_null'] = False
     M['steer_gain'] = 1.0
     M['motor_gain'] = 1.0
@@ -224,14 +210,14 @@ def setup(M,Arduinos):
     M['calibrated'] = False
     M['PID'] = [-1,-1]
 
-    state_one = Human_Control('state 1',1,1900,M,Arduinos)
-    state_two = Smooth_Human_Control('state 2',2,1700,M,Arduinos)
-    state_six = Net_Steer_PID_Motor('state 6',6,1424,M,Arduinos)
-    state_three = Net_Steer_Hum_Motor('state 3',3,1424,M,Arduinos)
-    state_five = Human_Control('state 5',5,1424,M,Arduinos)
-    state_seven = Hum_Steer_PID_Motor('state 7',7,1424,M,Arduinos)
-    state_eight = Net_Steer_PID_Motor('state 8',8,1424,M,Arduinos)
-    state_nine = Freeze('state 9',9,1424,M,Arduinos)
+    state_one = Smooth_Human_Control('state 1',1,1700,M,Arduinos)#1900
+    state_two = Human_Control('state 2',2,1424,M,Arduinos)#1700
+    state_six = Net_Steer_PID_Motor('state 6',6,1900,M,Arduinos)#1424
+    state_three = Net_Steer_Hum_Motor('state 3',3,1900,M,Arduinos)
+    state_five = Human_Control('state 5',5,1900,M,Arduinos)
+    state_seven = Hum_Steer_PID_Motor('state 7',7,1900,M,Arduinos)
+    state_eight = Net_Steer_PID_Motor('state 8',8,1900,M,Arduinos)
+    state_nine = Freeze('state 9',9,1900,M,Arduinos)
     state_four = Calibration_State('state 4',4,870,M,Arduinos)
     M['state_one'] = state_one
     M['state_two'] = state_two
