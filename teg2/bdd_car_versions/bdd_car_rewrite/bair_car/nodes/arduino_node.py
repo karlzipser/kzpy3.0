@@ -10,9 +10,18 @@ import std_msgs.msg
 import geometry_msgs.msg
 import rospy
 
+import kzpy3.teg2.bdd_car_versions.bdd_car.rewrite.runtime_params
+from kzpy3.teg2.bdd_car_versions.bdd_car.rewrite.runtime_params import *
+
 M = {}
-
-
+M['Stop_Arduinos'] = False
+baudrate = 115200
+timeout = 0.1
+Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
+time_step = Timer(1)
+folder_display_timer = Timer(10)
+git_pull_timer = Timer(60)
+reload_timer = Timer(30)
 
 def caffe_steer_callback(msg):
     global M
@@ -47,38 +56,35 @@ def arduino_sig_thread():
 
 def arduino_master_thread():
     while M['Stop_Arduinos'] == False:
-        """
+
+        if time_step.check():
+            time_step.reset()
+            if not folder_display_timer.check():
+                print("*** Data foldername = "+foldername+ '***')
+
+        if reload_timer.check():
+            reload(kzpy3.teg2.bdd_car_versions.bdd_car.rewrite.runtime_params)
+            from kzpy3.teg2.bdd_car_versions.bdd_car.rewrite.runtime_params import *
+            #model_name_pub.publish(std_msgs.msg.String(weights_file_path))
+            reload_timer.reset()
+
+        if git_pull_timer.check():
+            unix(opjh('kzpy3/kzpy3_git_pull.sh'))
+            git_pull_timer.reset()
+
         try:
-            print M['steer_pwm_lst'][-1],M['steer_pwm_smooth_lst'][-1]
-            figure(1)
-            clf()
-            plot(M['steer_pwm_lst'][-100:],'b')
-            plot(M['steer_pwm_smooth_lst'][-100:],'r')
-            plot(M['motor_pwm_lst'][-100:],'b')
-            plot(M['motor_pwm_smooth_lst'][-100:],'r')
-            ylim(500,3000)
-            pause(0.0001)
-        except:
-            pass
-        """
-        try:
-            M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+            
             print(int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
         except:
             pass
-        #else:
-        #    M['state'] = np.random.choice([1,2,3,4])
+
         time.sleep(0.5)
     
 
-
-M['Stop_Arduinos'] = False
-
-baudrate = 115200
-timeout = 0.1
-
-Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
 ard_MSE.setup(M,Arduinos)
+ard_IMU.setup(M,Arduinos)
+ard_SIG.setup(M,Arduinos)
+
 threading.Thread(target=arduino_mse_thread).start()
 threading.Thread(target=arduino_imu_thread).start()
 threading.Thread(target=arduino_sig_thread).start()
