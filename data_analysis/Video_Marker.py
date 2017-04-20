@@ -154,6 +154,8 @@ class Video_Marker(object):
         if len(corners) > 0:
             gray = aruco.drawDetectedMarkers(frame, corners)            
         
+            print(help(aruco.estimatePoseSingleMarkers))
+            sys.exit(0)
             rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.20, self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
             
             
