@@ -90,7 +90,7 @@ try:
 	
 	while not rospy.is_shutdown():
 		# Check timer for parameter file update
-        if reload_timer.check():
+		if reload_timer.check():
 			reload(rp)
             reload_timer.reset()
 		
