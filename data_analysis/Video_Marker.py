@@ -103,7 +103,10 @@ class Video_Marker(object):
         stop_distance = ar_params['ar_stop_distance']
                 
         max_motor = ar_params['ar_max_motor']
-        min_motor = ar_params['ar_min_motor'] 
+        min_motor = ar_params['ar_min_motor']
+        
+        motor_override = ar_params['ar_override_motor']
+        steer_override = ar_params['ar_override_steer'] 
  
         
         # Which area in our viewport is considered "in front"
@@ -155,7 +158,12 @@ class Video_Marker(object):
                 distance_norm = ((min_perceived_distance - stop_distance) / (critical_distance - stop_distance))
                 motor_command = min_motor + distance_norm * (max_motor - min_motor)
                 
-                
+        
+        
+        if motor_override != 49:
+            motor_command = motor_override
+        if steer_override != 49:
+            steer_command = steer_override   
         
         # safe_motor, safe_steer
         return motor_command, steering_command
