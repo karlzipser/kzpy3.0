@@ -37,9 +37,15 @@ def caffe_motor_callback(msg):
     global M
     M['caffe_motor'] = msg.data
 
+def aruco_evasion_callback(msg):
+    global M
+    M['aruco_evasion_active'] = msg.data
+   
+
 rospy.init_node('run_arduino',anonymous=True)
 rospy.Subscriber('cmd/steer', std_msgs.msg.Int32, callback=caffe_steer_callback)
 rospy.Subscriber('cmd/motor', std_msgs.msg.Int32, callback=caffe_motor_callback)
+rospy.Subscriber('cmd/evasion_active', std_msgs.msg.Int32, callback=aruco_evasion_callback)
 M['state_pub'] = rospy.Publisher('state', std_msgs.msg.Int32, queue_size=5) 
 M['steer_pub'] = rospy.Publisher('steer', std_msgs.msg.Int32, queue_size=5) 
 M['motor_pub'] = rospy.Publisher('motor', std_msgs.msg.Int32, queue_size=5) 
