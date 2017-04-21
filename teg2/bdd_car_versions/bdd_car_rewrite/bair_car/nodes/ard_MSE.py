@@ -170,7 +170,12 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             M['previous_state'].leave()
             return
 
-    if M['aruco_evasion_active'] == 1:
+    if M['aruco_evasion_active'] == 1 and M['current_state'] != M['state_ten']:
+       #print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        M['previous_state'] == M['current_state']
+        M['current_state'] = M['state_ten']
+        M['current_state'].enter()
+        M['previous_state'].leave()
         return
 
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
@@ -321,12 +326,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
                 freeze = True
         
-        if M['aruco_evasion_active'] == 1 and M['current_state'] != M['state_ten']:
-           #print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            M['previous_state'] == M['current_state']
-            M['current_state'] = M['state_ten']
-            M['current_state'].enter()
-            M['previous_state'].leave()
+
             
 
         if M['current_state'] == M['state_nine']:
