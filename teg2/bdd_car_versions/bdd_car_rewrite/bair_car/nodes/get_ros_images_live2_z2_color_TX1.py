@@ -156,7 +156,7 @@ try:
 							caf_motor = aruco_motor
 						"""
 						# Aruco Marker Code ->
-						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor)
+						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
 						if aruco_only:
 							caf_steer = aruco_steer
 							caf_motor = aruco_motor

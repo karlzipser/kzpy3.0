@@ -49,16 +49,16 @@ class Video_Marker(object):
             capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
         
        
-    def process_next_image(self, crop, cv_image=None):
+    def process_next_image(self, crop, ar_params, cv_image=None):
         
-            return self.mark_next_image(cv_image, crop)
+            return self.mark_next_image(cv_image, ar_params, crop)
 
          
     def read_next_image(self):
         return self.capture_device.read()
 
 
-    def get_safe_commands(self, critical_dist_angle_pairs):
+    def get_safe_commands(self, critical_dist_angle_pairs, ar_params):
         '''
         Avert collision by steering at the opposite side of the average angle of all
         obstacles which are too near
@@ -68,7 +68,7 @@ class Video_Marker(object):
         if closer than 0.5 meter
         
         '''
-        
+        ''' Old settings
         motor_command = 49 # This is the resting command for stop
         max_left_steering_angle = np.deg2rad(-130)
         max_right_steering_angle = np.deg2rad(130)
@@ -86,7 +86,24 @@ class Video_Marker(object):
         
         max_motor = 60
         min_motor = 49  # Full stop. Backwards is not considered
+        '''
+        motor_command = ar_params['ar_motor_command']
+        max_left_steering_angle = ar_params['ar_max_left_steering_angle']
+        max_right_steering_angle = ar_params['ar_max_right_steering_angle']
         
+        max_left_command = ar_params['ar_max_left_command']
+        max_right_command = ar_params['ar_max_right_command']
+                
+        left_range = ar_params['ar_left_range']
+        right_range = ar_params['ar_right_range']
+                
+        min_perceived_distance = ar_params['ar_min_perceived_distance']
+                
+        critical_distance = ar_params['ar_critical_distance']
+        stop_distance = ar_params['ar_stop_distance']
+                
+        max_motor = ar_params['ar_max_motor']
+        min_motor = ar_params['ar_min_motor'] 
  
         
         # Which area in our viewport is considered "in front"
@@ -143,7 +160,7 @@ class Video_Marker(object):
         return motor_command, steering_command
     
     
-    def mark_next_image(self, cv_image, crop=False):
+    def mark_next_image(self, cv_image, ar_params, crop=False):
                 
         frame = cv_image
     
@@ -210,7 +227,7 @@ class Video_Marker(object):
                 markers.append(marker)
             
             if(evasion_needed and self.bagfile_handler == None):
-                safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
+                safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs,ar_params)
                 cv2.putText(gray, str(np.round(safe_motor, 2)) + "," + str(safe_steer), (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
             # If an evasion is needed draw onto the image safe values
