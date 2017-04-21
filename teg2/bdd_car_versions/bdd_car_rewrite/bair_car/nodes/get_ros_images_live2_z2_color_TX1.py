@@ -92,7 +92,7 @@ try:
 		# Check timer for parameter file update
 		if reload_timer.check():
 			reload(rp)
-            reload_timer.reset()
+			reload_timer.reset()
 		
 		
 		if state in [3,5,6,7]:
