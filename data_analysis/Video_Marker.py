@@ -84,7 +84,7 @@ class Video_Marker(object):
         critical_distance = 1.5
         stop_distance = 0.5
         
-        max_motor = 100
+        max_motor = 60
         min_motor = 49  # Full stop. Backwards is not considered
         
  
