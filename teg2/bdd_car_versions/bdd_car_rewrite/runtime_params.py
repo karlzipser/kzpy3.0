@@ -144,8 +144,8 @@ ar_params={
 'ar_stop_distance' : 0.5,
 'ar_max_motor' : 70,
 'ar_min_motor' : 59,
-'ar_override_motor':55,
-'ar_override_steer':100 } # Full stop. Backwards is not considered
+'ar_override_motor':49,
+'ar_override_steer':49 } # Full stop. Backwards is not considered
         
 
 
