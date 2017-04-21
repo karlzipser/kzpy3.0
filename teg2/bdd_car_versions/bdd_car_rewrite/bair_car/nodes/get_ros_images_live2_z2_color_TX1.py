@@ -80,7 +80,7 @@ try:
 	steer_cmd_pub = rospy.Publisher('cmd/steer', std_msgs.msg.Int32, queue_size=100)
 	motor_cmd_pub = rospy.Publisher('cmd/motor', std_msgs.msg.Int32, queue_size=100)
 	### ARUCO ROS CODE
-	aruco_cmd_pub = rospy.Publisher('cmd/evasion_active', std_msgs.Int32, queue_size=100)
+	aruco_cmd_pub = rospy.Publisher('cmd/evasion_active', std_msgs.msg.Int32, queue_size=100)
 	### ARUCO ROS CODE
 	#freeze_cmd_pub = rospy.Publisher('cmd/freeze', std_msgs.msg.Int32, queue_size=100)
 	#model_name_pub = rospy.Publisher('/bair_car/model_name', std_msgs.msg.String, queue_size=10)
@@ -159,9 +159,9 @@ try:
 							# If the aruco module should override the motor and steering commands, 
 							# publish this to a ros publisher so the arduino can pick it up and
 							# read the caffe motor values
-							aruco_cmd_pub.publish(std.msgs.msg.Int32(1))
+							aruco_cmd_pub.publish(std_msgs.msg.Int32(1))
 						else:
-							aruco_cmd_pub.publish(std.msgs.msg.Int32(0))
+							aruco_cmd_pub.publish(std_msgs.msg.Int32(0))
 						# <- Aruco Marker Code
 						print("#####")
 						print(aruco_only)
