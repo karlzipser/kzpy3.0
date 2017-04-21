@@ -178,7 +178,7 @@ try:
 		else:
 			caffe_enter_timer.reset()
 
-
+    unix('killall python && killall roslaunch && killall record')
 
 
 except Exception as e:

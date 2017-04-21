@@ -90,7 +90,7 @@ def arduino_master_thread():
             pass
 
         time.sleep(0.5)
-    unix('killall python && killall roslaunch && killall record')
+
     
 
 ard_MSE.setup(M,Arduinos)
