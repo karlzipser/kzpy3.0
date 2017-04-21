@@ -103,12 +103,11 @@ threading.Thread(target=arduino_sig_thread).start()
 threading.Thread(target=arduino_master_thread).start()
 
 
-"""
 q = raw_input('')
 while q not in ['q','Q']:
     q = raw_input('')
 M['Stop_Arduinos'] = True
 rospy.signal_shutdown("M[Stop_Arduinos] = True")
-"""
+unix('rosnode kill -a && killall python && killall roslaunch && killall record')
 
 
