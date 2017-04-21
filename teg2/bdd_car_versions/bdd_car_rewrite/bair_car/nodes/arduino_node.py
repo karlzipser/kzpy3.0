@@ -10,12 +10,16 @@ import std_msgs.msg
 import geometry_msgs.msg
 import rospy
 
-import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
-from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
+import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
+#from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 M = {}
-M['acc2rd_threshold'] = acc2rd_threshold
+M['acc2rd_threshold'] = rp.acc2rd_threshold
+M['steer_gain'] = rp.steer_gain
+M['motor_gain'] = rp.motor_gain
 M['Stop_Arduinos'] = False
+M['PID_min_max'] = rp.PID_min_max
+
 baudrate = 115200
 timeout = 0.1
 Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
@@ -66,12 +70,13 @@ def arduino_master_thread():
 
         if reload_timer.check():
             reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
-            from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
+            #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
             #model_name_pub.publish(std_msgs.msg.String(weights_file_path))
             reload_timer.reset()
-            M['steer_gain'] = steer_gain
-            M['motor_gain'] = motor_gain
-            M['acc2rd_threshold'] = acc2rd_threshold
+            M['steer_gain'] = rp.steer_gain
+            M['motor_gain'] = rp.motor_gain
+            M['acc2rd_threshold'] = rp.acc2rd_threshold
+            M['PID_min_max'] = rp.PID_min_max
         if git_pull_timer.check():
             unix(opjh('kzpy3/kzpy3_git_pull.sh'))
             git_pull_timer.reset()

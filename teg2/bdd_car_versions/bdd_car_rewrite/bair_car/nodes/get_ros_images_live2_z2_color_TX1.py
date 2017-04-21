@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params
-from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
+import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
+#from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
 
 try:
@@ -12,7 +12,7 @@ try:
 	import cv2
 	os.chdir(home_path) # this is for the sake of the train_val.prototxt
 
-	def setup_solver():
+	def setup_solver(solver_file_path):
 		solver = caffe.SGDSolver(solver_file_path)
 		for l in [(k, v.data.shape) for k, v in solver.net.blobs.items()]:
 			print(l)
@@ -79,12 +79,12 @@ try:
 	
 	while not rospy.is_shutdown():
 		if state in [3,5,6,7]:
-			if use_caffe:
+			if rp.use_caffe:
 				if solver == None:
-					solver = setup_solver()
+					solver = setup_solver(rp.solver_file_path)
 					if weights_file_path != None:
-						print "loading " + weights_file_path
-						solver.net.copy_from(weights_file_path)
+						print "loading " + rp.weights_file_path
+						solver.net.copy_from(rp.weights_file_path)
 				if (previous_state not in [3,5,6,7]):
 					previous_state = state
 					caffe_enter_timer.reset()
@@ -119,12 +119,12 @@ try:
 						solver.net.blobs['ZED_data'].data[0,10,:,:] = r0[:,:,2]
 						solver.net.blobs['ZED_data'].data[0,11,:,:] = r1[:,:,2]
 							
-						solver.net.blobs['metadata'].data[0,0,:,:] = Racing#target_data[0]/99. #current steer
+						solver.net.blobs['metadata'].data[0,0,:,:] = rp.Racing#target_data[0]/99. #current steer
 						solver.net.blobs['metadata'].data[0,1,:,:] = 0#target_data[len(target_data)/2]/99. #current motor
-						solver.net.blobs['metadata'].data[0,2,:,:] = Follow
-						solver.net.blobs['metadata'].data[0,3,:,:] = Direct
-						solver.net.blobs['metadata'].data[0,4,:,:] = Play
-						solver.net.blobs['metadata'].data[0,5,:,:] = Furtive
+						solver.net.blobs['metadata'].data[0,2,:,:] = rp.Follow
+						solver.net.blobs['metadata'].data[0,3,:,:] = rp.Direct
+						solver.net.blobs['metadata'].data[0,4,:,:] = rp.Play
+						solver.net.blobs['metadata'].data[0,5,:,:] = rp.Furtive
 						
 						solver.net.forward(start='ZED_data',end='ip2')
 
