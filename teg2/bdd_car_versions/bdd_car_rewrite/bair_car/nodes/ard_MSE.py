@@ -130,6 +130,12 @@ class Net_Steer_Hum_Motor(PID_Motor):
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
         mse_write_publish(self.M,self.Arduinos,self.M['caffe_steer_pwm'],self.M['smooth_motor'])
 
+class Aruco_Steer_Aruco_Motor(Computer_Control):
+    def process(self):
+        self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
+        self.M['caffe_motor_pwm'] = percent_to_pwm(self.M['caffe_motor'],self.M['motor_null'],self.M['motor_max'],self.M['motor_min'])
+        mse_write_publish(self.M,self.Arduinos,self.M['caffe_steer_pwm'],self.M['caffe_motor_pwm'])
+
 
 
 
@@ -221,6 +227,7 @@ def setup(M,Arduinos):
     state_eight = Net_Steer_PID_Motor('state 8',8,1900,M,Arduinos)
     state_nine = Freeze('state 9',9,1900,M,Arduinos)
     state_four = Calibration_State('state 4',4,870,M,Arduinos)
+    state_ten = Aruco_Steer_Aruco_Motor('state 10',10,1900,M,Arduinos)
     """
     state_one = Human_Control('state 1',1,1900,M,Arduinos)
     state_two = Smooth_Human_Control('state 2',2,1700,M,Arduinos)
@@ -242,6 +249,7 @@ def setup(M,Arduinos):
     M['state_seven'] = state_seven
     M['state_eight'] = state_eight
     M['state_nine'] = state_nine
+    M['state_ten'] = state_ten
 
     M['current_state'] = None
     M['caffe_steer'] = 49
@@ -308,8 +316,12 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
                 freeze = True
         
-        if M['current_state'] == M['state_nine']:
+        if M['aruco_evasion_active'] == 1:
+            M['current_state'] == M['state_ten']
+
+        elif M['current_state'] == M['state_nine']:
             pass
+
         elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
             human_motor = False
             human_steer = False
