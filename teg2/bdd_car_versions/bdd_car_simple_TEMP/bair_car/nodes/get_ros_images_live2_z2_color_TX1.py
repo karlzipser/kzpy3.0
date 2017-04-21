@@ -295,6 +295,7 @@ try:
 			time_step.reset()
 			if not folder_display_timer.check():
 				print("*** Data foldername = "+foldername+ '***')
+				print("TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 		if reload_timer.check():
 			#reload(run_params)
 			#from run_params import *
