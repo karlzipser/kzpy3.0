@@ -60,4 +60,10 @@ export PATH=~/caffe/build/tools:$PATH
 
 export PYTHONPATH=~/caffe/python:$PYTHONPATH
 
+# ARUCO CODE PYTHON PATH CHANGE
 
+if [ "$(whoami)" == "ubuntu" ]
+then
+	export PYTHONPATH=$PYTHONPATH:/kzpy3/data_analysis
+fi
+# ARUCO CODE PYTHON PATH CHANGE

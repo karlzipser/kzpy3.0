@@ -5,6 +5,9 @@ import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
 from kzpy3.utils import *
+# aruco code
+import aruco_code
+# aruco code
 import roslib
 import std_msgs.msg
 import geometry_msgs.msg
@@ -40,6 +43,10 @@ try:
 
 	state = 0
 	previous_state = 0
+	
+	# For reloading the parameter file
+	reload_timer = Timer(30)
+
 
 
 	def state_callback(data):
@@ -82,6 +89,12 @@ try:
 	caf_motor_previous = 49
 	
 	while not rospy.is_shutdown():
+		# Check timer for parameter file update
+		if reload_timer.check():
+			reload(rp)
+            reload_timer.reset()
+		
+		
 		if state in [3,5,6,7]:
 			if rp.use_caffe:
 				if solver == None:
@@ -142,6 +155,12 @@ try:
 							caf_steer = aruco_steer
 							caf_motor = aruco_motor
 						"""
+						# Aruco Marker Code ->
+						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
+						if aruco_only:
+							caf_steer = aruco_steer
+							caf_motor = aruco_motor
+						# <- Aruco Marker Code
 
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
