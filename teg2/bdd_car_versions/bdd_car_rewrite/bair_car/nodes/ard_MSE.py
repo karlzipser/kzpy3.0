@@ -319,7 +319,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         
         if M['aruco_evasion_active'] == 1:
             #print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-            M['current_state'] == M['state_ten']
+            M['current_state'] = M['state_ten']
 
         elif M['current_state'] == M['state_nine']:
             pass
