@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-
+import os
 
 #retval, cameraMatrix, distCoeffs, rvecs, tvecs
 
@@ -16,7 +16,7 @@ class Zed_Parameter(object):
     
     def __init__(self):
         print("Reading ZED parameters")
-        file_out = open( "ZED_new.cal", "r" );
+        file_out = open(os.path.expanduser('~') + "/kzpy3/data_analysis/" + "ZED_new.cal", "r" );
         values = pickle.load( file_out )
         self.retval = values['retval']
         self.cameraMatrix = values['cameraMatrix']
