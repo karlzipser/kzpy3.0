@@ -170,15 +170,16 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             M['previous_state'].leave()
             return
 
-    if M['aruco_evasion_active'] == 1 and M['current_state'] != M['state_ten']:
-       #print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        M['previous_state'] == M['current_state']
-        M['current_state'] = M['state_ten']
-        M['current_state'].enter()
-        M['previous_state'].leave()
-        return
+
 
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
+        if M['aruco_evasion_active'] == 1 and M['current_state'] != M['state_ten']:
+           #print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            M['previous_state'] == M['current_state']
+            M['current_state'] = M['state_ten']
+            M['current_state'].enter()
+            M['previous_state'].leave()
+            return
         if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
             return
         M['previous_state'] = M['current_state']
@@ -299,7 +300,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         smooth_data(M)
         
         if M['current_state'] == M['state_four']:
-            M['aruco_evasion_active'] = 0
+            #M['aruco_evasion_active'] = 0
             process_state_4(M)
             continue
         else:
@@ -330,11 +331,11 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             
 
         if M['current_state'] == M['state_nine']:
-            M['aruco_evasion_active'] = 0
+            #M['aruco_evasion_active'] = 0
             pass
 
         elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
-            M['aruco_evasion_active'] = 0
+            #M['aruco_evasion_active'] = 0
             human_motor = False
             human_steer = False
             if np.abs(M['steer_percent'] - 49) > 5:
