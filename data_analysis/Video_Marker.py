@@ -69,7 +69,7 @@ class Video_Marker(object):
         
         '''
         
-        motor_command = -1
+        motor_command = 49 # This is the resting command for stop
         max_left_steering_angle = np.deg2rad(-130)
         max_right_steering_angle = np.deg2rad(130)
         
