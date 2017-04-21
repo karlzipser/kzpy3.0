@@ -64,6 +64,6 @@ export PYTHONPATH=~/caffe/python:$PYTHONPATH
 
 if [ "$(whoami)" == "ubuntu" ]
 then
-	export PYTHONPATH=$PYTHONPATH:/kzpy3/data_analysis
+	export PYTHONPATH=$PYTHONPATH:~/kzpy3/data_analysis
 fi
 # ARUCO CODE PYTHON PATH CHANGE
