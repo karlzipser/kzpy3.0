@@ -67,7 +67,7 @@ def arduino_master_thread():
         if time_step.check():
             time_step.reset()
             if not folder_display_timer.check():
-                print("*** Data foldername = "+foldername+ '***')
+                print("*** Data foldername = "+rp.foldername+ '***')
 
         if reload_timer.check():
             reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
