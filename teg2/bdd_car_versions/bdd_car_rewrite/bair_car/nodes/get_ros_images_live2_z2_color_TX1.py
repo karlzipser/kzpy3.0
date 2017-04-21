@@ -85,7 +85,7 @@ try:
 			if rp.use_caffe:
 				if solver == None:
 					solver = setup_solver(rp.solver_file_path)
-					if weights_file_path != None:
+					if rp.weights_file_path != None:
 						print "loading " + rp.weights_file_path
 						solver.net.copy_from(rp.weights_file_path)
 				if (previous_state not in [3,5,6,7]):
