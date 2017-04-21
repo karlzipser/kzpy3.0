@@ -13,13 +13,6 @@ import rospy
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
-M = {}
-M['acc2rd_threshold'] = rp.acc2rd_threshold
-M['steer_gain'] = rp.steer_gain
-M['motor_gain'] = rp.motor_gain
-M['Stop_Arduinos'] = False
-M['PID_min_max'] = rp.PID_min_max
-
 baudrate = 115200
 timeout = 0.1
 Arduinos = ard_ser_in.assign_serial_connections(ard_ser_in.get_arduino_serial_connections(baudrate,timeout))
@@ -27,6 +20,14 @@ time_step = Timer(1)
 folder_display_timer = Timer(10)
 git_pull_timer = Timer(60)
 reload_timer = Timer(30)
+
+
+M = {}
+M['acc2rd_threshold'] = rp.acc2rd_threshold
+M['steer_gain'] = rp.steer_gain
+M['motor_gain'] = rp.motor_gain
+M['Stop_Arduinos'] = False
+M['PID_min_max'] = rp.PID_min_max
 
 def caffe_steer_callback(msg):
     global M
