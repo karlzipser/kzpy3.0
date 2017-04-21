@@ -200,6 +200,7 @@ def setup(M,Arduinos):
     M['motor_max'] = M['motor_null']+1
     M['steer_min'] = M['motor_null']-1
     M['motor_min'] = M['motor_null']-1
+    M['aruco_evasion_active'] = 0
     #M['buttons'] = [0,1900,1700,1424,870]
     M['set_null'] = False
     #M['steer_gain'] = 1.0
