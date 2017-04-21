@@ -98,7 +98,7 @@ try:
 			reload_timer.reset()
 		
 		
-		if state in [3,5,6,7]:
+		if state in [3,5,6,7,10]:
 			if rp.use_caffe:
 				if solver == None:
 					solver = setup_solver(rp.solver_file_path)
