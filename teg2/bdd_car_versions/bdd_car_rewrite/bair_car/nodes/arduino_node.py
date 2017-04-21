@@ -108,6 +108,6 @@ while q not in ['q','Q']:
     q = raw_input('')
 M['Stop_Arduinos'] = True
 rospy.signal_shutdown("M[Stop_Arduinos] = True")
-unix('rosnode killall python && killall roslaunch && killall record')
+unix('rosnode killall && python && killall roslaunch && killall record')
 """
 
