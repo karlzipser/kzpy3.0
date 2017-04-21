@@ -148,19 +148,16 @@ try:
 						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
-						"""
-						caf_steer += d_aruco_steer
-						caf_motor += d_aruco_motor
-						if aruco_only:
-							caf_steer = aruco_steer
-							caf_motor = aruco_motor
-						"""
 						# Aruco Marker Code ->
 						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
 						if aruco_only:
 							caf_steer = aruco_steer
 							caf_motor = aruco_motor
 						# <- Aruco Marker Code
+						print("#####")
+						print(aruco_only)
+						print(aruco_steer)
+						print(aruco_motor)
 
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
