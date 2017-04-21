@@ -140,7 +140,7 @@ ar_params={
 'ar_left_range' : 50,
 'ar_right_range' : 50,
 'ar_min_perceived_distance' : 9999,
-'ar_critical_distance' : 1.5,
+'ar_critical_distance' : 0.75,
 'ar_stop_distance' : 0.5,
 'ar_max_motor' : 60,
 'ar_min_motor' : 49 } # Full stop. Backwards is not considered
