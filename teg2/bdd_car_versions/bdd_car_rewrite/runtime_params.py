@@ -127,7 +127,8 @@ foldername = foldername + time_str() + '_'
 
 foldername = foldername + computer_name
 
-
-
+#
+###################################################################
+# Aruco code parameters
 
 

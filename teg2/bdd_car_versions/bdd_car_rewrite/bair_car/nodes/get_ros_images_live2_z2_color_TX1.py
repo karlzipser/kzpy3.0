@@ -43,6 +43,10 @@ try:
 
 	state = 0
 	previous_state = 0
+	
+	# For reloading the parameter file
+	reload_timer = Timer(30)
+
 
 
 	def state_callback(data):
@@ -85,6 +89,12 @@ try:
 	caf_motor_previous = 49
 	
 	while not rospy.is_shutdown():
+		# Check timer for parameter file update
+        if reload_timer.check():
+			reload(rp)
+            reload_timer.reset()
+		
+		
 		if state in [3,5,6,7]:
 			if rp.use_caffe:
 				if solver == None:
