@@ -40,7 +40,7 @@ def caffe_motor_callback(msg):
 def aruco_evasion_callback(msg):
     global M
     M['aruco_evasion_active'] = msg.data
-   
+
 
 rospy.init_node('run_arduino',anonymous=True)
 rospy.Subscriber('cmd/steer', std_msgs.msg.Int32, callback=caffe_steer_callback)
@@ -91,7 +91,7 @@ def arduino_master_thread():
 
         try:
             
-            print(int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
+            print(int(M['aruco_evasion_active'],M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
         except:
             pass
 
