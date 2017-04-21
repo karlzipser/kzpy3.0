@@ -73,8 +73,8 @@ class Video_Marker(object):
         max_left_steering_angle = np.deg2rad(-130)
         max_right_steering_angle = np.deg2rad(130)
         
-        max_left_command = 0
-        max_right_command = 100
+        max_left_command = 100
+        max_right_command = 0
         
         left_range = 50
         right_range = 50
@@ -220,7 +220,7 @@ class Video_Marker(object):
                 
                 cv2.putText(gray, str(np.round(safe_motor, 2)) + "," + str(safe_steer), (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
-        return gray, markers, safe_motor, safe_steer
+        return gray, markers, safe_motor, safe_steer, evasion_needed
     
     def get_center_line_xy(self, image, rvec, tvec, camMat, camDist):
         length = 0.2

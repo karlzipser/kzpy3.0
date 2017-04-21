@@ -7,9 +7,9 @@ marker = Video_Marker()
 def do_aruco(cv_image,steering_cmd,motor_cmd):
     
     crop = True
-    cv_image, markers, safe_motor, safe_steer = marker.process_next_image(crop,cv_image) 
+    cv_image, markers, safe_motor, safe_steer, evasion_needed = marker.process_next_image(crop,cv_image) 
     
     cv2.imshow('frame 2',cv_image)
     cv2.moveWindow('frame 2',700,600)
-    return safe_steer,safe_motor,True
+    return safe_steer,safe_motor,evasion_needed
 
