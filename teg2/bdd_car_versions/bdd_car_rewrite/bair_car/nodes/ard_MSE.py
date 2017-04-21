@@ -114,7 +114,7 @@ class Freeze(Run_State):
 
 class Hum_Steer_PID_Motor(PID_Motor):
     def process(self):
-        self.M['PID'] = M['PID_min_max']
+        self.M['PID'] = self.M['PID_min_max']
         pid_processing(self.M)
         mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'])
 
