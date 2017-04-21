@@ -9,7 +9,6 @@ bridge = CvBridge()
 image_topics = ['left_image','right_image']
 single_value_topics = ['steer','state','motor','encoder','GPS2_lat']
 vector3_topics = ['acc','gyro','gyro_heading']#,'gps']
-all_topics = image_topics + single_value_topics + vector3_topics
 camera_sides = ['left','right']
 
 A = {}
@@ -17,8 +16,12 @@ A = {}
 def preprocess(path,A):
     timer = Timer(0)
     
-    for topic in all_topics:
+    for topic in image_topics + single_value_topics:
         A[topic] = []
+    for topic in vector3_topics:
+        A[topic+'_x'] = []
+        A[topic+'_y'] = []
+        A[topic+'_z'] = []
 
     try:
         cprint(path,'yellow')
@@ -51,7 +54,9 @@ def preprocess(path,A):
                         print("if not isinstance(m[1].x,(int,long,float)):")
                         print(d2s("m[1].z = ",m[1].z)) 
                         assert(False)
-                    A[topic].append([t,[m[1].x,m[1].y,m[1].z]])
+                    A[topic+'_x'].append([t,m[1].x])
+                    A[topic+'_y'].append([t,m[1].y])
+                    A[topic+'_z'].append([t,m[1].z])
 
         try:
             topic = 'gps'
@@ -74,6 +79,16 @@ def preprocess(path,A):
 
     print(d2s('Done in',timer.time(),'seconds'))
     
+    A['state'] = array(A['state'])
+    A['steer'] = array(A['steer'])
+    A['motor'] = array(A['motor'])
+    A['gyro_x'] = array(A['gyro_x'])
+    A['gyro_y'] = array(A['gyro_y'])
+    A['gyro_z'] = array(A['gyro_z'])
+    A['acc_x'] = array(A['acc_x'])
+    A['acc_y'] = array(A['acc_y'])
+    A['acc_z'] = array(A['acc_z'])
+
     return A
 
 """
@@ -90,16 +105,33 @@ for t in ts:
 
 
 def graph(A):
-    state = array(A['state'])
-    steer = array(A['steer'])
-    motor = array(A['motor'])
-    gyro = array(A['gyro'])
-    figure('graph')
-    clf()
-    plot(steer[:,0],steer[:,1])
-    plot(motor[:,0],motor[:,1])
-    plot(state[:,0],10*state[:,1])
-    figure('IMU')
-    plot(gyro[0,:])
-    
 
+
+    figure('MSE')
+    clf()
+    plot(A['state'][:,0]-A['state'][0,0],A['state'][:,1])
+    plot(A['motor'][:,0]-A['motor'][0,0],A['motor'][:,1])
+    plot(A['steer'][:,0]-A['steer'][0,0],A['steer'][:,1])
+
+    
+    figure('gyro')
+    clf()
+    plot(A['gyro_x'][:,0]-A['gyro_x'][0,0],A['gyro_x'][:,1])
+    plot(A['gyro_y'][:,0]-A['gyro_y'][0,0],A['gyro_y'][:,1])
+    plot(A['gyro_z'][:,0]-A['gyro_z'][0,0],A['gyro_z'][:,1])
+
+    figure('acc')
+    clf()
+    plot(A['acc_x'][:,0]-A['acc_x'][0,0],A['acc_x'][:,1])
+    plot(A['acc_y'][:,0]-A['acc_y'][0,0],A['acc_y'][:,1])
+    plot(A['acc_z'][:,0]-A['acc_z'][0,0],A['acc_z'][:,1])
+
+    for i in range(300):
+        xlim(i/10.,i/10.+3)
+        pause(0.05)
+
+
+
+def animate(A):
+    for a in A['left_image']:
+        mi_or_cv2(a[1],cv=True,delay=30,title='animate')
