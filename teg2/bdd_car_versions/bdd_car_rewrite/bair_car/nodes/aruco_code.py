@@ -1,1 +1,1 @@
-/home/picard/kzpy3/data_analysis/aruco_code.py
+/home/ubuntu/kzpy3/data_analysis/aruco_code.py
