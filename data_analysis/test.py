@@ -25,7 +25,8 @@ for i in range(1,len(sys.argv)):
 """
 
 cap = cv2.VideoCapture(0)
-
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1344)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
 while True:
     ret, image = cap.read()
         
