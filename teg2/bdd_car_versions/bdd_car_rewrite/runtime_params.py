@@ -132,22 +132,17 @@ foldername = foldername + computer_name
 # Aruco code parameters
 
 ar_params={
-'ar_motor_command' : 49 # This is the resting command for stop
-'ar_max_left_steering_angle' : np.deg2rad(-130)
-'ar_max_right_steering_angle' : np.deg2rad(130)
-
-'ar_max_left_command' : 100
-'ar_max_right_command' : 0
-        
-'ar_left_range' : 50
-'ar_right_range' : 50
-        
-'ar_min_perceived_distance' : 9999
-        
-'ar_critical_distance' : 1.5
-'ar_stop_distance' : 0.5
-        
-'ar_max_motor' : 60
+'ar_motor_command' : 49, # This is the resting command for stop
+'ar_max_left_steering_angle' : np.deg2rad(-130),
+'ar_max_right_steering_angle' : np.deg2rad(130),
+'ar_max_left_command' : 100,
+'ar_max_right_command' : 0,
+'ar_left_range' : 50,
+'ar_right_range' : 50,
+'ar_min_perceived_distance' : 9999,
+'ar_critical_distance' : 1.5,
+'ar_stop_distance' : 0.5,
+'ar_max_motor' : 60,
 'ar_min_motor' : 49 } # Full stop. Backwards is not considered
         
 
