@@ -1,5 +1,5 @@
 '''aruco_steer,aruco_motor,aruco_only = aruco_code.do_aruco(left_list[-1],steer,motor)'''
-from Map import Map
+#from Map import Map
 from Video_Marker import Video_Marker
 import cv2
 marker = Video_Marker()
