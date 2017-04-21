@@ -291,6 +291,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         smooth_data(M)
         
         if M['current_state'] == M['state_four']:
+            M['aruco_evasion_active'] == 0
             process_state_4(M)
             continue
         else:
@@ -318,12 +319,15 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                 freeze = True
         
         if M['aruco_evasion_active'] == 1:
-            M['current_state'] == M['state_ten']
+            print "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            M['current_state'] = M['state_ten']
 
         elif M['current_state'] == M['state_nine']:
+            M['aruco_evasion_active'] == 0
             pass
 
         elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+            M['aruco_evasion_active'] == 0
             human_motor = False
             human_steer = False
             if np.abs(M['steer_percent'] - 49) > 5:
