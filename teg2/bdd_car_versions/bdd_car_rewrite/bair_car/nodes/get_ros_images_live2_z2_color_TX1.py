@@ -3,14 +3,22 @@ import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
 
+import roslib
+import std_msgs.msg
+import geometry_msgs.msg
+import cv2
+from cv_bridge import CvBridge,CvBridgeError
+import rospy
+from sensor_msgs.msg import Image
+os.environ['GLOG_minloglevel'] = '2'
+import caffe
+caffe.set_device(0)
+caffe.set_mode_gpu()
+from kzpy3.utils import *
+import cv2
+os.chdir(home_path)
 try:
-	os.environ['GLOG_minloglevel'] = '2'
-	import caffe
-	caffe.set_device(0)
-	caffe.set_mode_gpu()
-	from kzpy3.utils import *
-	import cv2
-	os.chdir(home_path) # this is for the sake of the train_val.prototxt
+ # this is for the sake of the train_val.prototxt
 
 	def setup_solver(solver_file_path):
 		solver = caffe.SGDSolver(solver_file_path)
@@ -22,13 +30,7 @@ try:
 
 	solver = None
 
-	import roslib
-	import std_msgs.msg
-	import geometry_msgs.msg
-	import cv2
-	from cv_bridge import CvBridge,CvBridgeError
-	import rospy
-	from sensor_msgs.msg import Image
+
 	bridge = CvBridge()
 	rospy.init_node('run_caffe',anonymous=True)
 
