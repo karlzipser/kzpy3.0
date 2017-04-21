@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from kzpy3.utils import *
+
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
@@ -14,7 +16,6 @@ os.environ['GLOG_minloglevel'] = '2'
 import caffe
 caffe.set_device(0)
 caffe.set_mode_gpu()
-from kzpy3.utils import *
 import cv2
 os.chdir(home_path)
 try:
