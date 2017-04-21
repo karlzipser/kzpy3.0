@@ -200,19 +200,10 @@ class Video_Marker(object):
             critical_dist_angle_pairs = []
             
             for i in range(0, len(rvec)):
-               
-                
-                
-                
                 
                 # Get two dictionaries with xy positions about the corners of one marker and calculate also distance and angle to them
                 center_line_xy, center_line_dist_ang = self.get_marker_from_image(gray, rvec[i][0], tvec[i][0], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs)
-                
-                
-                 # map test code
-                
-                # self.map.experiment(gray,rvec[i], tvec[i], self.zed_parameters.cameraMatrix, self.zed_parameters.distCoeffs, center_line_dist_ang)
-                # map test code
+               
                 
                 # They are drawn onto the current image
                 self.drawPointAtSingleMarker(gray, center_line_xy, center_line_dist_ang)
