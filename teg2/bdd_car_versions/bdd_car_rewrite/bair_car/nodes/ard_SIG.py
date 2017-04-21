@@ -2,7 +2,7 @@
 #import threading
 
 from kzpy3.utils import *
-
+import rospy
 """
 sudo chmod 666 /dev/ttyACM*
 
