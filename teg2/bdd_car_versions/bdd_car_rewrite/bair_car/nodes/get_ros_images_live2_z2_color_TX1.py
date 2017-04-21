@@ -186,9 +186,9 @@ try:
 
 
 						
-						if state in [3,6]:			
+						if state in [3,6,10]:			
 							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
-						if state in [6,7]:
+						if state in [6,7,10]:
 							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
 
 						"""
