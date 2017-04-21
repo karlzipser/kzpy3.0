@@ -34,7 +34,7 @@ class Marker_Handler:
             
         elif (self.source_local_camera):
             
-            capture_device = cv2.VideoCapture(2)
+            capture_device = cv2.VideoCapture(0)
             if(capture_device == None):
                 print("Camera not found")
                 sys.exit(1)

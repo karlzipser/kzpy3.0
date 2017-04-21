@@ -30,7 +30,10 @@ class Video_Marker(object):
 
     def __init__(self, bagfile_handler=None, capture_device=None):
         
+        
         self.bagfile_handler = bagfile_handler
+        
+        
         if capture_device != None:
             self.capture_device = capture_device
             ''' Possible modes according to the zed manufacturer. This relates to the overall
@@ -44,9 +47,7 @@ class Video_Marker(object):
             '''
             capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 1344)
             capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
-        else:
-            self.capture_device = capture_device    
-            
+        
        
     def process_next_image(self, crop, cv_image=None):
         
@@ -165,6 +166,8 @@ class Video_Marker(object):
         markers = []
         
         evasion_needed = False
+        safe_steer = None
+        safe_motor = None
         
         if len(corners) > 0:
             gray = aruco.drawDetectedMarkers(frame, corners)            
@@ -202,11 +205,9 @@ class Video_Marker(object):
                     evasion_needed = True
                 
                 # Finally they are filled in the marker data object
-                # PUT DICT SAVING HERE
+
                 marker = Marker(ids[i], confidence=1.0, center_line_xy=center_line_xy, center_line_dist_ang=center_line_dist_ang)
                 markers.append(marker)
-            # print(self.bagfile_handler)
-            # print(evasion_needed)
             
             if(evasion_needed and self.bagfile_handler == None):
                 safe_motor, safe_steer = self.get_safe_commands(critical_dist_angle_pairs)
@@ -219,7 +220,7 @@ class Video_Marker(object):
                 
                 cv2.putText(gray, str(np.round(safe_motor, 2)) + "," + str(safe_steer), (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
-        return gray, markers
+        return gray, markers, safe_motor, safe_steer
     
     def get_center_line_xy(self, image, rvec, tvec, camMat, camDist):
         length = 0.2
