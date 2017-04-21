@@ -99,7 +99,7 @@ class PID_Motor(Computer_Control):
             self.M['pid_motor_pwm'] = self.M['smooth_motor']
     def process(self):
             if self.M['smooth_motor'] < 5+self.M['pid_motor_pwm'] and  self.M['smooth_motor'] > self.M['motor_null']-5:
-                self.M['PID'] = M['PID_min_max']
+                self.M['PID'] = self.M['PID_min_max']
                 pid_processing(self.M)
                 mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'])
             else:
@@ -114,13 +114,13 @@ class Freeze(Run_State):
 
 class Hum_Steer_PID_Motor(PID_Motor):
     def process(self):
-        self.M['PID'] = M['PID_min_max']
+        self.M['PID'] = self.M['PID_min_max']
         pid_processing(self.M)
         mse_write_publish(self.M,self.Arduinos,self.M['smooth_steer'],self.M['pid_motor_pwm'])
 
 class Net_Steer_PID_Motor(PID_Motor):
     def process(self):
-        self.M['PID'] = M['PID_min_max']
+        self.M['PID'] = self.M['PID_min_max']
         pid_processing(self.M)
         self.M['caffe_steer_pwm'] = percent_to_pwm(self.M['caffe_steer'],self.M['steer_null'],self.M['steer_max'],self.M['steer_min'])
         mse_write_publish(self.M,self.Arduinos,self.M['caffe_steer_pwm'],self.M['pid_motor_pwm'])

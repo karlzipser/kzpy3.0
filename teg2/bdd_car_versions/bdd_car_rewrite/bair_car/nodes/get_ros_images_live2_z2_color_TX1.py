@@ -78,14 +78,15 @@ try:
 
 
 	caffe_enter_timer = Timer(2)
-
+	caf_steer_previous = 49
+	caf_motor_previous = 49
 	
 	while not rospy.is_shutdown():
 		if state in [3,5,6,7]:
 			if rp.use_caffe:
 				if solver == None:
 					solver = setup_solver(rp.solver_file_path)
-					if weights_file_path != None:
+					if rp.weights_file_path != None:
 						print "loading " + rp.weights_file_path
 						solver.net.copy_from(rp.weights_file_path)
 				if (previous_state not in [3,5,6,7]):
@@ -142,6 +143,12 @@ try:
 							caf_motor = aruco_motor
 						"""
 
+						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
+						caf_steer_previous = caf_steer
+						caf_motor = int((caf_motor+caf_motor_previous)/2.0)
+						caf_motor_previous = caf_motor
+
+
 						if caf_motor > 99:
 							caf_motor = 99
 						if caf_motor < 0:
@@ -150,6 +157,9 @@ try:
 							caf_steer = 99
 						if caf_steer < 0:
 							caf_steer = 0
+
+
+
 
 						if state in [3,6]:			
 							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))

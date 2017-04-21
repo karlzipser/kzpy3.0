@@ -67,10 +67,11 @@ def arduino_master_thread():
         if time_step.check():
             time_step.reset()
             if not folder_display_timer.check():
-                print("*** Data foldername = "+foldername+ '***')
+                print("*** Data foldername = "+rp.foldername+ '***')
 
         if reload_timer.check():
-            reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
+            reload(rp)
+            #reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
             #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
             #model_name_pub.publish(std_msgs.msg.String(weights_file_path))
             reload_timer.reset()
