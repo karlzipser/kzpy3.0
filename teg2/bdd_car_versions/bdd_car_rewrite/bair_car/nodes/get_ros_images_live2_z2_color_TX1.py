@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from kzpy3.utils import *
+
 
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
-
+from kzpy3.utils import *
 import roslib
 import std_msgs.msg
 import geometry_msgs.msg
