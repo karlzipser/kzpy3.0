@@ -57,7 +57,7 @@ class Marker_Handler:
                    
                 if image is None:
                     print("Error reading image! Wrong number of camera?")
-                cv_image, markers = image_marker.process_next_image(self.crop,image) 
+                cv_image, markers, motor_cmd, steer_cmd = image_marker.process_next_image(self.crop,image) 
  
                 
                 
