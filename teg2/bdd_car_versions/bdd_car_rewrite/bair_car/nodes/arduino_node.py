@@ -28,6 +28,7 @@ M['steer_gain'] = rp.steer_gain
 M['motor_gain'] = rp.motor_gain
 M['Stop_Arduinos'] = False
 M['PID_min_max'] = rp.PID_min_max
+M['aruco_evasion_active'] = 0
 
 def caffe_steer_callback(msg):
     global M
