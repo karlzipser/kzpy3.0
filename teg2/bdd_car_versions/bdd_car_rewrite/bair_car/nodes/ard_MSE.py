@@ -170,6 +170,9 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
             M['previous_state'].leave()
             return
 
+    if M['aruco_evasion_active'] == 1:
+        return
+        
     if np.abs(M['button_pwm_lst'][-1] - M['state_three'].button_pwm_peak) < BUTTON_DELTA:
         if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven'],M['state_eight'],M['state_nine']]:
             return
