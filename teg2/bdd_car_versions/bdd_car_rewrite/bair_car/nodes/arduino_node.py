@@ -90,6 +90,7 @@ def arduino_master_thread():
             pass
 
         time.sleep(0.5)
+
     
 
 ard_MSE.setup(M,Arduinos)

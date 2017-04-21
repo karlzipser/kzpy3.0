@@ -178,11 +178,12 @@ try:
 		else:
 			caffe_enter_timer.reset()
 
-
+	
 
 
 except Exception as e:
 	print("********** Exception ***********************",'red')
 	print(e.message, e.args)
 	rospy.signal_shutdown(d2s(e.message,e.args))
+	#unix('killall python && killall roslaunch && killall record')
 
