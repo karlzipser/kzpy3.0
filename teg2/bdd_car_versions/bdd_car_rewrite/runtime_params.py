@@ -27,7 +27,7 @@ Play = 0.
 Furtive = 0.
 Caf = 0.0
 Racing = 0.0
-Location =  'rewrite_test' # 'local' #'Smyth_tape'
+Location =  'Fern' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more.caffemodel")
@@ -44,7 +44,7 @@ use_caffe = True
 steer_gain = 1.0
 motor_gain = 1.0
 acc2rd_threshold = 100
-PID_min_max = [2.0,3.0]
+PID_min_max = [3.0,4.0]
 if False:
 	gyro_freeze_threshold = 500
 	acc_freeze_threshold_x = 12
