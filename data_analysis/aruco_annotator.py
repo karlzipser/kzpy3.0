@@ -3,10 +3,6 @@ import cv2
 from zed_parameter import Zed_Parameter
 import numpy as np
 
-if __name__ == '__main__':
-    pass
-    
-
 zed_parameters = Zed_Parameter()
 
 def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
@@ -62,4 +58,28 @@ def fill_image(cv_image, corners,rvec,tvec,camMat,camDist,color):
     polyPoints = np.array([[xy1,xy2,xy3,xy4]],dtype=np.int32)
 
     cv2.fillConvexPoly(cv_image,polyPoints, color)
+    
+    
+if __name__ == '__main__':
+    '''
+    This code is purely to check if the code works standalone
+    '''
+    capture_device = cv2.VideoCapture(0)
+    paused_video = False
+    while True:
+            if not paused_video:
+                ret, image = capture_device.read()
+                if image is None:
+                    print("Error reading image! Wrong number of camera?")
+                     
+                cv_image = get_aruco_image(image,True,(255,0,0),True)
+                cv2.imshow('frame',cv_image)
+                key = cv2.waitKey(1000/30) & 0xFF
+                
+                if key == ord('q'):
+                    break
+                if key == ord(' '):
+                    paused_video = not paused_video
+                
+    
         
