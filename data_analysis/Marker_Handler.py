@@ -7,11 +7,13 @@ import sys
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import aruco_annotator
 
 from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
+from aruco_annotator import get_aruco_image
 
 class Marker_Handler:
     
@@ -34,7 +36,7 @@ class Marker_Handler:
             
         elif (self.source_local_camera):
             
-            capture_device = cv2.VideoCapture(0)
+            capture_device = cv2.VideoCapture(2)
             if(capture_device == None):
                 print("Camera not found")
                 sys.exit(1)
@@ -57,8 +59,9 @@ class Marker_Handler:
                    
                 if image is None:
                     print("Error reading image! Wrong number of camera?")
-                cv_image, markers, motor_cmd, steer_cmd = image_marker.process_next_image(self.crop,image) 
- 
+                
+                #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,image) 
+                cv_image = get_aruco_image(image,True,True)
                 
                 
             if(self.show_video):
@@ -70,12 +73,8 @@ class Marker_Handler:
                     paused_video = not paused_video
                 if key == ord('w'):
                     bagfile_handler.fast_forward()
-                if not paused_video:
-                    self.area_visualizer.visualize_markers_center_line(markers)
+                #if not paused_video:
+                # DEBUG    self.area_visualizer.visualize_markers_center_line(markers)
             
 
-if len(sys.argv) < 2:
-    print("Please provide the path to the bagfile")
-else:
-    print("Processing bag files")
-    Marker_Handler(sys.argv[1])
+Marker_Handler(sys.argv)
