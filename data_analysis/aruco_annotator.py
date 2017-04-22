@@ -24,9 +24,6 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
         xMax = width / 2
         cv_image = cv_image[yMin:yMax, xMin:xMax]    
         
-        
-    marker_length = 0.2 # in meters    
-    
     aruco_dict = cv2.aruco.getPredefinedDictionary(aruco.DICT_4X4_250)
     parameters = aruco.DetectorParameters_create()
     
