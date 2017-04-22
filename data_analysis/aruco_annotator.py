@@ -35,8 +35,11 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
     
     
     if(filled):
-        rvec, tvec = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
-        
+        try:
+            rvec, tvec = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
+        except:
+            rvec, tvec, values = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
+            print(values)
         # We have now one rvec and tvec for each found marker
         if (not rvec == None) and (not tvec == None):
             for i in range(0, len(rvec)):
