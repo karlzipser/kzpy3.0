@@ -27,7 +27,7 @@ Play = 0.
 Furtive = 0.
 Caf = 0.0
 Racing = 0.0
-Location =  'Fern' # 'local' #'Smyth_tape'
+Location =  'rewrite_test' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more.caffemodel")
@@ -44,7 +44,7 @@ use_caffe = True
 steer_gain = 1.0
 motor_gain = 1.0
 acc2rd_threshold = 100
-PID_min_max = [3.0,4.0]
+PID_min_max = [1.0,2.0]
 if False:
 	gyro_freeze_threshold = 500
 	acc_freeze_threshold_x = 12
@@ -140,8 +140,8 @@ ar_params={
 'ar_left_range' : 50,
 'ar_right_range' : 50,
 'ar_min_perceived_distance' : 9999,
-'ar_critical_distance' : 0.75,
-'ar_stop_distance' : 0.5,
+'ar_critical_distance' : 1.5,
+'ar_stop_distance' : 0.7,
 'ar_max_motor' : 70,
 'ar_min_motor' : 59,
 'ar_override_motor':49,
