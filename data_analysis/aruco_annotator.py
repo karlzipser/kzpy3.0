@@ -33,24 +33,16 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
     corners, ids, rejected_points = aruco.detectMarkers(cv_image, aruco_dict, parameters=parameters)
     cv_image = aruco.drawDetectedMarkers(cv_image, corners, borderColor = color)
     
-    
+
     if(filled):
-        try:
-            rvec, tvec = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
-        except:
-            # Quick fix to account for the new cv3 way of doing things
-            rvec, tvec, values = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
-            
-        # We have now one rvec and tvec for each found marker
-        if (not rvec == None) and (not tvec == None):
-            for i in range(0, len(rvec)):
-                fill_image(cv_image,corners,rvec[i],tvec[i],zed_parameters.cameraMatrix, zed_parameters.distCoeffs,color)
+        for i in range(0, len(corners)):
+            fill_image(cv_image,corners[i],color)
     
     return cv_image
     
     
-def fill_image(cv_image, corners,rvec,tvec,camMat,camDist,color):
-    polyPoints = np.array(corners[0],dtype=np.int32)
+def fill_image(cv_image, corners,color):
+    polyPoints = np.array(corners,dtype=np.int32)
     cv2.fillConvexPoly(cv_image,polyPoints, color)
     
     
