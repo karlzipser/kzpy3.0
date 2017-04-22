@@ -32,7 +32,7 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
     
     corners, ids, rejected_points = aruco.detectMarkers(cv_image, aruco_dict, parameters=parameters)
     cv_image = aruco.drawDetectedMarkers(cv_image, corners, borderColor = color)
-    print(corners)
+    
     
     if(filled):
         try:
@@ -51,7 +51,7 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
     
 def fill_image(cv_image, corners,rvec,tvec,camMat,camDist,color):
     polyPoints = np.array(corners[0],dtype=np.int32)
-    cv2.fillPoly(cv_image,polyPoints, color)
+    cv2.fillConvexPoly(cv_image,polyPoints, color)
     
     
 if __name__ == '__main__':
