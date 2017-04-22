@@ -61,7 +61,7 @@ class Marker_Handler:
                     print("Error reading image! Wrong number of camera?")
                 
                 #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,image) 
-                cv_image = get_aruco_image(image,True,True)
+                cv_image = get_aruco_image(image,True,(255,0,0),True)
                 
                 
             if(self.show_video):

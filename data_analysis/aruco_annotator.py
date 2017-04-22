@@ -9,7 +9,16 @@ if __name__ == '__main__':
 
 zed_parameters = Zed_Parameter()
 
-def get_aruco_image(cv_image, filled = False, crop = False):
+def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
+    '''
+    Returns but also writes on the input image the place where the aruco markers
+    are found.
+    
+    It is possible to fill the area of the marker entirely (filled)
+    to choose the color (color = (RGB)) and to crop the input image
+    by width/2.0 because that is sometimes handy when the whole ZED
+    camera image from both cameras is used as input
+    '''
         
     if(crop):
         height, width, channel = cv_image.shape
@@ -26,8 +35,7 @@ def get_aruco_image(cv_image, filled = False, crop = False):
     parameters = aruco.DetectorParameters_create()
     
     corners, ids, rejected_points = aruco.detectMarkers(cv_image, aruco_dict, parameters=parameters)
-    cv_image = aruco.drawDetectedMarkers(cv_image, corners)
-    
+    cv_image = aruco.drawDetectedMarkers(cv_image, corners, borderColor = color)
     
     
     if(filled):
@@ -36,12 +44,12 @@ def get_aruco_image(cv_image, filled = False, crop = False):
         # We have now one rvec and tvec for each found marker
         if (not rvec == None) and (not tvec == None):
             for i in range(0, len(rvec)):
-                fill_image(cv_image,corners,rvec[i],tvec[i],zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
+                fill_image(cv_image,corners,rvec[i],tvec[i],zed_parameters.cameraMatrix, zed_parameters.distCoeffs,color)
     
     return cv_image
     
     
-def fill_image(cv_image, corners,rvec,tvec,camMat,camDist):
+def fill_image(cv_image, corners,rvec,tvec,camMat,camDist,color):
     length = 0.2
     
     axisPoints = np.array([[-length/2.0,-length/2.0,0.0],[-length/2.0,length/2.0,0.0],[length/2.0,length/2.0,0.0],[length/2.0,-length/2.0,0.0]])
@@ -53,5 +61,5 @@ def fill_image(cv_image, corners,rvec,tvec,camMat,camDist):
     xy4 = (int(imgpts[3][0][0]), int(imgpts[3][0][1]))
     polyPoints = np.array([[xy1,xy2,xy3,xy4]],dtype=np.int32)
 
-    cv2.fillPoly(cv_image,polyPoints, (0,0,255))
+    cv2.fillConvexPoly(cv_image,polyPoints, color)
         
