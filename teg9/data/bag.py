@@ -13,6 +13,7 @@ single_value_topics = ['steer','state','motor','encoder','GPS2_lat']
 vector3_topics = ['acc','gyro','gyro_heading']#,'gps']
 camera_sides = ['left','right']
 
+import kzpy3.data_analysis.aruco_annotator as ann
 
 
 def multi_preprocess(A,bag_folder_path,bagfile_range=[]):
@@ -201,7 +202,8 @@ def animator_thread(A):
             indx = len(A['left_image'])-1
 
         a = A['left_image'][indx]
-        mi_or_cv2(a[1],cv=True,delay=30,title='animate')
+        img = ann.get_aruco_image(a[1],filled=True)
+        mi_or_cv2(img,cv=True,delay=30,title='animate')
 
         A['current_img_index'] += A['d_indx']
         if A['current_img_index'] >= len(A['left_image']):
