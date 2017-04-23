@@ -17,7 +17,6 @@ def get_arduino_serial_connections(baudrate, timeout):
     return sers
 
 def assign_serial_connections(sers):
-    print 'here D'
     Arduinos = {}
     for ser in sers:
         for _ in xrange(100):

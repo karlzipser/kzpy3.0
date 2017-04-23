@@ -24,6 +24,7 @@ def multi_preprocess(A,bag_folder_path,bagfile_range=[]):
     threading.Thread(target=multi_preprocess_thread,args=[A,bag_files]).start()
 
 
+
 def multi_preprocess_thread(A,bag_files):
     for b in bag_files:
         if A['STOP_LOADER_THREAD']:
@@ -33,13 +34,16 @@ def multi_preprocess_thread(A,bag_files):
         preprocess(A,b)
 
 
-def get_new_A():
+
+def get_new_A(_=None):
     A = {}
     A['current_img_index'] = 0
     A['STOP_LOADER_THREAD'] = False
     A['STOP_ANIMATOR_THREAD'] = False
+    A['STOP_GRAPH_THREAD'] = False
     A['d_indx'] = 1.0
     return A
+
 
 
 def preprocess(A,path):
@@ -138,48 +142,57 @@ bag.animate(A)
 
 
 
-def graph(A):
-
+def graph_thread(A):
 
     figure('MSE')
     clf()
-    
-    steer = array(A['steer'])
-    plot(steer[:,0],steer[:,1])
-    
-    motor = array(A['motor'])
-    plot(motor[:,0],motor[:,1])
-    """
-    plot(A['motor'][:,0]-A['motor'][0,0],A['motor'][:,1])
-    plot(A['steer'][:,0]-A['steer'][0,0],A['steer'][:,1])
 
-    
-    figure('gyro')
-    clf()
-    plot(A['gyro_x'][:,0]-A['gyro_x'][0,0],A['gyro_x'][:,1])
-    plot(A['gyro_y'][:,0]-A['gyro_y'][0,0],A['gyro_y'][:,1])
-    plot(A['gyro_z'][:,0]-A['gyro_z'][0,0],A['gyro_z'][:,1])
+    while A['STOP_GRAPH_THREAD'] == False:   
 
-    figure('acc')
-    clf()
-    plot(A['acc_x'][:,0]-A['acc_x'][0,0],A['acc_x'][:,1])
-    plot(A['acc_y'][:,0]-A['acc_y'][0,0],A['acc_y'][:,1])
-    plot(A['acc_z'][:,0]-A['acc_z'][0,0],A['acc_z'][:,1])
-    """
-    while True:
-        indx = int(A['current_img_index'])
-        if indx < 0:
-            indx = 0
-        elif indx >= len(A['left_image']):
-            indx = len(A['left_image'])-1
-        t = A['left_image'][indx][0]
-        xlim(t-3,t)
-        pause(0.05)
+        A_len = len(A['left_image'])
+        steer = array(A['steer'])
+        plot(steer[:,0]-steer[0,0],steer[:,1])
+        
+        motor = array(A['motor'])
+        plot(motor[:,0]-motor[0,0],motor[:,1])
+        """
+        plot(A['motor'][:,0]-A['motor'][0,0],A['motor'][:,1])
+        plot(A['steer'][:,0]-A['steer'][0,0],A['steer'][:,1])
+
+        
+        figure('gyro')
+        clf()
+        plot(A['gyro_x'][:,0]-A['gyro_x'][0,0],A['gyro_x'][:,1])
+        plot(A['gyro_y'][:,0]-A['gyro_y'][0,0],A['gyro_y'][:,1])
+        plot(A['gyro_z'][:,0]-A['gyro_z'][0,0],A['gyro_z'][:,1])
+
+        figure('acc')
+        clf()
+        plot(A['acc_x'][:,0]-A['acc_x'][0,0],A['acc_x'][:,1])
+        plot(A['acc_y'][:,0]-A['acc_y'][0,0],A['acc_y'][:,1])
+        plot(A['acc_z'][:,0]-A['acc_z'][0,0],A['acc_z'][:,1])
+        """
+        while A_len == len(A['left_image']):
+            indx = int(A['current_img_index'])
+            if indx < 0:
+                indx = 0
+            elif indx >= len(A['left_image']):
+                indx = len(A['left_image'])-1
+            t = A['left_image'][indx][0]
+            xlim(t-3-steer[0,0],t-steer[0,0])
+            pause(0.05)
+    A['STOP_GRAPH_THREAD'] = False
+
+
+
 
 
 def animator_thread(A):
 
     while A['STOP_ANIMATOR_THREAD'] == False:
+        if len(A['left_image']) < 30*10:
+            time.sleep(0.1)
+            continue
 
         indx = int(A['current_img_index'])
         if indx < 0:
@@ -191,23 +204,47 @@ def animator_thread(A):
         mi_or_cv2(a[1],cv=True,delay=30,title='animate')
 
         A['current_img_index'] += A['d_indx']
+        if A['current_img_index'] >= len(A['left_image']):
+            A['current_img_index'] = len(A['left_image'])-1
+    A['STOP_ANIMATOR_THREAD'] = False
 
 
+
+
+
+def start_graph(A):
+    A['STOP_GRAPH_THREAD'] = False
+    threading.Thread(target=graph_thread,args=[A]).start()
+def stop_graph(A):
+    A['STOP_GRAPH_THREAD'] = True
 def start_animation(A):
+    A['STOP_ANIMATOR_THREAD'] = False
     threading.Thread(target=animator_thread,args=[A]).start()
+def stop_animation(A):
+    A['STOP_ANIMATOR_THREAD'] = True
 
-def animate(A):
-    while A['current_img_index'] < len(A['left_image']):
-        a = A['left_image'][A['current_img_index']]
-        mi_or_cv2(a[1],cv=True,delay=30,title='animate')
-        A['current_img_index'] += 1
+def menu(A):
+    menu_functions = ['start_animation','stop_animation','start_graph','stop_graph','get_new_A']
+    for i in range(len(menu_functions)):
+        print(d2n(i,') ',menu_functions[i]))
+    choice = input('> ')
+    if type(choice) == int:
+        if choice >-1 and choice < len(menu_functions):
+            exec_str = d2n(menu_functions[choice],'(A)')
+            exec(exec_str)
+
+
+
+
+
 
 """
 import kzpy3.teg9.data.bag as bag
 reload(bag)
 A=bag.get_new_A()
 bag_folder_path='/media/karlzipser/ExtraDrive1/bair_car_data_10/caffe_direct_Smyth_tape_16Jan17_16h52m24s_Mr_Silver'
-bag.multi_preprocess(A,bag_folder_path,[0,1])
+bag_folder_path='/media/karlzipser/ExtraDrive1/bair_car_data_10/direct_Smyth_tape_25Jan17_19h24m14s_Mr_Yellow'
+bag.multi_preprocess(A,bag_folder_path,[1,2])
 
 bag.start_animation(A)   
 bag.graph(A)
