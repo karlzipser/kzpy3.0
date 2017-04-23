@@ -13,7 +13,7 @@ from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
-from aruco_annotator import get_aruco_image
+from aroco_angle_retriever import get_aruco_image
 
 class Marker_Handler:
     
@@ -26,10 +26,12 @@ class Marker_Handler:
     
     
     def __init__(self, arguments):
+
         
         if(self.source_bagfile):
         
-            bagfile_handler = Bagfile_Handler(arguments)
+            self.crop = False    
+            bagfile_handler = Bagfile_Handler(arguments[1])
             image_marker = Video_Marker(bagfile_handler,None) 
             self.area_visualizer = Area_Visualizer()
             self.play_video(bagfile_handler,None,image_marker)
