@@ -97,8 +97,8 @@ segment = segments[seg][elm:(elm+N)]
 
 
 Segment_Data = {}
-hdf5_runs_path = opjD('bair_car_data/hdf5/runs')
-hdf5_segment_metadata_path = opjD('bair_car_data/hdf5/segment_metadata')
+hdf5_runs_path = opjD('bair_car_data_new/hdf5/runs')
+hdf5_segment_metadata_path = opjD('bair_car_data_new/hdf5/segment_metadata')
 
 
 
@@ -319,7 +319,7 @@ def val_to_category(value,cat_min,cat_max,num_bins):
 
 
 solver = setup_solver(opjh('kzpy3/caf7/z2_color/solver.prototxt'))
-weights_file_path = opjh('Desktop/z2_color/z2_color_scratch_iter_27900000.caffemodel')
+weights_file_path = opjh('kzpy3/caf5/z2_color/z2_color.caffemodel')
 solver.net.copy_from(weights_file_path)
 cprint('Loaded weights from '+weights_file_path)
 

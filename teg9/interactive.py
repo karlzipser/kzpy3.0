@@ -8,7 +8,7 @@ This
 
 Interactive data viewer for model car project.
  
-Expects to find ~/Desktop/bair_car_data/ by default.
+
 
 Change path with SP(), i.e., function_set_paths()
 
@@ -60,17 +60,18 @@ Using the TX1 dev. board cleans this up dramatically.
 
 i_variables = ['state','steer','motor','run_','runs','run_labels','meta_path','rgb_1to4_path','B_','left_images','right_images','unsaved_labels']
 
-i_labels = ['out1_in2','direct','home','furtive','play','racing','multicar','campus','night','Smyth','left','notes','local','Tilden','reject_run','reject_intervals','snow','follow','only_states_1_and_6_good']
+i_labels = ['mostly_caffe','mostly_human','aruco_ring','out1_in2','direct','home','furtive','play','racing','multicar','campus','night','Smyth','left','notes','local','Tilden','reject_run','reject_intervals','snow','follow','only_states_1_and_6_good']
 not_direct_modes = ['out1_in2','left','furtive','play','racing','follow']
 
 i_functions = ['function_close_all_windows','function_set_plot_time_range','function_set_label','function_current_run','function_help','function_set_paths','function_list_runs','function_set_run','function_visualize_run','function_animate','function_run_loop']
 for q in i_variables + i_functions + i_labels:
 	exec(d2n(q,' = ',"\'",q,"\'")) # I use leading underscore because this facilitates auto completion in ipython
 
-i_label_abbreviations = {out1_in2:'o1i2', direct:'D' ,home:'H',furtive:'Fu',play:'P',racing:'R',multicar:'M',campus:'C',night:'Ni',Smyth:'Smy',left:'Lf',notes:'N',local:'L',Tilden:'T',reject_run:'X',reject_intervals:'Xi',snow:'S',follow:'F',only_states_1_and_6_good:'1_6'}
+i_label_abbreviations = {aruco_ring:'ar_r',mostly_human:'mH',mostly_caffe:'mC',out1_in2:'o1i2', direct:'D' ,home:'H',furtive:'Fu',play:'P',racing:'R',multicar:'M',campus:'C',night:'Ni',Smyth:'Smy',left:'Lf',notes:'N',local:'L',Tilden:'T',reject_run:'X',reject_intervals:'Xi',snow:'S',follow:'F',only_states_1_and_6_good:'1_6'}
 
 I = {}
 
+bair_car_data_path = opjD('bair_car_data_new')
 
 
 
@@ -116,9 +117,9 @@ def blank_labels():
 
 
 
-def function_set_paths(p=opjD('bair_car_data')):
+def function_set_paths(p=opj(bair_car_data_path)):
 	"""
-	function_set_paths(p=opjD('bair_car_data'))
+	function_set_paths(p=opj(bair_car_data_path))
 		SP
 	"""
 	global I
@@ -167,7 +168,7 @@ def function_list_runs(rng=None,auto_direct_labelling=False):
 	"""
 	cprint(I[meta_path])
 	try:
-		run_labels_path = most_recent_file_in_folder(opjD('bair_car_data','run_labels'),['run_labels'])
+		run_labels_path = most_recent_file_in_folder(opj(bair_car_data_path,'run_labels'),['run_labels'])
 		I[run_labels] = load_obj(run_labels_path)
 	except:
 		cprint('Unable to load run_labels!!!!! Initalizing to empty dict')
@@ -223,7 +224,7 @@ def function_set_label(k,v=True):
 		k = [k]
 	for m in k:
 		I[run_labels][I[run_]][m] = v
-	save_obj(I[run_labels],opjD('bair_car_data','run_labels','run_labels_'+time_str()+'.pkl'))
+	save_obj(I[run_labels],opj('bair_car_data_path','run_labels','run_labels_'+time_str()+'.pkl'))
 SL = function_set_label
 
 
@@ -435,7 +436,11 @@ def function_animate(t0,t1):
 					plt.pause(rdt)
 				#mi(left_images[t],preview_fig,[N,N,5],do_clf=False)
 				#pause(0.0001)
-				img = I[left_images][t]
+				try:
+					img = I[left_images][t]
+				except Exception as e:
+					cprint("********** Exception ***********************",'red')
+					print(e.message, e.args)
 				#print state_one_g_t_zero_dict[t]
 				if state_one_g_t_zero_dict[t] < 1:#t not in B['good_timestamps_to_raw_timestamps_indicies__dic']:
 					#img[:,:,0] = img[:,:,1]
@@ -478,7 +483,7 @@ if __name__ == '__main__':
 
 
 
-def function_save_hdf5(run_num=None,dst_path=opjD('bair_car_data/hdf5/runs'),flip=False):
+def function_save_hdf5(run_num=None,dst_path=opj(bair_car_data_path,'hdf5/runs'),flip=False):
 	if run_num != None:
 		CA()
 		SR(run_num)
@@ -676,7 +681,6 @@ def load_hdf5_steer_hist(path,dst_path):
 
 
 
-
 if False:
 	for i in range(160):
 		SR(i)
@@ -684,26 +688,26 @@ if False:
 
 
 
-if False:
-	for i in range(205):
+if True:
+	for i in range(21):
 		S5(i,flip=False)
 		S5(flip=True)
 
-if False:
-	hdf5s = sgg(opjD('bair_car_data/hdf5/runs/*.hdf5'))
+if True:
+	hdf5s = sgg(opj(bair_car_data_path,'hdf5/runs/*.hdf5'))
 	ctr = 0
 	for h in hdf5s:
 		ctr += 1
 		print ctr
-		load_hdf5_steer_hist(h,opjD('bair_car_data','hdf5','segment_metadata'))
+		load_hdf5_steer_hist(h,opj(bair_car_data_path,'hdf5','segment_metadata'))
 
 
 
-if False:
+if True:
 
 	if True:
 		run_codes = {}
-		steer_hists = sgg(opjD('bair_car_data/hdf5/segment_metadata/*.state_hist_list.pkl'))
+		steer_hists = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.state_hist_list.pkl'))
 		ctr = 0
 		combined = []
 		for s in steer_hists:
@@ -715,13 +719,13 @@ if False:
 			#	combined.append(o[j])
 			ctr += 1
 		#save_obj(combined,opjD('combined'))
-		save_obj(run_codes,opjD('bair_car_data/hdf5/segment_metadata/run_codes'))
+		save_obj(run_codes,opj(bair_car_data_path,'hdf5/segment_metadata/run_codes'))
 
 
 	if True:
 		low_steer = []
 		high_steer = []
-		low_steer_files = sgg(opjD('bair_car_data/hdf5/segment_metadata/*.low_steer.pkl'))
+		low_steer_files = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.low_steer.pkl'))
 		ctr = 0
 		for s in low_steer_files:
 			print (ctr,s)
@@ -734,7 +738,7 @@ if False:
 				q[i].append(ctr)
 			high_steer += q
 			ctr += 1
-		save_obj(low_steer,opjD('bair_car_data/hdf5/segment_metadata/low_steer'))
-		save_obj(high_steer,opjD('bair_car_data/hdf5/segment_metadata/high_steer'))
+		save_obj(low_steer,opj(bair_car_data_path,'hdf5/segment_metadata/low_steer'))
+		save_obj(high_steer,opj(bair_car_data_path,'hdf5/segment_metadata/high_steer'))
 
 

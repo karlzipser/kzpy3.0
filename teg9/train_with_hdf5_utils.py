@@ -2,6 +2,7 @@ from kzpy3.teg7.data.preprocess_bag_data import *
 from kzpy3.teg7.data.Bag_File import *
 from kzpy3.misc.progress import *
 from kzpy3.vis import *
+os.environ['GLOG_minloglevel'] = '2'
 import caffe
 
 
@@ -15,11 +16,11 @@ for q in i_variables + i_labels:
 
 
 
-
+bair_car_data_path = opjD('bair_car_data_new')
 
 Segment_Data = {} # main data dictionary for segments
-hdf5_runs_path = opjD('bair_car_data/hdf5/runs') # large hdf5 files for runs
-hdf5_segment_metadata_path = opjD('bair_car_data/hdf5/segment_metadata') # metatdata associated with runs
+hdf5_runs_path = opj(bair_car_data_path,'hdf5/runs') # large hdf5 files for runs
+hdf5_segment_metadata_path = opj(bair_car_data_path,'hdf5/segment_metadata') # metatdata associated with runs
 
 
 def function_load_hdf5(path):
