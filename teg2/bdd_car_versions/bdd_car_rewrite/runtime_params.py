@@ -30,8 +30,8 @@ Racing = 0.0
 Location =  'Fern' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
-weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_iter_16400000.caffemodel")
+#weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
+weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_iter_16400000.caffemodel")
 verbose = False
 use_caffe = True
 steer_gain = 1.0
