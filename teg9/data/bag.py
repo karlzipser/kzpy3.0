@@ -149,7 +149,9 @@ def graph_thread(A):
     clf()
 
     while A['STOP_GRAPH_THREAD'] == False:   
-
+        if len(A['left_image']) < 30*10:
+            time.sleep(0.1)
+            continue
         A_len = len(A['left_image'])
         steer = array(A['steer'])
         plot(steer[:,0]-steer[0,0],steer[:,1])
@@ -180,7 +182,7 @@ def graph_thread(A):
             elif indx >= len(A['left_image']):
                 indx = len(A['left_image'])-1
             t = A['left_image'][indx][0]
-            xlim(t-3-steer[0,0],t-steer[0,0])
+            xlim(t-10-steer[0,0],t-steer[0,0])
             pause(0.05)
     A['STOP_GRAPH_THREAD'] = False
 

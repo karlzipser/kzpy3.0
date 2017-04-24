@@ -61,7 +61,7 @@ imread = scipy.misc.imread
 imsave = scipy.misc.imsave
 #opj = os.path.join
 gg = glob.glob
-
+os.environ['GLOG_minloglevel'] = '2'
 def sgg(d):
     return sorted(gg(d),key=natural_keys)
 

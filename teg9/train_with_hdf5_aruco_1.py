@@ -100,6 +100,9 @@ if True:
 		if data == None:
 			#print('if data == None:')
 			continue
+		if data['states'][0] != 1: ##################################################### !!!!!!!!!!!!
+			continue
+			print data['states'][0]
 		############## load data into solver #####################
 		#
 		ctr = 0
