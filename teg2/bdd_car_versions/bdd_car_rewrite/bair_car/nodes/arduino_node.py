@@ -12,7 +12,7 @@ import rospy
 
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 
-os.environ['STOP_ARDUINOS'] = 'False'
+os.environ['STOP'] = 'False'
 
 baudrate = 115200
 timeout = 0.1

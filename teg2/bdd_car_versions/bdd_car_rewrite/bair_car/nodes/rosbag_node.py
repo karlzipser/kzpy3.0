@@ -4,7 +4,7 @@ import os, sys, shutil, subprocess, time
 import rospy
 import std_msgs.msg
 
-os.environ['STOP_ARDUINOS'] = 'False'
+os.environ['STOP'] = 'False'
 
 from kzpy3.teg2.car_run_params import foldername
 
