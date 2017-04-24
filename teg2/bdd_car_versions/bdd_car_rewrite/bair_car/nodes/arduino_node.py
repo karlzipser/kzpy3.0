@@ -115,6 +115,7 @@ def arduino_master_thread():
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)
+        print("arduino_node.py exiting.")
         os.environ['STOP'] = 'True'
         LED_signal = d2n('(10000)')
         Arduinos['SIG'].write(LED_signal)

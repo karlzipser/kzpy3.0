@@ -388,6 +388,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)
+        print("ard_MSE.py exiting.")
         os.environ['STOP'] = 'True'
         M['Stop_Arduinos'] = True
         rospy.signal_shutdown(d2s(e.message,e.args))

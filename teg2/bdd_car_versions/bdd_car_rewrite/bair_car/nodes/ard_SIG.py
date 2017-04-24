@@ -48,6 +48,7 @@ def run_loop(Arduinos,M):
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)
+        print("ard_SIG.py exiting.")
         os.environ['STOP'] = 'True'
         M['Stop_Arduinos'] = True
         LED_signal = d2n('(10000)')
