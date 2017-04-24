@@ -9,7 +9,7 @@ sudo chmod 666 /dev/ttyACM*
 """
 
 def setup(M,Arduinos):
-    LED_signal = d2n('(',3,')')
+    LED_signal = d2n('(10000)')
     Arduinos['SIG'].write(LED_signal)
     pass
 

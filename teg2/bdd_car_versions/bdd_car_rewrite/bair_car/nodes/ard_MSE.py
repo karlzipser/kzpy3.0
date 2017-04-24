@@ -49,12 +49,13 @@ class Run_State(State):
         self.led()
         State.enter(self)
     def led(self):
-        if self.number in [3,5,6,7,8]:
-            n = 3
-        else:
-            n = self.number
+        #if self.number in [3,5,6,7,8]:
+        #    n = 3
+        #else:
+        #    n = self.number
         #print n
-        LED_signal = d2n('(',n*100+n*10+1001,')')
+        #LED_signal = d2n('(',n*100+n*10+1001,')')
+        LED_signal = d2n('(',self.M['data_saving']*10000+self.number,')')
         self.Arduinos['SIG'].write(LED_signal)
 
 
@@ -268,6 +269,7 @@ def setup(M,Arduinos):
     M['steer_gain'] = steer_gain
     M['motor_gain'] = motor_gain
     M['acc2rd_threshold'] = acc2rd_threshold
+    M['data_saving'] = 0
     print("MSE setup")
 
 calibration_signal_timer = Timer(0.01)
@@ -379,7 +381,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             #print((M['current_state'].number,M['steer_percent'],M['motor_percent'],M['state_transition_timer'].time()))
             Arduinos['MSE'].write(M['smooth_write_str'])
         """
-    LED_signal = d2n('(',3,')')
+    LED_signal = d2n('(',10000')')
     Arduinos['SIG'].write(LED_signal)
 
 #        
@@ -390,8 +392,8 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 def calibrated(Arduinos,M):
     if not M['calibrated']:
         if calibration_signal_timer.check():
-            s = np.random.choice([1,2,3])
-            LED_signal = d2n('(',s*100+s*10+1001,')')
+            s = np.random.choice([1,2,3,5,6,7,9])
+            LED_signal = d2n('(',M['data_saving']*10000+s,')')
             Arduinos['SIG'].write(LED_signal)
             calibration_signal_timer.reset()
         return False

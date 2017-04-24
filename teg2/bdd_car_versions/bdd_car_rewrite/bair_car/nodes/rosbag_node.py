@@ -11,7 +11,7 @@ time.sleep(3)
 
 if __name__ == '__main__':
     rospy.init_node('rosbag_node', anonymous=True)
-    save_pub = rospy.Publisher('signals', std_msgs.msg.Int32, queue_size=100)
+    save_pub = rospy.Publisher('data_saving', std_msgs.msg.Int32, queue_size=100)
     
 
     fl = gg('/home/ubuntu/catkin_ws/src/bair_car/rosbags/*')
@@ -37,11 +37,11 @@ if __name__ == '__main__':
 
     rate = rospy.Rate(2.0)
     while not rospy.is_shutdown():
-        save_pub.publish(std_msgs.msg.Int32(1))
+        save_pub.publish(std_msgs.msg.Int32(0))
         for f in os.listdir(bag_rec_folder):
             if '.bag' != os.path.splitext(f)[1]:
                 continue
-            save_pub.publish(std_msgs.msg.Int32(2) )
+            save_pub.publish(std_msgs.msg.Int32(1) )
             print('Moving {0}'.format(f))
             f_rec = os.path.join(bag_rec_folder, f)
             f_mv = os.path.join(bag_mv_folder, f)
@@ -51,7 +51,7 @@ if __name__ == '__main__':
             elapsed = time.time() - start
             unix('rm '+opj(bag_rec_folder,'*.bag')) # 27 Nov 2016, to remove untransferred bags
             print('Done in {0} secs\n'.format(elapsed))
-            save_pub.publish(std_msgs.msg.Int32(1))
+            save_pub.publish(std_msgs.msg.Int32(0))
             
         rate.sleep()
 
