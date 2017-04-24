@@ -9,10 +9,10 @@ def do_aruco(cv_image,steering_cmd,motor_cmd,ar_params):
     crop = False
     cv_image, markers, safe_motor, safe_steer, evasion_needed = marker.process_next_image(crop,ar_params,cv_image) 
     #try: 
-    cv2.imshow('frame 2',cv_image)
-    key = cv2.waitKey(1000/30) & 0xFF
-    if key == ord('q'):
-        break
+    #cv2.imshow('frame 2',cv_image)
+    #key = cv2.waitKey(1000/30) & 0xFF
+    #if key == ord('q'):
+    #    break
                 
     #except:
     #cv2.moveWindow('frame 2',700,600)

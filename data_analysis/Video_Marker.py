@@ -111,8 +111,8 @@ class Video_Marker(object):
         
         # Which area in our viewport is considered "in front"
         # The viewport is at our angle calculation roughly in between -33 and 33 deg
-        front_left_limit_deg = -25
-        front_right_limit_deg = 25
+        front_left_limit_deg = -33
+        front_right_limit_deg = 33
         
         
         # Calculating the average angle to get away from the wall.
