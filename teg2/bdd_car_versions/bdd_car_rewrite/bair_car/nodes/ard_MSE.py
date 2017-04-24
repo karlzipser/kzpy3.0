@@ -389,6 +389,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         print("********** Exception ***********************")
         print(e.message, e.args)
         os.environ['STOP'] = 'True'
+        M['Stop_Arduinos'] = True
         rospy.signal_shutdown(d2s(e.message,e.args))
         LED_signal = d2n('(10000)')
         Arduinos['SIG'].write(LED_signal)

@@ -105,7 +105,7 @@ def arduino_master_thread():
                 git_pull_timer.reset()
 
             try:
-                print os.environ['STOP']
+                print M['Stop_Arduinos']
                 print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
             except:
                 pass
