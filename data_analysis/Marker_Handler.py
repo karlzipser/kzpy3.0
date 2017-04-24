@@ -13,7 +13,7 @@ from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
-from aroco_angle_retriever import get_average_boundary_angle
+from aruco_annotator import get_aruco_image
 
 class Marker_Handler:
     
@@ -63,7 +63,7 @@ class Marker_Handler:
                     print("Error reading image! Wrong number of camera?")
                 
                 #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,image) 
-                cv_image = get_average_boundary_angle(image,True,(255,0,0),False)
+                cv_image = get_aruco_image(image,True,(255,0,0),False)
                 
                 
             if(self.show_video):
