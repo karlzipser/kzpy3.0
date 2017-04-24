@@ -7,7 +7,7 @@ import caffe
 
 i_variables = ['state','steer','motor','run_','runs','run_labels','meta_path','rgb_1to4_path','B_','left_images','right_images','unsaved_labels']
 
-i_labels = ['out1_in2','direct','home','furtive','play','racing','multicar','campus','night','Smyth','left','notes','local','Tilden','reject_run','reject_intervals','snow','follow','only_states_1_and_6_good']
+i_labels = ['mostly_caffe','mostly_human','aruco_ring','out1_in2','direct','home','furtive','play','racing','multicar','campus','night','Smyth','left','notes','local','Tilden','reject_run','reject_intervals','snow','follow','only_states_1_and_6_good']
 not_direct_modes = ['out1_in2','left','furtive','play','racing','follow']
 
 for q in i_variables + i_labels:

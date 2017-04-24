@@ -30,21 +30,13 @@ Racing = 0.0
 Location =  'Fern' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
-#weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more.caffemodel")
-#weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more_2.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_state_1_5_6_7_iter_4000000.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_state_1_5_6_7_iter_6000000.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_state_1_5_6_7_iter_10900000.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_state_1_5_6_7_iter_8000000.caffemodel")
-#weights_file_path = opjh("kzpy3/caf6/z2_color_more/z2_color_more_3.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/solver_state_1_5_6_7_plus_extra_Smyth_racing_iter_400000.caffemodel")
 weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
 verbose = False
 use_caffe = True
 steer_gain = 1.0
 motor_gain = 1.0
 acc2rd_threshold = 100
-PID_min_max = [2.0,3.0]
+PID_min_max = [1.5,2.5]
 if False:
 	gyro_freeze_threshold = 500
 	acc_freeze_threshold_x = 12
