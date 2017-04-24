@@ -83,18 +83,20 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
                 sum_sinuses = (sum_sinuses + np.sin(angle)) * distance_norm 
                 sum_cosinuses = (sum_cosinuses + np.cos(angle)) * distance_norm
         
-        #averageDistance = averageDistance / distCounter
-        averageAngle = np.arctan(sum_sinuses / sum_cosinuses)
+        try:
+            averageAngle = np.arctan(sum_sinuses / sum_cosinuses)
+            angleMessage1 = 'angle: ' + str(np.round(np.rad2deg(averageAngle[0]),2)) 
+            angleMessage2 = 'min distance: ' + str(np.round(minDistance,2))
+            #    
+            cv2.putText(cv_image,angleMessage1, (50,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+            cv2.putText(cv_image,angleMessage2, (50,330), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
         
+        except ZeroDivisionError:
+            pass
         # Code for eventual visualisation
         #if averageAngle == None:
         #    angleMessage = "Too far" 
         #else:
-        angleMessage1 = 'angle: ' + str(np.round(np.rad2deg(averageAngle[0]),2)) 
-        angleMessage2 = 'min distance: ' + str(np.round(minDistance,2))
-        #    
-        cv2.putText(cv_image,angleMessage1, (50,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
-        cv2.putText(cv_image,angleMessage2, (50,330), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
         
     
     #return averageAngle
