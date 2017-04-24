@@ -286,103 +286,110 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
         return
 
     
-
-    while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
-        
-        if not serial_data_to_messages(Arduinos,M):
-            continue
-
-        buttons_to_state(Arduinos,M,BUTTON_DELTA)
-
-        if M['current_state'] == None:
-            continue
-
-        manage_list_lengths(M)
-
-        smooth_data(M)
-        
-        if M['current_state'] == M['state_four']:
-            #M['aruco_evasion_active'] = 0
-            process_state_4(M)
-            continue
-        else:
-            if not calibrated(Arduinos,M):
+    try:
+        if os.environ['STOP'] == 'True':
+            assert(False)
+        while M['Stop_Arduinos'] == False or not rospy.is_shutdown():
+            
+            if not serial_data_to_messages(Arduinos,M):
                 continue
 
-        M['steer_percent'] = pwm_to_percent(M,M['steer_null'],M['steer_pwm_lst'][-1],M['steer_max'],M['steer_min'])
-        M['motor_percent'] = pwm_to_percent(M,M['motor_null'],M['motor_pwm_lst'][-1],M['motor_max'],M['motor_min'])
+            buttons_to_state(Arduinos,M,BUTTON_DELTA)
 
-        M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
-        M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
-        
-        if 'acc' in M:
-            acc2rd = M['acc'][0]**2+M['acc'][2]**2
-            if acc2rd > M['acc2rd_threshold']:
-                if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
-                    M['previous_state'] = M['current_state']
-                    M['current_state'] = M['state_nine']
-                    M['current_state'].enter()
-                    M['previous_state'].leave()
-        else:
-            print 'acc not in M'
-        if False:
-            if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
-                freeze = True
-        
+            if M['current_state'] == None:
+                continue
 
+            manage_list_lengths(M)
+
+            smooth_data(M)
+            
+            if M['current_state'] == M['state_four']:
+                #M['aruco_evasion_active'] = 0
+                process_state_4(M)
+                continue
+            else:
+                if not calibrated(Arduinos,M):
+                    continue
+
+            M['steer_percent'] = pwm_to_percent(M,M['steer_null'],M['steer_pwm_lst'][-1],M['steer_max'],M['steer_min'])
+            M['motor_percent'] = pwm_to_percent(M,M['motor_null'],M['motor_pwm_lst'][-1],M['motor_max'],M['motor_min'])
+
+            M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
+            M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
+            
+            if 'acc' in M:
+                acc2rd = M['acc'][0]**2+M['acc'][2]**2
+                if acc2rd > M['acc2rd_threshold']:
+                    if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+                        M['previous_state'] = M['current_state']
+                        M['current_state'] = M['state_nine']
+                        M['current_state'].enter()
+                        M['previous_state'].leave()
+            else:
+                print 'acc not in M'
+            if False:
+                if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
+                    freeze = True
             
 
-        if M['current_state'] == M['state_nine']:
-            #M['aruco_evasion_active'] = 0
-            pass
+                
 
-        elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
-            #M['aruco_evasion_active'] = 0
-            human_motor = False
-            human_steer = False
-            if np.abs(M['steer_percent'] - 49) > 5:
-                human_steer = True
-            if np.abs(M['motor_percent'] - 49) > 5:
-                human_motor = True
-            if human_motor and human_steer:
-                if M['current_state'] != M['state_five']:
-                    M['previous_state'] = M['current_state']
-                    M['current_state'] = M['state_five']
-                    M['current_state'].enter()
-                    M['previous_state'].leave()
-            elif human_motor and (not human_steer):
-                if M['current_state'] != M['state_three']:
-                    M['previous_state'] = M['current_state']
-                    M['current_state'] = M['state_three']
-                    M['current_state'].enter()
-                    M['previous_state'].leave()
-            elif (not human_motor) and human_steer:
-                if M['current_state'] != M['state_seven']:
-                    M['previous_state'] = M['current_state']
-                    M['current_state'] = M['state_seven']
-                    M['current_state'].enter()
-                    M['previous_state'].leave()
-            elif (not human_steer) and (not human_motor):
-                if M['current_state'] != M['state_six']:
-                    M['previous_state'] = M['current_state']
-                    M['current_state'] = M['state_six']
-                    M['current_state'].enter()
-                    M['previous_state'].leave()
+            if M['current_state'] == M['state_nine']:
+                #M['aruco_evasion_active'] = 0
+                pass
 
-        M['current_state'].process()
+            elif M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+                #M['aruco_evasion_active'] = 0
+                human_motor = False
+                human_steer = False
+                if np.abs(M['steer_percent'] - 49) > 5:
+                    human_steer = True
+                if np.abs(M['motor_percent'] - 49) > 5:
+                    human_motor = True
+                if human_motor and human_steer:
+                    if M['current_state'] != M['state_five']:
+                        M['previous_state'] = M['current_state']
+                        M['current_state'] = M['state_five']
+                        M['current_state'].enter()
+                        M['previous_state'].leave()
+                elif human_motor and (not human_steer):
+                    if M['current_state'] != M['state_three']:
+                        M['previous_state'] = M['current_state']
+                        M['current_state'] = M['state_three']
+                        M['current_state'].enter()
+                        M['previous_state'].leave()
+                elif (not human_motor) and human_steer:
+                    if M['current_state'] != M['state_seven']:
+                        M['previous_state'] = M['current_state']
+                        M['current_state'] = M['state_seven']
+                        M['current_state'].enter()
+                        M['previous_state'].leave()
+                elif (not human_steer) and (not human_motor):
+                    if M['current_state'] != M['state_six']:
+                        M['previous_state'] = M['current_state']
+                        M['current_state'] = M['state_six']
+                        M['current_state'].enter()
+                        M['previous_state'].leave()
 
-        M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+            M['current_state'].process()
 
-        """
+            M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+
+            """
 
 
-            #else:
-            #M['PID'] = [-1,-1]
-            #print((M['current_state'].number,M['steer_percent'],M['motor_percent'],M['state_transition_timer'].time()))
-            Arduinos['MSE'].write(M['smooth_write_str'])
-        """
-    LED_signal = d2n('(10000)')
-    Arduinos['SIG'].write(LED_signal)
+                #else:
+                #M['PID'] = [-1,-1]
+                #print((M['current_state'].number,M['steer_percent'],M['motor_percent'],M['state_transition_timer'].time()))
+                Arduinos['MSE'].write(M['smooth_write_str'])
+            """
+    except Exception as e:
+        print("********** Exception ***********************")
+        print(e.message, e.args)
+        os.environ['STOP'] = 'True'
+        rospy.signal_shutdown(d2s(e.message,e.args))
+        LED_signal = d2n('(10000)')
+        Arduinos['SIG'].write(LED_signal)
 
 #        
 ##############################################################3
