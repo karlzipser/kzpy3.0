@@ -3,6 +3,9 @@
 
 from kzpy3.utils import *
 import rospy
+
+os.environ['STOP'] = 'False'
+
 """
 sudo chmod 666 /dev/ttyACM*
 
@@ -41,7 +44,7 @@ def run_loop(Arduinos,M):
 
             except Exception as e:
                 pass #print e
-                
+
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)

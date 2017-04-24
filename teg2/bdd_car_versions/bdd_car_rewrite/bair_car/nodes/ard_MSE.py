@@ -7,6 +7,8 @@ from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 
 lock = threading.Lock()
 
+os.environ['STOP'] = 'False'
+
 def apply_steer_pwm_gain(steer_pwm,M):
     return (steer_pwm-M['steer_null']) * M['steer_gain'] + M['steer_null']
 
