@@ -381,7 +381,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             #print((M['current_state'].number,M['steer_percent'],M['motor_percent'],M['state_transition_timer'].time()))
             Arduinos['MSE'].write(M['smooth_write_str'])
         """
-    LED_signal = d2n('(',10000')')
+    LED_signal = d2n('(10000)')
     Arduinos['SIG'].write(LED_signal)
 
 #        
