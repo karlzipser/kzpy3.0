@@ -13,16 +13,16 @@ from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
-from aroco_angle_retriever import get_aruco_image
+from aroco_angle_retriever import get_average_boundary_angle
 
 class Marker_Handler:
     
     detected_markers = {}
     area_visualizer = None # The choice if there is a visualizer or not is not yet implemented
-    source_local_camera = True
-    source_bagfile = False
+    source_local_camera = False
+    source_bagfile = True
     show_video = True
-    crop = True # Should the input video be cropped to the left image input. If false this code might contain errors
+    crop = False # Should the input video be cropped to the left image input. If false this code might contain errors
     
     
     def __init__(self, arguments):
@@ -63,7 +63,7 @@ class Marker_Handler:
                     print("Error reading image! Wrong number of camera?")
                 
                 #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,image) 
-                cv_image = get_aruco_image(image,True,(255,0,0),True)
+                cv_image = get_average_boundary_angle(image,True,(255,0,0),False)
                 
                 
             if(self.show_video):

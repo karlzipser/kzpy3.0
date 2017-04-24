@@ -11,15 +11,10 @@ zed_parameters = Zed_Parameter()
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 
-def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
+def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 4):
     '''
-    Returns but also writes on the input image the place where the aruco markers
-    are found.
-    
-    It is possible to fill the area of the marker entirely (filled)
-    to choose the color (color = (RGB)) and to crop the input image
-    by width/2.0 because that is sometimes handy when the whole ZED
-    camera image from both cameras is used as input
+    Returns the average angle of the boundary next to the vehicle
+    within the distance, defined by max_distance_boundary (in meter)
     '''
         
     if(crop):
@@ -36,48 +31,88 @@ def get_aruco_image(cv_image, filled = False,color=(0,0,255), crop = False):
     corners, ids, rejected_points = aruco.detectMarkers(cv_image, aruco_dict, parameters=parameters)
     cv_image = aruco.drawDetectedMarkers(cv_image, corners, borderColor = color)
     
- 
-
-
- 
     marker_length = 0.2 # meter
+    
+    averageAngle = None
+    
     try:
         rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
     except:
         rvecs, tvecs = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
     
     if rvecs != None:       
+        
+        sum_sinuses = 0.0
+        sum_cosinuses = 0.0
+        
         for i in range(0,len(rvecs)):
             
             rvec = rvecs[i]
             tvec = tvecs[i]
             
             R,strangeStuffIDontUnderstand = cv2.Rodrigues(rvec)
-            
             cameraRotationVector,strangeStuffIDontUnderstand = cv2.Rodrigues(cv2.transpose(R))
-        
             cameraTranslationVector = np.dot(cv2.transpose(-R),cv2.transpose(tvec))
-   
+            
             angle=np.arctan2(cameraTranslationVector[2],cameraTranslationVector[0])
             
-            xy1 = cv2.polarToCart(30,angle[0]-np.pi/2.0)
-            a = cv2.polarToCart(50,angle[0]-np.pi/2.0)
+            top_left_corner = tuple(corners[i][0][0].astype(int))
+            bottom_left_corner = tuple(corners[i][0][3].astype(int))
+           
+            # Corner 0 is the top left corner and corner 3 the bottom left. This can be used
+            # to detect flipped markers
+            markerFlipped = False
+            if top_left_corner[1] > bottom_left_corner[1]:
+                markerFlipped = True
             
-            cv2.line(cv_image,(xy1[0][0],xy1[1][0]),(a[0][0],a[1][0]),(255,255,255),1)
+            if markerFlipped:
+                angle = np.pi - angle 
             
-
-
-    if(filled):
-        for i in range(0, len(corners)):
-            fill_image(cv_image,corners[i],color)
-    
+            # Some corrections to have the angle within reasonable values
+            angle = angle - np.pi/2.0
+            
+            # Now get the distance to weight according to distance
+            distance_marker = get_distance_of_line(0.2, top_left_corner, bottom_left_corner, zed_parameters.cameraMatrix,zed_parameters.distCoeffs)
+            
+            if distance_marker < max_distance_boundary:           
+                
+                distance_norm = 1.0-(max_distance_boundary-distance)/max_distance_boundary
+                                            
+                sum_sinuses = (sum_sinuses + np.sin(angle)) * distance_norm 
+                sum_cosinuses = (sum_cosinuses + np.cos(angle)) * distance_norm
+            
+                
+            
+        
+        average_angle = np.arctan(sum_sinuses / sum_cosinuses)
+        
+        if averageAngle == None:
+            angleMessage = "Too far" 
+        else:
+            angleMessage = str(np.rad2deg(averageAngle))
+            
+        cv2.putText(cv_image,angleMessage, (300,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+        
+        
     return cv_image
-    
-    
-def fill_image(cv_image, corners,color):
-    polyPoints = np.array(corners,dtype=np.int32)
-    cv2.fillConvexPoly(cv_image,polyPoints, color)
-    
+
+
+def get_distance_of_line(self, real_line_length, (px, py), (px_, py_), camMat, camDist):
+        '''
+        Returns distance to a line of known size, given by px,py and px_,py_ and the angle in degree to 
+        the point px,xy
+        '''
+                       
+        # The focal length is averaged over fx and fy, which might decrease
+        # the accuracy. This could be corrected in the future
+        F = (camMat[0][0] + camMat[1][1]) / 2.0
+        
+        P_x = (px_ - px)
+        P_y = (py_ - py)     
+        P = np.hypot(P_x, P_y)
+        
+        distance = (real_object_width_m * F) / P
+        return distance
     
 if __name__ == '__main__':
     '''
