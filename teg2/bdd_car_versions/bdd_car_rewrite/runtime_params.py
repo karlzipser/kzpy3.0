@@ -36,7 +36,7 @@ verbose = False
 use_caffe = True
 steer_gain = 1.0
 motor_gain = 1.0
-acc2rd_threshold = 100
+acc2rd_threshold = 150
 PID_min_max = [1.5,2.5]
 if False:
 	gyro_freeze_threshold = 500
