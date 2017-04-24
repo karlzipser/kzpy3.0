@@ -114,6 +114,7 @@ def arduino_master_thread():
         os.environ['STOP'] = 'True'
         LED_signal = d2n('(10000)')
         Arduinos['SIG'].write(LED_signal)
+        os.environ['STOP'] = 'True'
         rospy.signal_shutdown(d2s(e.message,e.args))
         
 
