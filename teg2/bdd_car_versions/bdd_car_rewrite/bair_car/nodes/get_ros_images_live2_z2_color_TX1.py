@@ -217,7 +217,7 @@ try:
 except Exception as e:
 	print("********** Exception ***********************",'red')
 	print(e.message, e.args)
-	print("get_ros_images_live...py exiting.")
+	#print("get_ros_images_live...py exiting.")
 	os.environ['STOP'] = 'True'
 	rospy.signal_shutdown(d2s(e.message,e.args))
 
