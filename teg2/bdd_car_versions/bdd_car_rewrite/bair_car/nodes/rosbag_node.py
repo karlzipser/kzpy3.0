@@ -4,6 +4,7 @@ import os, sys, shutil, subprocess, time
 import rospy
 import std_msgs.msg
 
+os.environ['STOP_ARDUINOS'] = 'False'
 
 from kzpy3.teg2.car_run_params import foldername
 
@@ -62,7 +63,6 @@ if __name__ == '__main__':
         print("********** Exception ***********************")
         print(e.message, e.args)
         os.environ['STOP'] = 'True'
-        LED_signal = d2n('(10000)')
-        Arduinos['SIG'].write(LED_signal)
+    
         rospy.signal_shutdown(d2s(e.message,e.args))
 
