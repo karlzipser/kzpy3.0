@@ -4,6 +4,9 @@ from zed_parameter import Zed_Parameter
 import numpy as np
 from numpy import average
 
+angleList = [0,0,0,0]
+angleListIndex = 0
+angleListLength = 4
 
 zed_parameters = Zed_Parameter()
 
@@ -30,6 +33,7 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
     marker_length = 0.2 # meter
     
     averageAngle = None
+    minDistance = 99.0
     
     try:
         rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
@@ -40,6 +44,7 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
         
         sum_sinuses = 0.0
         sum_cosinuses = 0.0
+        distCounter = 0
         
         for i in range(0,len(rvecs)):
             
@@ -63,31 +68,43 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
             # Some corrections to have the angle within reasonable values
             angle = angle - np.pi/2.0
         
-            cv2.putText(cv_image,str(np.round(np.rad2deg(angle[0]),2)), (top_left_corner[0],top_left_corner[1]+30), cv2.FONT_HERSHEY_SIMPLEX, 1, (25,25,255),2)
+            #cv2.putText(cv_image,str(np.round(np.rad2deg(angle[0]),2)), (top_left_corner[0],top_left_corner[1]+30), cv2.FONT_HERSHEY_SIMPLEX, 1, (25,25,255),2)
             
             # Now get the distance to weight according to distance
             distance_marker = get_distance_of_line(0.2, top_left_corner, bottom_left_corner, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
             
+            # Angle averaging is difficult because of the change around 0 and 2*pi
             if distance_marker < max_distance_boundary:           
-                
+                distCounter=distCounter + 1.0                
                 distance_norm = (max_distance_boundary-distance_marker)/max_distance_boundary
-                #cv2.putText(cv_image,str(np.round((distance_norm),2)), top_left_corner, cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+                minDistance = min(minDistance, distance_marker)
+                
+                
                 sum_sinuses = (sum_sinuses + np.sin(angle)) * distance_norm 
                 sum_cosinuses = (sum_cosinuses + np.cos(angle)) * distance_norm
         
+        #averageDistance = averageDistance / distCounter
         averageAngle = np.arctan(sum_sinuses / sum_cosinuses)
         
         # Code for eventual visualisation
         #if averageAngle == None:
         #    angleMessage = "Too far" 
         #else:
-        #    angleMessage = str(np.rad2deg(averageAngle))
+        angleMessage1 = 'angle: ' + str(np.round(np.rad2deg(averageAngle[0]),2)) 
+        angleMessage2 = 'min distance: ' + str(np.round(minDistance,2))
         #    
-        #cv2.putText(cv_image,angleMessage, (300,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+        cv2.putText(cv_image,angleMessage1, (50,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+        cv2.putText(cv_image,angleMessage2, (50,330), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
         
-        
-    return averageAngle
-
+    
+    #return averageAngle
+    
+    
+    # Angles are averaged over the last 10 angles however, this is
+    # done in a very simple fashion and should be also done with the
+    # sin/cosin calculation
+    
+    return cv_image
 
 def get_distance_of_line(real_line_length, (px, py), (px_, py_), camMat, camDist):
         '''
