@@ -86,7 +86,8 @@ def arduino_master_thread():
                 time_step.reset()
                 if not folder_display_timer.check():
                     print("*** Data foldername = "+rp.foldername+ '***')
-
+            if os.environ['STOP'] == 'True':
+                assert(False)
             if reload_timer.check():
                 reload(rp)
                 #reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
@@ -97,6 +98,8 @@ def arduino_master_thread():
                 M['motor_gain'] = rp.motor_gain
                 M['acc2rd_threshold'] = rp.acc2rd_threshold
                 M['PID_min_max'] = rp.PID_min_max
+            if os.environ['STOP'] == 'True':
+                assert(False)
             if git_pull_timer.check():
                 unix(opjh('kzpy3/kzpy3_git_pull.sh'))
                 git_pull_timer.reset()
@@ -106,7 +109,8 @@ def arduino_master_thread():
                 print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
             except:
                 pass
-
+            if os.environ['STOP'] == 'True':
+                assert(False)
             time.sleep(0.5)
     except Exception as e:
         print("********** Exception ***********************")
