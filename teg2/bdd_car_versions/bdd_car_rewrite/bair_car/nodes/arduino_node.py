@@ -86,8 +86,7 @@ def arduino_master_thread():
                 time_step.reset()
                 if not folder_display_timer.check():
                     print("*** Data foldername = "+rp.foldername+ '***')
-            if os.environ['STOP'] == 'True':
-                assert(False)
+
             if reload_timer.check():
                 reload(rp)
                 #reload(kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params)
@@ -98,28 +97,23 @@ def arduino_master_thread():
                 M['motor_gain'] = rp.motor_gain
                 M['acc2rd_threshold'] = rp.acc2rd_threshold
                 M['PID_min_max'] = rp.PID_min_max
-            if os.environ['STOP'] == 'True':
-                assert(False)
             if git_pull_timer.check():
                 unix(opjh('kzpy3/kzpy3_git_pull.sh'))
                 git_pull_timer.reset()
 
             try:
-                #print d2s('Stop_Arduinos =',M['Stop_Arduinos'])
+                
                 print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
             except:
                 pass
-            if os.environ['STOP'] == 'True':
-                assert(False)
+
             time.sleep(0.5)
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)
-        #print("arduino_node.py exiting.")
         os.environ['STOP'] = 'True'
         LED_signal = d2n('(10000)')
         Arduinos['SIG'].write(LED_signal)
-        os.environ['STOP'] = 'True'
         rospy.signal_shutdown(d2s(e.message,e.args))
         
 
@@ -132,12 +126,11 @@ threading.Thread(target=arduino_imu_thread).start()
 threading.Thread(target=arduino_sig_thread).start()
 threading.Thread(target=arduino_master_thread).start()
 
-"""
+
 q = raw_input('')
 while q not in ['q','Q']:
     q = raw_input('')
-os.environ['STOP'] == 'True'
+
 M['Stop_Arduinos'] = True
 rospy.signal_shutdown("M[Stop_Arduinos] = True")
-"""
 

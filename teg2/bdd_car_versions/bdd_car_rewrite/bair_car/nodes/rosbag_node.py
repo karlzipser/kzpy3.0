@@ -62,7 +62,6 @@ if __name__ == '__main__':
     except Exception as e:
         print("********** Exception ***********************")
         print(e.message, e.args)
-        #print("rosbag_node.py exiting.")
         os.environ['STOP'] = 'True'
     
         rospy.signal_shutdown(d2s(e.message,e.args))

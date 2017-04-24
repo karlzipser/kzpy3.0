@@ -27,7 +27,6 @@ os.environ['STOP'] = 'False'
 try:
 	if os.environ['STOP'] == 'True':
 		assert(False)
-
  # this is for the sake of the train_val.prototxt
 
 	def setup_solver(solver_file_path):
@@ -217,7 +216,6 @@ try:
 except Exception as e:
 	print("********** Exception ***********************",'red')
 	print(e.message, e.args)
-	#print("get_ros_images_live...py exiting.")
 	os.environ['STOP'] = 'True'
 	rospy.signal_shutdown(d2s(e.message,e.args))
 
