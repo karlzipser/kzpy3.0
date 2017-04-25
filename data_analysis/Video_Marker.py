@@ -133,7 +133,7 @@ class Video_Marker(object):
             front_right_limit_deg = 90
                     
             average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
-            
+            print(str(np.rad2deg(average_angle)))
             if(min_perceived_distance < critical_distance):
                 evasion_needed = True
             
