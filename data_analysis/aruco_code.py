@@ -13,8 +13,8 @@ def do_aruco(cv_image,steering_cmd,motor_cmd,ar_params, crop=False):
     
     safe_motor, safe_steer, evasion_needed = marker.add_evasion_behaviour(cv_image,steering_cmd,motor_cmd,ar_params,follow_behaviour,crop) 
 
-    #cv2.imshow('test',cv_image)
-    #cv2.moveWindow('test',0,500)
+    cv2.imshow('test',cv_image)
+    cv2.moveWindow('test',0,500)
 
     #print("Hey: " + str(safe_motor) + " , " + str(safe_steer))
 
