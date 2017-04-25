@@ -3,10 +3,9 @@
 
 import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
-import aruco_code
 from kzpy3.utils import *
 # aruco code
-#import aruco_code
+import aruco_code
 # aruco code
 import roslib
 import std_msgs.msg
