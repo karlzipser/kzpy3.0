@@ -154,20 +154,20 @@ try:
 						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
 						if aruco_only:
 							caf_steer = aruco_steer
-							caf_motor = aruco_motor
+							#caf_motor = aruco_motor
 							# If the aruco module should override the motor and steering commands, 
 							# publish this to a ros publisher so the arduino can pick it up and
 							# read the caffe motor values
-							if state in [6,10]:
-								aruco_cmd_pub.publish(std_msgs.msg.Int32(1))
-						else:
-							if state in [6,10]:
-								aruco_cmd_pub.publish(std_msgs.msg.Int32(0))
+							#if state in [6,10]:
+							#	aruco_cmd_pub.publish(std_msgs.msg.Int32(1))
+						#else:
+						#	if state in [6,10]:
+						#		aruco_cmd_pub.publish(std_msgs.msg.Int32(0))
 						# <- Aruco Marker Code
 						print("#####")
 						print(aruco_only)
 						print(aruco_steer)
-						print(aruco_motor)
+						#print(aruco_motor)
 
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
