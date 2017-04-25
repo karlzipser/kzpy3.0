@@ -56,6 +56,16 @@ This will show going from non-data to data.
 Note, sometimes there is a gap in the frames, as in this example.
 The program will report this and pause during this time.
 Using the TX1 dev. board cleans this up dramatically.
+
+
+These runs need to be processed correctly:
+22[18] direct_rewrite_test_24Apr17_13h09m31s_Mr_Blue  22	X:True 
+25[24] direct_rewrite_test_24Apr17_13h31m59s_Mr_Black  25	X:True 
+30[60] direct_rewrite_test_24Apr17_14h39m17s_Mr_Orange  30	X:True 
+
+
+
+
 """
 
 i_variables = ['state','steer','motor','run_','runs','run_labels','meta_path','rgb_1to4_path','B_','left_images','right_images','unsaved_labels']
@@ -145,10 +155,15 @@ def function_current_run():
 	r=I[run_]
 	n = len(gg(opj(I[rgb_1to4_path],r,'*.bag.pkl')))
 	cprint(d2n('[',n,'] ',r))
-	state_hist = np.zeros(8)
+	state_hist = np.zeros(10)
 	L=I[B_]['left_image_bound_to_data']
 	for l in L:
-		state_hist[int(L[l]['state'])]+=1
+		s = L[l]['state']
+		if type(s) == str:
+			s = 0
+		else:
+			s = int(s)
+		state_hist[s]+=1
 	state_hist /= state_hist.sum()
 	state_percent = []
 	for i in range(0,8):
@@ -224,7 +239,7 @@ def function_set_label(k,v=True):
 		k = [k]
 	for m in k:
 		I[run_labels][I[run_]][m] = v
-	save_obj(I[run_labels],opj('bair_car_data_path','run_labels','run_labels_'+time_str()+'.pkl'))
+	save_obj(I[run_labels],opj(bair_car_data_path,'run_labels','run_labels_'+time_str()+'.pkl'))
 SL = function_set_label
 
 
@@ -270,6 +285,13 @@ def function_set_plot_time_range(t0=-999,t1=-999):
 	plt.xlim(t0,t1)
 ST = function_set_plot_time_range
 
+
+
+
+if False: # trying to fix problem
+	for i in range(len(I[B_]['data']['state'])):
+		if I[B_]['data']['state'][i] == 'no data':
+			I[B_]['data']['state'][i] = 0
 
 
 def function_visualize_run(j=None,do_load_images=True,do_CA=True):
@@ -687,58 +709,58 @@ if False:
 		SL(only_states_1_and_6_good,True)
 
 
-
-if True:
-	for i in range(21):
-		S5(i,flip=False)
-		S5(flip=True)
-
-if True:
-	hdf5s = sgg(opj(bair_car_data_path,'hdf5/runs/*.hdf5'))
-	ctr = 0
-	for h in hdf5s:
-		ctr += 1
-		print ctr
-		load_hdf5_steer_hist(h,opj(bair_car_data_path,'hdf5','segment_metadata'))
-
-
-
-if True:
+if False:
+	if True: # This needs to be made more general!
+		for i in [18,19,20,21,23,24,26,27,28,29]:#range(21):
+			S5(i,flip=False)
+			S5(flip=True)
 
 	if True:
-		run_codes = {}
-		steer_hists = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.state_hist_list.pkl'))
+		hdf5s = sgg(opj(bair_car_data_path,'hdf5/runs/*.hdf5'))
 		ctr = 0
-		combined = []
-		for s in steer_hists:
-			o = load_obj(s)
-			run_codes[ctr] = fname(s).replace('.state_hist_list.pkl','')
-			print ctr,run_codes[ctr]
-			#for j in range(len(o)):
-			#	o[j][3] = ctr
-			#	combined.append(o[j])
+		for h in hdf5s:
 			ctr += 1
-		#save_obj(combined,opjD('combined'))
-		save_obj(run_codes,opj(bair_car_data_path,'hdf5/segment_metadata/run_codes'))
+			print ctr
+			load_hdf5_steer_hist(h,opj(bair_car_data_path,'hdf5','segment_metadata'))
+
 
 
 	if True:
-		low_steer = []
-		high_steer = []
-		low_steer_files = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.low_steer.pkl'))
-		ctr = 0
-		for s in low_steer_files:
-			print (ctr,s)
-			q = load_obj(s)
-			for i in range(len(q)):
-				q[i].append(ctr)
-			low_steer += q
-			q = load_obj(s.replace('.low_steer.','.high_steer.'))
-			for i in range(len(q)):
-				q[i].append(ctr)
-			high_steer += q
-			ctr += 1
-		save_obj(low_steer,opj(bair_car_data_path,'hdf5/segment_metadata/low_steer'))
-		save_obj(high_steer,opj(bair_car_data_path,'hdf5/segment_metadata/high_steer'))
+
+		if True:
+			run_codes = {}
+			steer_hists = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.state_hist_list.pkl'))
+			ctr = 0
+			combined = []
+			for s in steer_hists:
+				o = load_obj(s)
+				run_codes[ctr] = fname(s).replace('.state_hist_list.pkl','')
+				print ctr,run_codes[ctr]
+				#for j in range(len(o)):
+				#	o[j][3] = ctr
+				#	combined.append(o[j])
+				ctr += 1
+			#save_obj(combined,opjD('combined'))
+			save_obj(run_codes,opj(bair_car_data_path,'hdf5/segment_metadata/run_codes'))
+
+
+		if True:
+			low_steer = []
+			high_steer = []
+			low_steer_files = sgg(opj(bair_car_data_path,'hdf5/segment_metadata/*.low_steer.pkl'))
+			ctr = 0
+			for s in low_steer_files:
+				print (ctr,s)
+				q = load_obj(s)
+				for i in range(len(q)):
+					q[i].append(ctr)
+				low_steer += q
+				q = load_obj(s.replace('.low_steer.','.high_steer.'))
+				for i in range(len(q)):
+					q[i].append(ctr)
+				high_steer += q
+				ctr += 1
+			save_obj(low_steer,opj(bair_car_data_path,'hdf5/segment_metadata/low_steer'))
+			save_obj(high_steer,opj(bair_car_data_path,'hdf5/segment_metadata/high_steer'))
 
 

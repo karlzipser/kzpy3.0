@@ -14,7 +14,7 @@ if False:
 		backup_locations.append(opj('/media',username,'bair_car_data_'+str(i)))
 
 
-#'/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_4_car_24April2017'
+#
 #
 
 
@@ -22,7 +22,8 @@ if False:
 #bag_folders_src_location = opj('/media',username,'rosbags')
 #bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Blue/Mr_Blue_4_car_24April2017'
 #bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Black/Mr_Black_4_car_24April2017'
-bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Orange/Mr_Orange_4_car_24April2017'
+#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Orange/Mr_Orange_4_car_24April2017'
+bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_4_car_24April2017'
 
 bag_folders_src = opj(bag_folders_src_location,'new' )
 bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new/rgb_1to4')
@@ -59,7 +60,7 @@ bag_folders_transfer_meta(bag_folders_src,bag_folders_dst_meta_path)
 bag_folders_save_images(bag_folders_src,bag_folders_dst_rgb1to4_path)
 
 if True:
-	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=90,graphics=False,accepted_states=[1,3,5,6,7])
+	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=90,graphics=False,accepted_states=[1,3,5,6,7],pkl_name='Bag_Folder_90_state_one_steps.pkl')
 if False:
 	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=30,graphics=False,accepted_states=[1,3,5,6,7])
 if False:
