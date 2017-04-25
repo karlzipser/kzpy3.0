@@ -133,11 +133,12 @@ class Video_Marker(object):
             front_right_limit_deg = 90
                     
             average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
-            print(str(np.rad2deg(average_angle)))
+            
             if(min_perceived_distance < critical_distance):
                 evasion_needed = True
             
             if(average_angle != None):   
+                print(str(np.rad2deg(average_angle)))
                 opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
                 
                 mid_steering_command = np.abs(max_right_command - max_left_command) / 2.0
