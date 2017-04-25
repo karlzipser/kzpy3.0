@@ -168,6 +168,7 @@ class Video_Marker(object):
         if not 'steering_command' in vars():
             steering_command = incoming_steering_cmd
         
+        print("Angle " + average_angle)
         # safe_motor, safe_steer
         return motor_command, steering_command
     
