@@ -17,7 +17,7 @@ from numpy import average
 import aruco_angle_retriever
 
 
-safety_distance = 1.5  # meter
+
 
 
 class Video_Marker(object):
@@ -27,6 +27,11 @@ class Video_Marker(object):
     markers = []
     bagfile_handler = None
     zed_parameters = Zed_Parameter()
+    
+    safety_distance = 1.5  # meter
+    steering_command_length = 4
+    steering_command_list = np.arange(1,steering_command_length+1, 1)
+    steering_command_index = 0
 
     def __init__(self, bagfile_handler=None, capture_device=None):
         
@@ -71,8 +76,8 @@ class Video_Marker(object):
         if closer than 0.5 meter
         
         '''
-        evasion_needed = False
         
+  
         if(ar_params == None):
             #print("Warning, no ar params found, using defaults instead")
             motor_command = 49 # This is the resting command for stop
@@ -116,54 +121,79 @@ class Video_Marker(object):
             
             motor_override = ar_params['ar_override_motor']
             steer_override = ar_params['ar_override_steer'] 
- 
-        
-        # Which area in our viewport is considered "in front"
-        # The viewport is at our angle calculation roughly in between -33 and 33 deg
-        front_left_limit_deg = -90
-        front_right_limit_deg = 90
+     
+        # Check if steering command values are taken from an list of values, 
+        # designed to give smooth trajectories instead of sudden movements
+        if not (self.steering_command_index > 0):
+       
+            evasion_needed = False
+            
+       
+            front_left_limit_deg = -90
+            front_right_limit_deg = 90
+                    
+            average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
+            
+            if(min_perceived_distance < critical_distance):
+                evasion_needed = True
+            
+            if(average_angle != None):   
+                opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
                 
-        average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
+                mid_steering_command = np.abs(max_right_command - max_left_command) / 2.0
+                
+                if opposite_angle < 0:
+                    steering_command = (opposite_angle / np.pi) * left_range                               
+                else:
+                    steering_command = (opposite_angle / np.pi) * right_range 
+                
+                # Finally change the mapping from -50,50 to 0,100
+                steering_command = (steering_command + mid_steering_command)[0]
+                
+                
+                # A special behaviour is investigated. This is a test
+                # There is a list of steering commands. When this 
+                # list is still empty, resp. the index is 0
+                
+                #print(steering_command)
+                #print(incoming_steering_cmd)
+                # Now interpolate the intermediate values from the current steering towards that command
+                # in as many steps as the list is long
+                increment = np.abs(incoming_steering_cmd-steering_command)/self.steering_command_length
+                # Finally fill the list with those values. 
+                self.steering_command_list = self.steering_command_list*increment
+                    
+            
+                    
+                # Next, calculate a safe motor command
+                # If the average obstacle is in front of us....
+                #if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):
+                #    if(min_perceived_distance < stop_distance):
+                #        motor_command = min_motor
+                #    elif (min_perceived_distance < critical_distance):
+                #        distance_norm = ((min_perceived_distance - stop_distance) / (critical_distance - stop_distance))
+                #        motor_command = min_motor + distance_norm * (max_motor - min_motor)
+            
+            
+            if motor_override != 49:
+                motor_command = motor_override
+            if steer_override != 49:
+                steer_command = steer_override   
+            
+            if not 'motor_command' in vars():
+                motor_command = incoming_motor_cmd
+            if not 'steering_command' in vars():
+                steering_command = incoming_steering_cmd
+            
         
-        if(min_perceived_distance < critical_distance):
+        else:
             evasion_needed = True
-            
-        
-        if(average_angle != None):   
-            opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
-            
-
-            mid_steering_command = np.abs(max_right_command - max_left_command) / 2.0
-            
-            if opposite_angle < 0:
-                steering_command = (opposite_angle / np.pi) * left_range                               
-            else:
-                steering_command = (opposite_angle / np.pi) * right_range 
-            
-            # Finally change the mapping from -50,50 to 0,100
-            steering_command = (steering_command + mid_steering_command)[0]
-            
-            # Next, calculate a safe motor command
-            # If the average obstacle is in front of us....
-            
-            
-            if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):
-                if(min_perceived_distance < stop_distance):
-                    motor_command = min_motor
-                elif (min_perceived_distance < critical_distance):
-                    distance_norm = ((min_perceived_distance - stop_distance) / (critical_distance - stop_distance))
-                    motor_command = min_motor + distance_norm * (max_motor - min_motor)
+            # The steering command is one out of the command list, the index is 
+            # updated and if the index is 0 again, the calculation starts again
+            steering_command = self.steering_command_list[self.steering_command_index]
+            self.steering_command_index = (self.steering_command_index+1)%self.steering_command_length
         
         
-        if motor_override != 49:
-            motor_command = motor_override
-        if steer_override != 49:
-            steer_command = steer_override   
-        
-        if not 'motor_command' in vars():
-            motor_command = incoming_motor_cmd
-        if not 'steering_command' in vars():
-            steering_command = incoming_steering_cmd
         
         return motor_command, steering_command, evasion_needed
     

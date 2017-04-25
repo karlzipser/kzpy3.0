@@ -5,20 +5,18 @@ import cv2
 marker = Video_Marker()
 
 
-
+test = 10
 
 def do_aruco(cv_image,steering_cmd,motor_cmd,ar_params, crop=False):
     
     follow_behaviour = True
     
     safe_motor, safe_steer, evasion_needed = marker.add_evasion_behaviour(cv_image,steering_cmd,motor_cmd,ar_params,follow_behaviour,crop) 
-
+    
     #cv2.imshow('test',cv_image)
     #cv2.moveWindow('test',0,500)
 
-    #print("Hey: " + str(safe_motor) + " , " + str(safe_steer))
-    
-    return safe_steer.astype(int),safe_motor,evasion_needed
+    return safe_steer,safe_motor,evasion_needed
 
 if __name__ == '__main__':
     '''
