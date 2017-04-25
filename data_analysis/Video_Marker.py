@@ -57,11 +57,11 @@ class Video_Marker(object):
     def read_next_image(self):
         return self.capture_device.read()
     
-    def add_evasion_behaviour(self,cv_image,steering_cmd,motor_cmd,ar_params,crop):
+    def add_evasion_behaviour(self,cv_image,steering_cmd,motor_cmd,ar_params,follow_behaviour,crop):
         
-        return self.get_safe_commands(cv_image,steering_cmd,motor_cmd,ar_params,crop)
+        return self.get_safe_commands(cv_image,steering_cmd,motor_cmd,ar_params,follow_behaviour,crop)
 
-    def get_safe_commands(self,cv_image,incoming_steering_cmd,incoming_motor_cmd,ar_params,crop):
+    def get_safe_commands(self,cv_image,incoming_steering_cmd,incoming_motor_cmd,ar_params,follow_behaviour,crop):
         '''
         Avert collision by steering at the opposite side of the average angle of all
         obstacles which are too near
@@ -71,12 +71,13 @@ class Video_Marker(object):
         if closer than 0.5 meter
         
         '''
+        evasion_needed = False
         
         if(ar_params == None):
-            print("Warning, no ar params found, using defaults instead")
+            #print("Warning, no ar params found, using defaults instead")
             motor_command = 49 # This is the resting command for stop
-            max_left_steering_angle = np.deg2rad(-130)
-            max_right_steering_angle = np.deg2rad(130)
+            max_left_steering_angle = np.deg2rad(-90)
+            max_right_steering_angle = np.deg2rad(90)
             
             max_left_command = 100
             max_right_command = 0
@@ -121,33 +122,29 @@ class Video_Marker(object):
         # The viewport is at our angle calculation roughly in between -33 and 33 deg
         front_left_limit_deg = -33
         front_right_limit_deg = 33
-        
-        
+                
         average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
         
-        if(average_angle != None):            
+        if(min_perceived_distance < critical_distance):
+            evasion_needed = True
+        
+        if(average_angle != None):   
             opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
             
-            if opposite_angle < max_left_steering_angle:
-                steering_command = max_left_command
-            elif opposite_angle > max_right_steering_angle:
-                steering_command = max_right_command
+
+            mid_steering_command = np.abs(max_right_command - max_left_command) / 2.0
+            
+            if opposite_angle < 0:
+                steering_command = (opposite_angle / np.pi) * left_range                               
             else:
-                # Opposite angle is within our steerable area
-                # It is necessary to know if left or right to go though
-                mid_steering_command = (max_right_command - max_left_command) / 2.0
-                
-                if opposite_angle < 0:
-                    steering_command = (opposite_angle / np.pi) * left_range                               
-                else:
-                    steering_command = (opposite_angle / np.pi) * right_range 
-                
-                # Finally change the mapping from -50,50 to 0,100
-                steering_command = steering_command + mid_steering_command
+                steering_command = (opposite_angle / np.pi) * right_range 
+            
+            # Finally change the mapping from -50,50 to 0,100
+            steering_command = (steering_command + mid_steering_command)[0]
             
             # Next, calculate a safe motor command
             # If the average obstacle is in front of us....
-            #print("----" + str(average_angle)+ " , " + str(min_perceived_distance))
+            
             
             if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):
                 if(min_perceived_distance < stop_distance):
@@ -155,7 +152,6 @@ class Video_Marker(object):
                 elif (min_perceived_distance < critical_distance):
                     distance_norm = ((min_perceived_distance - stop_distance) / (critical_distance - stop_distance))
                     motor_command = min_motor + distance_norm * (max_motor - min_motor)
-                    
         
         
         if motor_override != 49:
@@ -167,12 +163,8 @@ class Video_Marker(object):
             motor_command = incoming_motor_cmd
         if not 'steering_command' in vars():
             steering_command = incoming_steering_cmd
-        if(average_angle != None):
-            print("#################")
-            print("Angle " + str(np.rad2deg(average_angle)))
-            print("#################")
-        # safe_motor, safe_steer
-        return motor_command, steering_command
+        
+        return motor_command, steering_command, evasion_needed
     
     
     def mark_next_image(self, cv_image, ar_params, crop=False):
