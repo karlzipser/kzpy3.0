@@ -16,7 +16,7 @@ def do_aruco(cv_image,steering_cmd,motor_cmd,ar_params, crop=False):
     #cv2.imshow('test',cv_image)
     #cv2.moveWindow('test',0,500)
 
-    #print("Hey: " + str(safe_motor) + " , " + str(safe_steer))
+    print("Hey: " + str(safe_motor) + " , " + str(safe_steer))
 
     return safe_steer,safe_motor,evasion_needed
 
