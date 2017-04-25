@@ -87,7 +87,7 @@ class Video_Marker(object):
             
             min_perceived_distance = 9999
             
-            critical_distance = 1.5
+            critical_distance = 2.0
             stop_distance = 0.5
             
             max_motor = 60
@@ -127,6 +127,7 @@ class Video_Marker(object):
         
         if(min_perceived_distance < critical_distance):
             evasion_needed = True
+            print("EVASION")
         
         if(average_angle != None):   
             opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
