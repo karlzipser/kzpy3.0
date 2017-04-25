@@ -138,7 +138,7 @@ class Video_Marker(object):
                 evasion_needed = True
             
             if(average_angle != None):   
-                print(str(np.rad2deg(average_angle)))
+                print("average angle " + str(np.rad2deg(average_angle)))
                 opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
                 
                 mid_steering_command = np.abs(max_right_command - max_left_command) / 2.0
