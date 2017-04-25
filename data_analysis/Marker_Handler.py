@@ -13,7 +13,7 @@ from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
-from aroco_angle_retriever import get_boundary_angle_distance
+from aruco_angle_retriever import get_boundary_angle_distance
 
 class Marker_Handler:
     
