@@ -19,7 +19,7 @@ if __name__ == '__main__':
     '''
     This code is purely to check if the code works standalone
     '''
-    capture_device = cv2.VideoCapture(2)
+    capture_device = cv2.VideoCapture(0)
     capture_device.set(cv2.CAP_PROP_FRAME_WIDTH, 1344)
     capture_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 376)
     paused_video = False
