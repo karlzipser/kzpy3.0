@@ -29,7 +29,7 @@ class Video_Marker(object):
     zed_parameters = Zed_Parameter()
     
     safety_distance = 1.5  # meter
-    steering_command_length = 4
+    steering_command_length = 3
     steering_command_list = np.arange(1,steering_command_length+1, 1)
     steering_command_index = 0
 
