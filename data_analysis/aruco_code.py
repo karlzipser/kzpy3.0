@@ -18,7 +18,7 @@ def do_aruco(cv_image,steering_cmd,motor_cmd,ar_params, crop=False):
 
     #print("Hey: " + str(safe_motor) + " , " + str(safe_steer))
     
-    return safe_steer.astype(int),safe_motor.astype(int),evasion_needed
+    return safe_steer.astype(int),safe_motor,evasion_needed
 
 if __name__ == '__main__':
     '''
