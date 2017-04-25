@@ -87,7 +87,7 @@ class Video_Marker(object):
             
             min_perceived_distance = 9999
             
-            critical_distance = 2.0
+            critical_distance = 3.0
             stop_distance = 0.5
             
             max_motor = 60
@@ -120,8 +120,8 @@ class Video_Marker(object):
         
         # Which area in our viewport is considered "in front"
         # The viewport is at our angle calculation roughly in between -33 and 33 deg
-        front_left_limit_deg = -33
-        front_right_limit_deg = 33
+        front_left_limit_deg = -90
+        front_right_limit_deg = 90
                 
         average_angle, min_perceived_distance, markers = aruco_angle_retriever.get_boundary_angle_distance(cv_image, crop, 2)
         
