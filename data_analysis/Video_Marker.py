@@ -14,7 +14,7 @@ import math
 from Marker import Marker
 from Map import Map
 from numpy import average
-
+import aruco_angle_retriever
 
 
 safety_distance = 1.5  # meter
@@ -56,9 +56,12 @@ class Video_Marker(object):
          
     def read_next_image(self):
         return self.capture_device.read()
+    
+    def add_evasion_behaviour(self,cv_image,steering_cmd,motor_cmd,ar_params,crop):
+        
+        return self.get_safe_commands(cv_image,steering_cmd,motor_cmd,ar_params,crop)
 
-
-    def get_safe_commands(self, critical_dist_angle_pairs, ar_params):
+    def get_safe_commands(self,cv_image,steering_cmd,motor_cmd,ar_params,crop):
         '''
         Avert collision by steering at the opposite side of the average angle of all
         obstacles which are too near
@@ -68,45 +71,50 @@ class Video_Marker(object):
         if closer than 0.5 meter
         
         '''
-        ''' Old settings
-        motor_command = 49 # This is the resting command for stop
-        max_left_steering_angle = np.deg2rad(-130)
-        max_right_steering_angle = np.deg2rad(130)
         
-        max_left_command = 100
-        max_right_command = 0
-        
-        left_range = 50
-        right_range = 50
-        
-        min_perceived_distance = 9999
-        
-        critical_distance = 1.5
-        stop_distance = 0.5
-        
-        max_motor = 60
-        min_motor = 49  # Full stop. Backwards is not considered
-        '''
-        motor_command = ar_params['ar_motor_command']
-        max_left_steering_angle = ar_params['ar_max_left_steering_angle']
-        max_right_steering_angle = ar_params['ar_max_right_steering_angle']
-        
-        max_left_command = ar_params['ar_max_left_command']
-        max_right_command = ar_params['ar_max_right_command']
-                
-        left_range = ar_params['ar_left_range']
-        right_range = ar_params['ar_right_range']
-                
-        min_perceived_distance = ar_params['ar_min_perceived_distance']
-                
-        critical_distance = ar_params['ar_critical_distance']
-        stop_distance = ar_params['ar_stop_distance']
-                
-        max_motor = ar_params['ar_max_motor']
-        min_motor = ar_params['ar_min_motor']
-        
-        motor_override = ar_params['ar_override_motor']
-        steer_override = ar_params['ar_override_steer'] 
+        if(ar_params == None):
+            print("Warning, no ar params found, using defaults instead")
+            motor_command = 49 # This is the resting command for stop
+            max_left_steering_angle = np.deg2rad(-130)
+            max_right_steering_angle = np.deg2rad(130)
+            
+            max_left_command = 100
+            max_right_command = 0
+            
+            left_range = 50
+            right_range = 50
+            
+            min_perceived_distance = 9999
+            
+            critical_distance = 1.5
+            stop_distance = 0.5
+            
+            max_motor = 60
+            min_motor = 49  # Full stop. Backwards is not considered
+            
+            motor_override = 49
+            steer_override = 49
+        else:
+            motor_command = ar_params['ar_motor_command']
+            max_left_steering_angle = ar_params['ar_max_left_steering_angle']
+            max_right_steering_angle = ar_params['ar_max_right_steering_angle']
+            
+            max_left_command = ar_params['ar_max_left_command']
+            max_right_command = ar_params['ar_max_right_command']
+                    
+            left_range = ar_params['ar_left_range']
+            right_range = ar_params['ar_right_range']
+                    
+            min_perceived_distance = ar_params['ar_min_perceived_distance']
+                    
+            critical_distance = ar_params['ar_critical_distance']
+            stop_distance = ar_params['ar_stop_distance']
+                    
+            max_motor = ar_params['ar_max_motor']
+            min_motor = ar_params['ar_min_motor']
+            
+            motor_override = ar_params['ar_override_motor']
+            steer_override = ar_params['ar_override_steer'] 
  
         
         # Which area in our viewport is considered "in front"
@@ -115,13 +123,6 @@ class Video_Marker(object):
         front_right_limit_deg = 33
         
         
-        # Calculating the average angle to get away from the wall.
-        # Lets just say it is not straightforward to calculate an
-        # average angle
-        for crit_pair in critical_dist_angle_pairs:
-            sum_sinuses = np.sin(crit_pair['angle'])
-            sum_cosinuses = np.cos(crit_pair['angle'])
-            min_perceived_distance = min(crit_pair['distance'], min_perceived_distance)
             
         average_angle = np.arctan(sum_sinuses / sum_cosinuses)    
             

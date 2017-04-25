@@ -10,11 +10,12 @@ angleListLength = 4
 
 zed_parameters = Zed_Parameter()
 
-def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2):
+def get_boundary_angle_distance(cv_image, crop = False, max_distance_boundary = 2):
     '''
     Returns the average angle of the boundary next to the vehicle
     within the distance, defined by max_distance_boundary (in meter)
     '''
+    markers = [] 
         
     if(crop):
         height, width, channel = cv_image.shape
@@ -47,12 +48,13 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
         distCounter = 0
         
         for i in range(0,len(rvecs)):
-            
+                        
             rvec = rvecs[i]
             tvec = tvecs[i]
             
             R,_ = cv2.Rodrigues(rvec)
-            cameraRotationVector,_ = cv2.Rodrigues(cv2.transpose(R))
+            #cameraRotationVector,_ = cv2.Rodrigues(cv2.transpose(R))
+            # Maybe needed later
             cameraTranslationVector = np.dot(cv2.transpose(-R),cv2.transpose(tvec))
             
             angle=np.arctan2(cameraTranslationVector[2],cameraTranslationVector[0])
@@ -82,31 +84,30 @@ def get_average_boundary_angle(cv_image, crop = False, max_distance_boundary = 2
                 
                 sum_sinuses = (sum_sinuses + np.sin(angle)) * distance_norm 
                 sum_cosinuses = (sum_cosinuses + np.cos(angle)) * distance_norm
-        
+                
+            #confidence,corners_xy,angle_to_top_left
+            markers.append(ids[i],1.0,corners,angle,distance_marker)
+                
         try:
             averageAngle = np.arctan(sum_sinuses / sum_cosinuses)
-            angleMessage1 = 'angle: ' + str(np.round(np.rad2deg(averageAngle[0]),2)) 
-            angleMessage2 = 'min distance: ' + str(np.round(minDistance,2))
-            #    
-            cv2.putText(cv_image,angleMessage1, (50,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
-            cv2.putText(cv_image,angleMessage2, (50,330), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+            #angleMessage1 = 'angle: ' + str(np.round(np.rad2deg(averageAngle[0]),2)) 
+            #angleMessage2 = 'min distance: ' + str(np.round(minDistance,2))
+            
+            #cv2.putText(cv_image,angleMessage1, (50,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
+            #cv2.putText(cv_image,angleMessage2, (50,330), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255),2)
         
         except ZeroDivisionError:
             pass
-        # Code for eventual visualisation
-        #if averageAngle == None:
-        #    angleMessage = "Too far" 
-        #else:
-        
+
     
-    #return averageAngle
+    return averageAngle, minDistance, markers
     
     
     # Angles are averaged over the last 10 angles however, this is
     # done in a very simple fashion and should be also done with the
     # sin/cosin calculation
     
-    return cv_image
+    # return cv_image
 
 def get_distance_of_line(real_line_length, (px, py), (px_, py_), camMat, camDist):
         '''

@@ -8,25 +8,29 @@ class Marker(object):
     '''
     classdocs
     '''
-    id = -1.0
+    marker_id = None
     confidence = 1.0
-    center_line_xy = []
-    center_line_dist_ang = []
+    corners_xy = []
+    angle_to_top_left = None
+    distance_to_left_side = None
     
     
 
-    def __init__(self,id,confidence,center_line_xy,center_line_dist_ang):
+    def __init__(self,marker_id,confidence,corners_xy,angle_to_top_left,distance_to_left_side):
         '''
         Constructor
         '''
-        self.id = id
+        self.marker_id = marker_id
         self.confidence = confidence
-        self.corners_xy_pos = center_line_xy
-        self.corners_distances_angles = center_line_dist_ang
+        self.corners_xy = corners_xy
+        self.angle_to_top_left = angle_to_top_left
+        self.distance_to_left_side = distance_to_left_side
         
     
     
-        
     
     def __repr__(self):
-        return str(self.id) + ","+str(self.confidence) + ","+str(self.center_line_xy) + ","+str(self.center_line_dist_ang) 
+        '''
+        Quick string out method
+        '''
+        return str(self.id) + ","+str(self.confidence) + ","+str(self.corners_xy) + ","+str(self.angle_to_top_left) 

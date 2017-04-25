@@ -286,8 +286,10 @@ A['d_indx']=2.0
 #import kzpy3.teg9.data.bag as bag
 #reload(bag)
 
-bag_folder_path='/media/karlzipser/ExtraDrive1/bair_car_data_10/caffe_direct_Smyth_tape_16Jan17_16h52m24s_Mr_Silver'
-bag_folder_path='/media/karlzipser/ExtraDrive3/from_Mr_Blue/Mr_Blue_Fern_14April2017/processsed/direct_Fern_aruco_1_14Apr17_13h45m40s_Mr_Blue'
+#bag_folder_path='/media/karlzipser/ExtraDrive1/bair_car_data_10/caffe_direct_Smyth_tape_16Jan17_16h52m24s_Mr_Silver'
+#bag_folder_path='/media/karlzipser/ExtraDrive3/from_Mr_Blue/Mr_Blue_Fern_14April2017/processsed/direct_Fern_aruco_1_14Apr17_13h45m40s_Mr_Blue'
+bag_folder_path='/media/picard/rosbags/direct_rewrite_test_24Apr17_11h34m15s_Mr_Black'
+#bag_folder_path=sys.argv[1]
 multi_preprocess(A,bag_folder_path)#,[1,3])
 
 threading.Thread(target=animator_thread,args=[A]).start()
