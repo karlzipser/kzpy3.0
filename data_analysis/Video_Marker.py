@@ -127,7 +127,7 @@ class Video_Marker(object):
         
         if(min_perceived_distance < critical_distance):
             evasion_needed = True
-            print("EVASION")
+            
         
         if(average_angle != None):   
             opposite_angle = ((average_angle + np.pi) + np.pi) % (2 * np.pi) - np.pi 
