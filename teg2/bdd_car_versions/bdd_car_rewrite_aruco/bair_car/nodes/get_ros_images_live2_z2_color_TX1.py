@@ -161,8 +161,8 @@ try:
 							caf_steer = aruco_steer
 							print("------> STEER:" + str(aruco_steer))
 
-						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
-						caf_steer_previous = caf_steer
+						#caf_steer = int((caf_steer+caf_steer_previous)/2.0)
+						#caf_steer_previous = caf_steer
 						caf_motor = int((caf_motor+caf_motor_previous)/2.0)
 						caf_motor_previous = caf_motor
 
