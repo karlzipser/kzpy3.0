@@ -145,7 +145,7 @@ class Video_Marker(object):
             
             # Next, calculate a safe motor command
             # If the average obstacle is in front of us....
-            print(opposite_angle)
+            
             
             if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):
                 if(min_perceived_distance < stop_distance):
