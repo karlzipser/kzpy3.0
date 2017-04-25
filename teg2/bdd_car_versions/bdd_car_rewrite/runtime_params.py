@@ -53,7 +53,7 @@ if False:
 ####################### specific car settings ################
 #
 if computer_name == 'Mr_Orange':
-	PID_min_max = [1.,2.]
+	PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Silver':
