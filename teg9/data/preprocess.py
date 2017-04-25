@@ -1,6 +1,6 @@
 from kzpy3.vis import *
-from kzpy3.teg7.data.preprocess_bag_data import *
-from kzpy3.teg7.data.preprocess_Bag_Folders import *
+from kzpy3.teg9.data.preprocess_bag_data import *
+from kzpy3.teg9.data.preprocess_Bag_Folders import *
 from kzpy3.teg7.data.Bag_File import *
 import shutil
 
@@ -14,17 +14,19 @@ if False:
 		backup_locations.append(opj('/media',username,'bair_car_data_'+str(i)))
 
 
- 
-
+#'/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_4_car_24April2017'
+#
 
 
 
 #bag_folders_src_location = opj('/media',username,'rosbags')
-bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_Fern_11April2017'
+#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Blue/Mr_Blue_4_car_24April2017'
+#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Black/Mr_Black_4_car_24April2017'
+bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Orange/Mr_Orange_4_car_24April2017'
 
 bag_folders_src = opj(bag_folders_src_location,'new' )
-bag_folders_dst_rgb1to4_path = opjD('bair_car_data/rgb_1to4')
-bag_folders_dst_meta_path = opjD('bair_car_data/meta_states_1_5_6_7_good')
+bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new/rgb_1to4')
+bag_folders_dst_meta_path = opjD('bair_car_data_new/meta_states_1_5_6_7_good')
 
 runs = sgg(opj(bag_folders_src,'*'))
 
@@ -57,6 +59,8 @@ bag_folders_transfer_meta(bag_folders_src,bag_folders_dst_meta_path)
 bag_folders_save_images(bag_folders_src,bag_folders_dst_rgb1to4_path)
 
 if True:
+	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=90,graphics=False,accepted_states=[1,3,5,6,7])
+if False:
 	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=30,graphics=False,accepted_states=[1,3,5,6,7])
 if False:
 	preprocess_Bag_Folders(bag_folders_dst_meta_path,bag_folders_dst_rgb1to4_path,NUM_STATE_ONE_STEPS=30,graphics=False,accepted_states=[1,3,5,6,7],pkl_name='Bag_Folder_60_state_one_steps.pkl')
