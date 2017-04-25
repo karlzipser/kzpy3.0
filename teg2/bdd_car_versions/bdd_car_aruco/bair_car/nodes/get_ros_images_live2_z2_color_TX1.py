@@ -151,6 +151,7 @@ try:
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
 						# Aruco Marker Code ->
+						print("input before" + str(caf_steer))
 						aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
 						if aruco_only:
 							caf_steer = aruco_steer
