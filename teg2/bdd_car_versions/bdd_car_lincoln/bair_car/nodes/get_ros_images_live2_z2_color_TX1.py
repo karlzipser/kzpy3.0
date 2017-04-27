@@ -11,7 +11,7 @@ import std_msgs.msg
 import geometry_msgs.msg
 import cv2
 from cv_bridge import CvBridge,CvBridgeError
-from kzpy3.lincoln_interface.ros_wrapper import Lilliput_steering
+from ros_wrapper import Lilliput_steering
 import rospy
 from sensor_msgs.msg import Image
 os.environ['GLOG_minloglevel'] = '2'
