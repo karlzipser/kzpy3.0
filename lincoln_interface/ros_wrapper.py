@@ -16,13 +16,13 @@ from dbw_mkz_msgs.msg import SteeringCmd
 
 class Lilliput_steering():
 
-    steer_pub = rospy.Publisher('chatter', SteeringCmd, queue_size=10)
+    steer_pub = rospy.Publisher('/vehicle/steering_cmd', SteeringCmd, queue_size=10)
 
     def __init__(self):
         self.lilliput_steering()
 
     def steering_callback(self,data):
-        rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+        #rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
         
         '''
         The dbw_mkz SteeringCmd message looks like this:
