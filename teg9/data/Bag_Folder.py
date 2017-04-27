@@ -240,7 +240,7 @@ def _is_timestamp_valid_data(BF,t,accepted_states=[1]):
         valid = False
     if motor < 53: # i.e., there must be at least a slight forward motor command 
         valid = False
-    if True:
+    if False:
         if state in [3,5,6,7]: # Some strange things can happen when human takes control, steering gets stuck at max
             if steer > 99:
                 valid = False
@@ -254,9 +254,12 @@ def _elements(BF,topic):
     data = []
     for t in BF['data']['raw_timestamps']:
         if topic in BF['left_image_bound_to_data'][t]:
-            data.append(BF['left_image_bound_to_data'][t][topic])
+            d = BF['left_image_bound_to_data'][t][topic]
+            if type(d) != int and type(d) != float:
+                d = 0
+            data.append(d)
         else:
-            data.append(-999.999)
+            data.append(0) #(-999.999)
             print "Bag_Folder::elements Warning, data.append(-999.999), topic ="+topic
     return np.array(data)
 
