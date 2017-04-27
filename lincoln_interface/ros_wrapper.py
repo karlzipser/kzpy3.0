@@ -24,8 +24,8 @@ class Lilliput_steering():
     # The five previous steering commands are used to smooth the response. They
     # are initialised by 49, because that is by definition, straight.
     # A deque ist used for its efficient list-shift
-    previous_steering_commands = deque([49,49,49,49,49,49])
-    smoothing_vector = np.array([0.1,0.1,0.15,0.2,0.2,0.25])
+    previous_steering_commands = deque([49,49,49,49,49,49,49,49])
+    smoothing_vector = np.array([0.5,0.5,0.15,0.15,0.15,0.15,0.3])
     last_execution_time = timer()
 
     def __init__(self):
