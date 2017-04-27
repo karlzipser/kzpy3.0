@@ -5,9 +5,7 @@ import kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params as rp
 #from kzpy3.teg2.bdd_car_versions.bdd_car_rewrite.runtime_params import *
 #import aruco_code
 from kzpy3.utils import *
-# aruco code
-#import aruco_code
-# aruco code
+
 import roslib
 import std_msgs.msg
 import geometry_msgs.msg
@@ -126,10 +124,6 @@ try:
 						r0 = right_list[-2]
 						r1 = right_list[-1]
 
-						"""
-						if use_aruco:
-							aruco_steer,aruco_motor,aruco_only = aruco_code.do_aruco(left_list[-1],steer,motor)
-						"""
 
 						solver.net.blobs['ZED_data'].data[0,0,:,:] = l0[:,:,0]
 						solver.net.blobs['ZED_data'].data[0,1,:,:] = l1[:,:,0]
@@ -156,25 +150,7 @@ try:
 						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
-						# Aruco Marker Code ->
-						#aruco_steer, aruco_motor, aruco_only = aruco_code.do_aruco(left_list[-1],caf_steer,caf_motor,rp.ar_params)
-						#if aruco_only:
-						#	caf_steer = aruco_steer
-						#	caf_motor = aruco_motor
-							# If the aruco module should override the motor and steering commands, 
-							# publish this to a ros publisher so the arduino can pick it up and
-							# read the caffe motor values
-						#	if state in [6,10]:
-						#		aruco_cmd_pub.publish(std_msgs.msg.Int32(1))
-						#else:
-						#	if state in [6,10]:
-						#		aruco_cmd_pub.publish(std_msgs.msg.Int32(0))
-						# <- Aruco Marker Code
-						#print("#####")
-						#print(aruco_only)
-						#print(aruco_steer)
-						#print(aruco_motor)
-
+					
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
 						caf_motor = int((caf_motor+caf_motor_previous)/2.0)
@@ -198,11 +174,6 @@ try:
 						if state in [6,7,10]:
 							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
 
-						"""
-						aruco_steer_cmd_pub.publish(std_msgs.msg.Int32(aruco_steer))
-						aruco_motor_cmd_pub.publish(std_msgs.msg.Int32(aruco_motor))
-						aruco_only_cmd_pub.publish(std_msgs.msg.Int32(aruco_only))
-						"""
 
 
 
