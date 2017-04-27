@@ -35,7 +35,7 @@ import rosbag
 #
 image_topics = ['left_image','right_image']
 single_value_topics = ['steer','state','motor','encoder']#,'GPS2_lat']
-vector3_topics = ['acc','gyro','gps']
+vector3_topics = ['acc','gyro','gps','gyro_heading']
 all_topics = image_topics + single_value_topics + vector3_topics
 #
 ######################################################################
