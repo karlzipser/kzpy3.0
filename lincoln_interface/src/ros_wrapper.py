@@ -4,6 +4,7 @@ Created on Apr 26, 2017
 @author: Sascha Hornauer
 '''
 import roslib
+from teg2.bdd_car_versions.bdd_car_lincoln.bair_car.nodes.get_ros_images_live2_z2_color_TX1 import lilliput_steering
 
 roslib.load_manifest('dbw_mkz_msgs')
 
@@ -19,7 +20,7 @@ class Lilliput_steering():
     steer_pub = rospy.Publisher('chatter', SteeringCmd, queue_size=10)
 
     def __init__(self):
-        pass
+        lilliput_steering()
 
     def steering_callback(self,data):
         rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
@@ -67,10 +68,10 @@ class Lilliput_steering():
         rospy.Subscriber("/bair_car/cmd/steer", std_msgs.msg.Int32, self.steering_callback)
         
         
-        rospy.spin()
+        #rospy.spin()
         
         
 
 
 
-test = Lilliput_steering()
+#test = Lilliput_steering()
