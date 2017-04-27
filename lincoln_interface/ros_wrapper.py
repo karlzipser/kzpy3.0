@@ -56,7 +56,7 @@ class Lilliput_steering():
         
         steer_range = np.abs(steer_max_left-steer_max_right)
         
-        steer_output_rad = steering_norm * steer_range
+        steer_output_rad = (steering_norm * steer_range) - (steer_range / 2.0)
         
         steeringCmd_msg.steering_wheel_angle_cmd = steer_output_rad
         
