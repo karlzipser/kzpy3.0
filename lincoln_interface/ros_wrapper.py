@@ -96,6 +96,15 @@ class Lilliput_steering():
             # Put it into a message
             steeringCmd_msg.steering_wheel_angle_cmd = steer_output_rad
             
+            # Fill other fields
+            steeringCmd_msg.steering_wheel_angle_velocity = 1.0
+            
+            steeringCmd_msg.enable = True
+            
+            steeringCmd_msg.ignore = False
+            
+            steeringCmd_msg.quiet = False
+            
             # and publish it.
             self.steer_pub.publish(steeringCmd_msg)
     
