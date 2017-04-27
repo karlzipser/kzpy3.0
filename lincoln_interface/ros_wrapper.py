@@ -18,6 +18,8 @@ class Lilliput_steering():
 
     steer_pub = rospy.Publisher('/vehicle/steering_cmd', SteeringCmd, queue_size=10)
 
+    previous_steering_command = None
+
     def __init__(self):
         self.lilliput_steering()
 
@@ -57,6 +59,28 @@ class Lilliput_steering():
         steer_range = np.abs(steer_max_left-steer_max_right)
         
         steer_output_rad = (steering_norm * steer_range) - (steer_range / 2.0)
+        
+        # Smooth the steering commands heavily
+        if(self.previous_steering_command == None):
+            self.previous_steering_command = steer_output_rad
+            
+        # First we calculate the absolute difference of two consecutive steering commands and divide it by the possible
+        # range to reach normed values
+        diff_values_normed = np.abs(steer_output_rad-self.previous_steering_command)/steer_range
+        
+        # If the difference in between values is high ( sudden movement ), the new value factor goes towards 0
+        # and the old value factor, its opposite, goes towards 1
+        new_value_factor = 1-diff_values_normed
+        old_value_factor = diff_values_normed
+        
+        # To avoid having no movement at all in emergency situations the factors are limited
+        if new_value_factor < 0.1:
+            new_value_factor = 0.1
+            old_value_factor = 0.9
+        
+        steer_output_rad = (steer_output_rad*new_value_factor + self.previous_steering_command*old_value_factor) 
+        
+        
         
         steeringCmd_msg.steering_wheel_angle_cmd = steer_output_rad
         
