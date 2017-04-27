@@ -92,7 +92,7 @@ if computer_name == 'Mr_Blue_Original':
 
 #
 ###################################################################
-motor_gain = 0.0 # override individual settings
+# motor_gain = 0.0 # override individual settings
 
 if Direct == 1:
 	task = 'direct'

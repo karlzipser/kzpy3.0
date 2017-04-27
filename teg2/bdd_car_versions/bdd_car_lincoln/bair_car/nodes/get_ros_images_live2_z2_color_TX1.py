@@ -151,7 +151,7 @@ try:
 						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
-						lilliput_steering
+						
 					
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
