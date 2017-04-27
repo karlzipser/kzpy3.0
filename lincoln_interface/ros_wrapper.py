@@ -77,6 +77,8 @@ class Lilliput_steering():
         if new_value_factor < 0.1:
             new_value_factor = 0.1
             old_value_factor = 0.9
+            
+        self.previous_steering_command = steer_output_rad
         
         steer_output_rad = (steer_output_rad*new_value_factor + self.previous_steering_command*old_value_factor) 
         
