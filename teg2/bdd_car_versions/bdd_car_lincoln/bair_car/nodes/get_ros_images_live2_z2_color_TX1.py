@@ -167,7 +167,8 @@ try:
 						if caf_steer < 0:
 							caf_steer = 0
 
-
+						# turn of motor
+						caf_motor = 49
 
 						
 						if state in [3,6,10]:			

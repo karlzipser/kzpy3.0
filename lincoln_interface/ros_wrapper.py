@@ -78,10 +78,16 @@ class Lilliput_steering():
             new_value_factor = 0.1
             old_value_factor = 0.9
             
-        self.previous_steering_command = steer_output_rad
-        
+            
+        # To limit the influence of new values, the opper limits are also set
+        if new_value_factor > 0.5:
+            new_value_factor = 0.5
+            old_value_factor = 0.5
+            
         steer_output_rad = (steer_output_rad*new_value_factor + self.previous_steering_command*old_value_factor) 
         
+        
+        self.previous_steering_command = steer_output_rad
         
         
         steeringCmd_msg.steering_wheel_angle_cmd = steer_output_rad
