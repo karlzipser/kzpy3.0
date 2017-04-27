@@ -63,7 +63,7 @@ class Lilliput_steering():
         self.steer_pub.publish(steeringCmd_msg)
     
     def lilliput_steering(self):
-        rospy.init_node('lilliput_steering', anonymous=True)
+        #rospy.init_node('lilliput_steering', anonymous=True)
         rospy.Subscriber("/bair_car/cmd/steer", std_msgs.msg.Int32, self.steering_callback)
         
         
