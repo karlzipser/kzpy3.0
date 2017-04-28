@@ -35,7 +35,7 @@ def run_loop(Arduinos,M):
                 M[imu_dic[m]].publish(geometry_msgs.msg.Vector3(*M[m]))
                 if m == 'acc':
                     ctr = 1
-                    for n in ['acc_x_lst','acc_y_lst','acc_z_lst'],['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
+                    for n in ['acc_x_lst','acc_y_lst','acc_z_lst']:#,['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
                         lock.aquire()
                         M[n].append(imu_input[ctr])
                         lock.release()
