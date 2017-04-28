@@ -118,7 +118,7 @@ def arduino_master_thread():
 
             #print M.keys()
             try:
-                
+                print M['acc_lst']
                 print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'],M['gyro'],M['head'])#,M['gyro'],M['head'],M['encoder'])
             except:
                 pass

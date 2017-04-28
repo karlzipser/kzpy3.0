@@ -18,6 +18,8 @@ def setup(M,Arduinos):
     M['n_avg_IMU'] = 20
 
 
+M['acc_lst'] = []
+
 
 def run_loop(Arduinos,M):
 
@@ -33,6 +35,11 @@ def run_loop(Arduinos,M):
                 #print imu_input
                 m = imu_input[0]
                 M[m] = imu_input[1:4]
+                if m == 'acc':
+                    print("if m == 'acc':")
+                    M['acc_lst'].append(M)
+                    if len(M['acc_lst']) > 15:
+                        M['acc_lst'] = M['acc_lst'][-10:]
                 M[imu_dic[m]].publish(geometry_msgs.msg.Vector3(*M[m]))
                 """
                 if m == 'acc':
