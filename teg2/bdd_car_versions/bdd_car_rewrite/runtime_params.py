@@ -39,6 +39,7 @@ use_caffe = True
 steer_gain = 1.0
 motor_gain = 0.6
 acc2rd_threshold = 150
+
 PID_min_max = [1.5,2.5]
 if False:
 	gyro_freeze_threshold = 500
@@ -53,14 +54,14 @@ if False:
 ####################### specific car settings ################
 #
 if computer_name == 'Mr_Orange':
-	PID_min_max = [2.,3.]
+	#PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Silver':
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue':
-	PID_min_max = [1.5,2.5]
+	#PID_min_max = [1.5,2.5]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Yellow':
