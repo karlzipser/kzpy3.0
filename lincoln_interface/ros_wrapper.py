@@ -24,8 +24,8 @@ class Lilliput_steering():
     # The five previous steering commands are used to smooth the response. They
     # are initialised by 49, because that is by definition, straight.
     # A deque ist used for its efficient list-shift
-    previous_steering_commands = deque([49,49,49,49,49,49])
-    smoothing_vector = np.array([0.1,0.1,0.15,0.2,0.2,0.25])
+    previous_steering_commands = deque([49,49,49,49,49,49,49,49])
+    smoothing_vector = np.array([0.05,0.05,0.10,0.10,0.15,0.15,0.2,0.2])
     last_execution_time = timer()
 
     def __init__(self):
@@ -95,6 +95,15 @@ class Lilliput_steering():
             
             # Put it into a message
             steeringCmd_msg.steering_wheel_angle_cmd = steer_output_rad
+            
+            # Fill other fields
+            steeringCmd_msg.steering_wheel_angle_velocity = 1.0
+            
+            steeringCmd_msg.enable = True
+            
+            steeringCmd_msg.ignore = False
+            
+            steeringCmd_msg.quiet = False
             
             # and publish it.
             self.steer_pub.publish(steeringCmd_msg)

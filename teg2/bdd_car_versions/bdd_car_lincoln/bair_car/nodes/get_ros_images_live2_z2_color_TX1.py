@@ -151,6 +151,7 @@ try:
 						caf_steer = 100*solver.net.blobs['ip2'].data[0,9]
 						caf_motor = 100*solver.net.blobs['ip2'].data[0,19]
 
+						
 					
 						caf_steer = int((caf_steer+caf_steer_previous)/2.0)
 						caf_steer_previous = caf_steer
@@ -173,8 +174,8 @@ try:
 						
 						if state in [3,6,10]:			
 							steer_cmd_pub.publish(std_msgs.msg.Int32(caf_steer))
-						#if state in [6,7,10]:
-						motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
+						if state in [6,7,10]:
+							motor_cmd_pub.publish(std_msgs.msg.Int32(caf_motor))
 
 
 
