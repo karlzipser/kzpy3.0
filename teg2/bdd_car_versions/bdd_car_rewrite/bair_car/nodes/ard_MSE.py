@@ -203,7 +203,7 @@ def setup(M,Arduinos):
     M['n_avg_steer'] = 20
     M['n_avg_motor'] = 20
     M['n_avg_button'] = 15
-    M['n_avg_encoder'] = 15
+    M['n_avg_encoder'] = 100
     M['steer_null'] = 1400
     M['motor_null'] = 1500
     M['steer_percent'] = 49
@@ -315,23 +315,47 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
             M['steer_percent'] = pwm_to_percent(M,M['steer_null'],M['steer_pwm_lst'][-1],M['steer_max'],M['steer_min'])
             M['motor_percent'] = pwm_to_percent(M,M['motor_null'],M['motor_pwm_lst'][-1],M['motor_max'],M['motor_min'])
+            M['pid_motor_percent'] = pwm_to_percent(M,M['motor_null'],M['pid_motor_pwm'],M['motor_max'],M['motor_min'])
 
             M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
             M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
-            
-            if 'acc' in M:
-                acc2rd = M['acc'][0]**2+M['acc'][2]**2
-                if acc2rd > M['acc2rd_threshold']:
-                    if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
-                        M['previous_state'] = M['current_state']
-                        M['current_state'] = M['state_nine']
-                        M['current_state'].enter()
-                        M['previous_state'].leave()
-            else:
-                print 'acc not in M'
-            if False:
-                if caf_motor > motor_freeze_threshold and np.array(encoder_list[0:3]).mean() > 1 and np.array(encoder_list[-3:]).mean()<0.2 and state_transition_time_s > 1:
+
+
+            #print(M['pid_motor_percent'],M['motor_freeze_threshold'],int(100*np.array(M['encoder_lst'][0:5]).mean()),int(100*np.array(M['encoder_lst'][-5:]).mean()),int(M['current_state'].state_transition_timer.time()))
+                         
+            freeze = False
+            if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+
+                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:20]).mean() > 1 and np.array(M['encoder_lst'][-20:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
+                    print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
+                if 'acc' in M:
+                    M['acc_lst_mean'] = array(M['acc_lst'][-10:]).mean(axis=0)
+                    acc2rd = M['acc'][0]**2+M['acc'][2]**2
+                    if acc2rd > M['acc2rd_threshold']:
+                        print("if acc2rd > M['acc2rd_threshold']:")
+                        freeze = True
+                    if np.abs(M['acc_lst_mean'][0]) > M['acc_freeze_threshold_x']:
+                        print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_x']:")
+                        freeze = True
+                    if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_max']:
+                        print("if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_max']:")
+                        freeze = True
+                    if M['acc_lst_mean'][1] < M['acc_freeze_threshold_y_min']:
+                        print("if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_min']:")
+                        freeze = True
+                    if np.abs(M['acc_lst_mean'][2]) > M['acc_freeze_threshold_z']:
+                        print("if M['acc_lst_mean'][2] > M['acc_freeze_threshold_z']:")
+                        freeze = True
+                else:
+                    print 'acc not in M'
+                if freeze:
+                    M['previous_state'] = M['current_state']
+                    M['current_state'] = M['state_nine']
+                    M['current_state'].enter()
+                    M['previous_state'].leave()
+
+
             
 
                 
@@ -420,10 +444,10 @@ def smooth_data(M):
     else:
         M['smooth_motor'] = M['motor_pwm_lst'][-1]
 
-    if len(M['encoder_lst']) >= M['n_avg_encoder']:  
-        M['smooth_encoder'] = array(M['encoder_lst'][-M['n_avg_encoder']:]).mean()
+    if len(M['encoder_lst']) >= M['n_avg_encoder']:
+        pass #M['smooth_encoder'] = array(M['encoder_lst'][-M['n_avg_encoder']:]).mean()
     else:
-        M['smooth_encoder'] = M['encoder_lst'][-1]
+        pass #M['smooth_encoder'] = M['encoder_lst'][-1]
 
 
 

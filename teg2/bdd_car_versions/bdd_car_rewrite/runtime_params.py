@@ -37,37 +37,39 @@ weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco2_iter_1200000.caffe
 verbose = False
 use_caffe = True
 steer_gain = 1.0
-motor_gain = 0.6
+motor_gain = 1.0
 acc2rd_threshold = 150
+
 PID_min_max = [1.5,2.5]
-if False:
-	gyro_freeze_threshold = 500
-	acc_freeze_threshold_x = 12
-	acc_freeze_threshold_y = 12
-	acc_freeze_threshold_z = 12
-	acc_freeze_threshold_z_neg = -7
-	motor_freeze_threshold = 60
+
+gyro_freeze_threshold = 150
+acc_freeze_threshold_x = 5
+acc_freeze_threshold_y_max = 12
+acc_freeze_threshold_y_min = 5
+acc_freeze_threshold_z = 5
+motor_freeze_threshold = 55
+n_avg_IMU = 10
 #
 ###################################################################
 
 ####################### specific car settings ################
 #
 if computer_name == 'Mr_Orange':
-	PID_min_max = [2.,3.]
+	#PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Silver':
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue':
-	PID_min_max = [1.5,2.5]
+	#PID_min_max = [1.5,2.5]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Yellow':
 	#motor_gain = 0.9
 	pass
 if computer_name == 'Mr_Black':
-	PID_min_max = [1.,2.]
+	PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_White':

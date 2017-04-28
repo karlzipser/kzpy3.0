@@ -15,7 +15,10 @@ def setup(M,Arduinos):
         for d in ['_x_lst','_y_lst','_z_lst']:
             M[m+d] = []
 
-    M['n_avg_IMU'] = 20
+    
+    M['acc_lst'] = []
+
+
 
 
 
@@ -30,12 +33,19 @@ def run_loop(Arduinos,M):
                 read_str = Arduinos['IMU'].readline()
                 #print read_str
                 exec('imu_input = list({0})'.format(read_str))
+                #print imu_input
                 m = imu_input[0]
                 M[m] = imu_input[1:4]
+                if m == 'acc':
+                    #print("if m == 'acc':")
+                    M['acc_lst'].append(M['acc'])
+                    if len(M['acc_lst']) > 1.5*M['n_avg_IMU']:
+                        M['acc_lst'] = M['acc_lst'][-M['n_avg_IMU']:]
                 M[imu_dic[m]].publish(geometry_msgs.msg.Vector3(*M[m]))
+                """
                 if m == 'acc':
                     ctr = 1
-                    for n in ['acc_x_lst','acc_y_lst','acc_z_lst'],['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
+                    for n in ['acc_x_lst','acc_y_lst','acc_z_lst']:#,['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
                         lock.aquire()
                         M[n].append(imu_input[ctr])
                         lock.release()
@@ -57,7 +67,7 @@ def run_loop(Arduinos,M):
                 else:
                     print '***'+read_str + "*** is not imu"
                     continue
-
+                
                 if m == 'acc':
                     A = ['acc_x_lst','acc_y_lst','acc_z_lst']
                     B = ['acc_x_smooth','acc_y_smooth','acc_z_smooth']
@@ -71,8 +81,10 @@ def run_loop(Arduinos,M):
                 for n,o in zip([A,B]):
                     if len(M[n]) >= M['n_avg_IMU']:
                         M[o] = np.array(M[n][-M['n_avg_IMU']:]).mean()
+                        print(d2n('************* M[',o,'] = ',M[o]))
                     else:
                         M[o] = M[n][-1]
+                """
 
             except Exception as e:
                 pass #print e
