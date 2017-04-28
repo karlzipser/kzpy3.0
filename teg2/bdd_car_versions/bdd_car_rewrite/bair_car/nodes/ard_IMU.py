@@ -71,6 +71,7 @@ def run_loop(Arduinos,M):
                 for n,o in zip([A,B]):
                     if len(M[n]) >= M['n_avg_IMU']:
                         M[o] = np.array(M[n][-M['n_avg_IMU']:]).mean()
+                        print(d2n('************* M[',o,'] = ',M[o]))
                     else:
                         M[o] = M[n][-1]
 
