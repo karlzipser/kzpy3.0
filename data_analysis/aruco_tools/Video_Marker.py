@@ -165,7 +165,7 @@ class Video_Marker(object):
                 self.steering_command_list = self.steering_command_list*increment
                     
             
-                    
+                # The motor command is no longer calculated
                 # Next, calculate a safe motor command
                 # If the average obstacle is in front of us....
                 #if(np.deg2rad(front_left_limit_deg) < average_angle < np.deg2rad(front_right_limit_deg)):

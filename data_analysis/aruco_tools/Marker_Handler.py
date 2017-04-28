@@ -13,7 +13,7 @@ from Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from Area_Visualizer import Area_Visualizer
 from Map import Map
-from aruco_angle_retriever import get_boundary_angle_distance
+from aruco_angle_retriever import get_boundary_angle_min_distance
 
 class Marker_Handler:
     
@@ -26,7 +26,6 @@ class Marker_Handler:
     
     
     def __init__(self, arguments):
-
         
         if(self.source_bagfile):
         
@@ -55,15 +54,15 @@ class Marker_Handler:
         while True:
             if not paused_video:
                 if(not bagfile_handler == None and capture_device == None):
-                    image = bagfile_handler.get_image()
+                    cv_image = bagfile_handler.get_image()
                 elif(not capture_device == None):
-                    ret, image = capture_device.read()
+                    ret, cv_image = capture_device.read()
                    
-                if image is None:
-                    print("Error reading image! Wrong number of camera?")
+                if cv_image is None:
+                    print("Error reading cv_image! Wrong number of camera?")
                 
-                #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,image) 
-                cv_image = get_boundary_angle_distance(image)
+                #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,cv_image) 
+                averageAngle, minDistance, markers = get_boundary_angle_min_distance(cv_image)
                 
                 
             if(self.show_video):

@@ -11,6 +11,7 @@ import os
 
 class Bagfile_Handler(object):
     
+    print("Reading Bagfilear")
     bag = None
     bag_access = None
     bridge = CvBridge()

@@ -12,7 +12,6 @@ from Map import Map
 
 class Area_Visualizer(object):
     
-    
     persistent_markers = {}
     #map = Map()
         
@@ -32,7 +31,6 @@ class Area_Visualizer(object):
         # Reduce confidence for each marker in the persistent list, if there are any yet
         for marker_id in self.persistent_markers:
             self.persistent_markers[marker_id].confidence = self.persistent_markers[marker_id].confidence-0.1
-        
         
         # Add markers to list, overwriting old markers and thereby increasing confidence levels
         for marker in markers:
