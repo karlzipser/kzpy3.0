@@ -320,12 +320,12 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
 
 
-            print(M['motor_percent'],M['motor_freeze_threshold'],np.array(encoder_lst[0:5]).mean(),np.array(encoder_lst[-5:]).mean(),M['current_state'].state_transition_timer.time())
+            print(M['motor_percent'],M['motor_freeze_threshold'],np.array(M['encoder_lst'][0:5]).mean(),np.array(M['encoder_lst'][-5:]).mean(),M['current_state'].state_transition_timer.time())
                          
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
 
-                if M['motor_percent'] > M['motor_freeze_threshold'] and np.array(encoder_lst[0:5]).mean() > 1 and np.array(encoder_lst[-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
+                if M['motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:5]).mean() > 1 and np.array(M['encoder_lst'][-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
                     print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
                 if 'acc' in M:
