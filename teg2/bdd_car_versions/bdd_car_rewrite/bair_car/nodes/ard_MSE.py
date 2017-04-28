@@ -326,7 +326,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
 
-                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:5]).mean() > 1 and np.array(M['encoder_lst'][-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
+                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:10]).mean() > 1 and np.array(M['encoder_lst'][-10:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
                     print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
                 if 'acc' in M:
