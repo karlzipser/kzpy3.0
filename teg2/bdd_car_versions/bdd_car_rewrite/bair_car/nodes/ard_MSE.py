@@ -319,14 +319,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
             M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
 
-"""
-gyro_freeze_threshold = 150
- = 5
-acc_freeze_threshold_y_max = 12
-acc_freeze_threshold_y_min = 5
-acc_freeze_threshold_z = 5
-motor_freeze_threshold = 60
-"""
+
             
             if 'acc' in M:
                 acc2rd = M['acc'][0]**2+M['acc'][2]**2
