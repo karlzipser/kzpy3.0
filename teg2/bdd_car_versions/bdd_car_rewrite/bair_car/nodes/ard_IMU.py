@@ -34,6 +34,7 @@ def run_loop(Arduinos,M):
                 m = imu_input[0]
                 M[m] = imu_input[1:4]
                 M[imu_dic[m]].publish(geometry_msgs.msg.Vector3(*M[m]))
+                """
                 if m == 'acc':
                     ctr = 1
                     for n in ['acc_x_lst','acc_y_lst','acc_z_lst']:#,['acc_x_smooth','acc_y_smooth','acc_z_smooth']:
@@ -58,7 +59,7 @@ def run_loop(Arduinos,M):
                 else:
                     print '***'+read_str + "*** is not imu"
                     continue
-                print "******* HERE ********* "
+                
                 if m == 'acc':
                     A = ['acc_x_lst','acc_y_lst','acc_z_lst']
                     B = ['acc_x_smooth','acc_y_smooth','acc_z_smooth']
@@ -75,6 +76,7 @@ def run_loop(Arduinos,M):
                         print(d2n('************* M[',o,'] = ',M[o]))
                     else:
                         M[o] = M[n][-1]
+                """
 
             except Exception as e:
                 pass #print e
