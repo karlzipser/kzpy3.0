@@ -203,7 +203,7 @@ def setup(M,Arduinos):
     M['n_avg_steer'] = 20
     M['n_avg_motor'] = 20
     M['n_avg_button'] = 15
-    M['n_avg_encoder'] = 15
+    M['n_avg_encoder'] = 100
     M['steer_null'] = 1400
     M['motor_null'] = 1500
     M['steer_percent'] = 49
@@ -326,7 +326,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
 
-                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:10]).mean() > 1 and np.array(M['encoder_lst'][-10:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
+                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:20]).mean() > 1 and np.array(M['encoder_lst'][-20:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
                     print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
                 if 'acc' in M:
@@ -444,10 +444,10 @@ def smooth_data(M):
     else:
         M['smooth_motor'] = M['motor_pwm_lst'][-1]
 
-    if len(M['encoder_lst']) >= M['n_avg_encoder']:  
-        M['smooth_encoder'] = array(M['encoder_lst'][-M['n_avg_encoder']:]).mean()
+    if len(M['encoder_lst']) >= M['n_avg_encoder']:
+        pass #M['smooth_encoder'] = array(M['encoder_lst'][-M['n_avg_encoder']:]).mean()
     else:
-        M['smooth_encoder'] = M['encoder_lst'][-1]
+        pass #M['smooth_encoder'] = M['encoder_lst'][-1]
 
 
 
