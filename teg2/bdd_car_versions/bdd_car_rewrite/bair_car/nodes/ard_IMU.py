@@ -37,8 +37,8 @@ def run_loop(Arduinos,M):
                 m = imu_input[0]
                 M[m] = imu_input[1:4]
                 if m == 'acc':
-                    print("if m == 'acc':")
-                    M['acc_lst'].append(M)
+                    #print("if m == 'acc':")
+                    M['acc_lst'].append(M['acc'])
                     if len(M['acc_lst']) > 1.5*M['n_avg_IMU']:
                         M['acc_lst'] = M['acc_lst'][-M['n_avg_IMU']:]
                 M[imu_dic[m]].publish(geometry_msgs.msg.Vector3(*M[m]))
