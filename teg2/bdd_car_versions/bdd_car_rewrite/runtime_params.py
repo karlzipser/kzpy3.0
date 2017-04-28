@@ -48,6 +48,7 @@ acc_freeze_threshold_y_max = 12
 acc_freeze_threshold_y_min = 5
 acc_freeze_threshold_z = 5
 motor_freeze_threshold = 60
+n_avg_IMU = 10
 #
 ###################################################################
 

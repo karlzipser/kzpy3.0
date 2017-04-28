@@ -15,7 +15,7 @@ def setup(M,Arduinos):
         for d in ['_x_lst','_y_lst','_z_lst']:
             M[m+d] = []
 
-    M['n_avg_IMU'] = 10
+    
     M['acc_lst'] = []
 
 
