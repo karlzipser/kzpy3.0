@@ -37,7 +37,7 @@ weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco2_iter_1200000.caffe
 verbose = False
 use_caffe = True
 steer_gain = 1.0
-motor_gain = 0.6
+motor_gain = 1.0
 acc2rd_threshold = 150
 
 PID_min_max = [1.5,2.5]
@@ -69,7 +69,7 @@ if computer_name == 'Mr_Yellow':
 	#motor_gain = 0.9
 	pass
 if computer_name == 'Mr_Black':
-	PID_min_max = [1.,2.]
+	#PID_min_max = [1.,2.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_White':
