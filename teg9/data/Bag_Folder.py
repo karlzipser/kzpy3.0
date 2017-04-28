@@ -1,4 +1,5 @@
 from kzpy3.vis import *
+import numbers
 import cv2
 
 def init(bag_folders_path_meta_path,bag_folders_rgb_1to4_path, left_image_bound_to_data_name='left_image_bound_to_data.pkl',NUM_STATE_ONE_STEPS=10,accepted_states=[1]):
@@ -122,19 +123,19 @@ def init(bag_folders_path_meta_path,bag_folders_rgb_1to4_path, left_image_bound_
             continue
         #assert('encoder' in SL[ts])
         """
-        if not type(SL[ts]['motor']) == float:
+        if not isinstance(SL[ts]['motor'],numbers.Number):
             bad_timestamps_list.append(ts)
-            cprint("if not type(SL[ts]['motor']) == float:")
+            cprint("if not isinstance(SL[ts]['motor'],numbers.Number):")
             continue
-        #assert('encoder' in SL[ts])
-        if not type(SL[ts]['steer']) == float:
+
+        if not isinstance(SL[ts]['steer'],numbers.Number):
             bad_timestamps_list.append(ts)
-            cprint("if not type(SL[ts]['steer']) == float:")
+            cprint("if not isinstance(SL[ts]['steer'],numbers.Number):")
             continue
-        #assert('encoder' in SL[ts])
-        if not type(SL[ts]['state']) == float:
+
+        if not isinstance(SL[ts]['state'],numbers.Number):
             bad_timestamps_list.append(ts)
-            cprint("if not type(SL[ts]['state']) == float:")
+            cprint("if not isinstance(SL[ts]['state'],numbers.Number):")
             continue
 
     if len(bad_timestamps_list) > 0:
@@ -255,8 +256,9 @@ def _elements(BF,topic):
     for t in BF['data']['raw_timestamps']:
         if topic in BF['left_image_bound_to_data'][t]:
             d = BF['left_image_bound_to_data'][t][topic]
-            if type(d) != int and type(d) != float:
-                d = 0
+            if type(d) == str or type(d) == type(None):
+                print(d2s(topic,t,d,type(d)))
+                d = -1
             data.append(d)
         else:
             data.append(0) #(-999.999)

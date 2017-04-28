@@ -44,6 +44,7 @@ from pprint import pprint
 import serial
 try:
     import h5py
+
 except:
     print("don't have h5py")
 try:
@@ -626,3 +627,10 @@ def start_at(t):
     while time.time() < t:
         time.sleep(0.1)
         print(t-time.time())
+
+try:
+    import numbers
+    def is_number(n):
+        return isinstance(n,numbers.Number)
+except:
+    print("Don't have numbers module")

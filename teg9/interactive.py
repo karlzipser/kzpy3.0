@@ -669,35 +669,42 @@ A5 = load_animate_hdf5
 # filter out left and out in files
 
 def load_hdf5_steer_hist(path,dst_path):
-	print path
-	unix('mkdir -p '+dst_path)
-	low_steer = []
-	high_steer = []
-	l,s=function_load_hdf5(path)
-	pb = ProgressBar(len(s))
-	state_hist_list = []
-	for h in range(len(s)):
+	if len(gg(opj(dst_path,fname(path).replace('hdf5','state_hist_list.pkl')))) == 1:
+		print(opj(dst_path,fname(path).replace('hdf5','state_hist_list.pkl'))+' exists')
+		return
+	try:
+		print path
+		unix('mkdir -p '+dst_path)
+		low_steer = []
+		high_steer = []
+		l,s=function_load_hdf5(path)
+		pb = ProgressBar(len(s))
+		state_hist_list = []
+		for h in range(len(s)):
+			pb.animate(h)
+			state_hist = np.zeros(8)
+			n = str(h)
+			for i in range(len(s[n][left])):
+				state_hist[int(s[n][state][i])] += 1
+				if i < 2:
+					smooth_steer = s[n][steer][i]
+				else:
+					smooth_steer = (s[n][steer][i] + 0.5*s[n][steer][i-1] + 0.25*s[n][steer][i-2])/1.75
+				if smooth_steer < 43 or smooth_steer > 55:
+					high_steer.append([h,i,int(round(smooth_steer))])
+				else:
+					low_steer.append([h,i,int(round(smooth_steer))])
+			state_hist_list.append(state_hist)
 		pb.animate(h)
-		state_hist = np.zeros(8)
-		n = str(h)
-		for i in range(len(s[n][left])):
-			state_hist[int(s[n][state][i])] += 1
-			if i < 2:
-				smooth_steer = s[n][steer][i]
-			else:
-				smooth_steer = (s[n][steer][i] + 0.5*s[n][steer][i-1] + 0.25*s[n][steer][i-2])/1.75
-			if smooth_steer < 43 or smooth_steer > 55:
-				high_steer.append([h,i,int(round(smooth_steer))])
-			else:
-				low_steer.append([h,i,int(round(smooth_steer))])
-		state_hist_list.append(state_hist)
-	pb.animate(h)
-	assert(len(high_steer)>0)
-	assert(len(low_steer)>0)
+		assert(len(high_steer)>0)
+		assert(len(low_steer)>0)
 
-	save_obj(high_steer,opj(dst_path,fname(path).replace('hdf5','high_steer.pkl')))
-	save_obj(low_steer,opj(dst_path,fname(path).replace('hdf5','low_steer.pkl')))
-	save_obj(state_hist_list,opj(dst_path,fname(path).replace('hdf5','state_hist_list.pkl')))
+		save_obj(high_steer,opj(dst_path,fname(path).replace('hdf5','high_steer.pkl')))
+		save_obj(low_steer,opj(dst_path,fname(path).replace('hdf5','low_steer.pkl')))
+		save_obj(state_hist_list,opj(dst_path,fname(path).replace('hdf5','state_hist_list.pkl')))
+	except Exception as e:
+		cprint("********** load_hdf5_steer_hist Exception ***********************",'red')
+		print(e.message, e.args)
 
 
 
@@ -711,7 +718,7 @@ if False:
 
 if False:
 	if True: # This needs to be made more general!
-		for i in [18,19,20,21,23,24,26,27,28,29]:#range(21):
+		for i in range(65): #[18,19,20,21,23,24,26,27,28,29]:#range(21):
 			S5(i,flip=False)
 			S5(flip=True)
 

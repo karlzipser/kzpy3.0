@@ -140,7 +140,7 @@ def animator_thread(A):
                 A['current_img_index'] = 0
             indx = int(A['current_img_index'])
             img = A['left_image'][indx]
-            aruco_img = ann.get_aruco_image(a[1],filled=False,color=(255,0,0))
+            aruco_img = ann.get_aruco_image(img[1],filled=False,color=(255,0,0))
             mi_or_cv2(aruco_img,cv=True,delay=30,title='animate')
         time.sleep(0.2)
 
@@ -187,13 +187,13 @@ def menu(A):
 
 
 if __name__ == '__main__':
-    bag_folder_path = argv[1]
+    bag_folder_path = sys.argv[1]
     hist_timer = Timer(5)
     A = {}
-    A = get_new_A[A]
+    A = get_new_A(A)
     multi_preprocess(A,bag_folder_path)
     threading.Thread(target=animator_thread,args=[A]).start()
-    threading.Thread(target=graph_thread,args=[A]).start()
+    #threading.Thread(target=graph_thread,args=[A]).start()
     menu(A)
 
 

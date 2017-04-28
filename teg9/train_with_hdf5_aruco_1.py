@@ -62,7 +62,8 @@ if True:
 	solver = setup_solver(opjh('kzpy3/caf7/z2_color/solver.prototxt'))
 	#weights_file_path = opjh('kzpy3/caf5/z2_color/z2_color.caffemodel')
 	#weights_file_path = opjD('z2_color_aruco_boundary_1st_pass/z2_color_iter_22600000.caffemodel')
-	weights_file_path = opjD('z2_color/z2_color_iter_100000.caffemodel')
+	#weights_file_path = opjD('z2_color/z2_color_iter_100000.caffemodel')
+	weights_file_path = opjD('z2_color_aruco_boundary_1st_pass/z2_color_iter_22600000.caffemodel')
 	solver.net.copy_from(weights_file_path)
 	cprint('Loaded weights from '+weights_file_path)
 	N_FRAMES = 2 # how many timesteps with images.
