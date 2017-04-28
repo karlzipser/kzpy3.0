@@ -322,6 +322,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
             
             if 'acc' in M:
+                M['acc_lst_mean'] = array(M['acc_lst'][-10:]).mean(axis=0)
                 acc2rd = M['acc'][0]**2+M['acc'][2]**2
                 if acc2rd > M['acc2rd_threshold']:
                     print("if acc2rd > M['acc2rd_threshold']:")
@@ -330,29 +331,29 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                         M['current_state'] = M['state_nine']
                         M['current_state'].enter()
                         M['previous_state'].leave()
-                if np.abs(M['acc'][0]) > M['acc_freeze_threshold_x']:
-                    print("if M['acc'][0] > M['acc_freeze_threshold_x']:")
+                if np.abs(M['acc_lst_mean'][0]) > M['acc_freeze_threshold_x']:
+                    print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_x']:")
                     if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                         M['previous_state'] = M['current_state']
                         M['current_state'] = M['state_nine']
                         M['current_state'].enter()
                         M['previous_state'].leave()
-                if M['acc'][1] > M['acc_freeze_threshold_y_max']:
-                    print("if M['acc'][0] > M['acc_freeze_threshold_y']:")
+                if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_max']:
+                    print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_y']:")
                     if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                         M['previous_state'] = M['current_state']
                         M['current_state'] = M['state_nine']
                         M['current_state'].enter()
                         M['previous_state'].leave()
-                if M['acc'][1] < M['acc_freeze_threshold_y_min']:
-                    print("if M['acc'][0] > M['acc_freeze_threshold_y']:")
+                if M['acc_lst_mean'][1] < M['acc_freeze_threshold_y_min']:
+                    print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_y']:")
                     if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                         M['previous_state'] = M['current_state']
                         M['current_state'] = M['state_nine']
                         M['current_state'].enter()
                         M['previous_state'].leave()
-                if np.abs(M['acc'][2]) > M['acc_freeze_threshold_z']:
-                    print("if M['acc'][0] > M['acc_freeze_threshold_z']:")
+                if np.abs(M['acc_lst_mean'][2]) > M['acc_freeze_threshold_z']:
+                    print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_z']:")
                     if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
                         M['previous_state'] = M['current_state']
                         M['current_state'] = M['state_nine']
