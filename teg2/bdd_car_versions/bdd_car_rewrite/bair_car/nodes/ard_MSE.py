@@ -315,17 +315,18 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
             M['steer_percent'] = pwm_to_percent(M,M['steer_null'],M['steer_pwm_lst'][-1],M['steer_max'],M['steer_min'])
             M['motor_percent'] = pwm_to_percent(M,M['motor_null'],M['motor_pwm_lst'][-1],M['motor_max'],M['motor_min'])
+            M['pid_motor_percent'] = pwm_to_percent(M,M['motor_null'],M['pid_motor_pwm'],M['motor_max'],M['motor_min'])
 
             M['raw_write_str'] = d2n( '(', int(M['steer_pwm_lst'][-1]), ',', int(M['motor_pwm_lst'][-1]+10000), ')')
             M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
 
 
-            print(M['motor_percent'],M['motor_freeze_threshold'],int(100*np.array(M['encoder_lst'][0:5]).mean()),int(100*np.array(M['encoder_lst'][-5:]).mean()),int(100*M['current_state'].state_transition_timer.time()))
+            print(M['pid_motor_percent'],M['motor_freeze_threshold'],int(100*np.array(M['encoder_lst'][0:5]).mean()),int(100*np.array(M['encoder_lst'][-5:]).mean()),int(M['current_state'].state_transition_timer.time()))
                          
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
 
-                if M['motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:5]).mean() > 1 and np.array(M['encoder_lst'][-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
+                if M['pid_motor_percent'] > M['motor_freeze_threshold'] and np.array(M['encoder_lst'][0:5]).mean() > 1 and np.array(M['encoder_lst'][-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
                     print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
                 if 'acc' in M:
