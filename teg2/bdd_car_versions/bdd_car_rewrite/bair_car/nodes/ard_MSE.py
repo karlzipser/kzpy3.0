@@ -323,6 +323,8 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                             
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
+                print(M['motor_percent'],M['motor_freeze_threshold'],np.array(encoder_list[0:5]).mean(),np.array(encoder_list[-5:]).mean(),M['current_state'].state_transition_timer.time())
+
                 if M['motor_percent'] > M['motor_freeze_threshold'] and np.array(encoder_list[0:5]).mean() > 1 and np.array(encoder_list[-5:]).mean()<0.1 and M['current_state'].state_transition_timer.time() > 1:
                     print("if M['motor_percent'] > M['motor_freeze_threshold']...")
                     freeze = True
@@ -336,13 +338,13 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
                         print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_x']:")
                         freeze = True
                     if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_max']:
-                        print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_y']:")
+                        print("if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_max']:")
                         freeze = True
                     if M['acc_lst_mean'][1] < M['acc_freeze_threshold_y_min']:
-                        print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_y']:")
+                        print("if M['acc_lst_mean'][1] > M['acc_freeze_threshold_y_min']:")
                         freeze = True
                     if np.abs(M['acc_lst_mean'][2]) > M['acc_freeze_threshold_z']:
-                        print("if M['acc_lst_mean'][0] > M['acc_freeze_threshold_z']:")
+                        print("if M['acc_lst_mean'][2] > M['acc_freeze_threshold_z']:")
                         freeze = True
                 else:
                     print 'acc not in M'
