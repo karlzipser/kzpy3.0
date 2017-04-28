@@ -63,6 +63,9 @@ M['gyro_pub'] = rospy.Publisher('gyro', geometry_msgs.msg.Vector3, queue_size=10
 M['gyro_heading_pub'] = rospy.Publisher('gyro_heading', geometry_msgs.msg.Vector3, queue_size=100)
 M['acc_pub'] = rospy.Publisher('acc', geometry_msgs.msg.Vector3, queue_size=100)
 
+
+
+
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)
 
@@ -96,6 +99,12 @@ def arduino_master_thread():
                 M['steer_gain'] = rp.steer_gain
                 M['motor_gain'] = rp.motor_gain
                 M['acc2rd_threshold'] = rp.acc2rd_threshold
+                M['gyro_freeze_threshold'] = rp.gyro_freeze_threshold
+                M['acc_freeze_threshold_x'] = rp.acc_freeze_threshold_x
+                M['acc_freeze_threshold_y_max'] = rp.acc_freeze_threshold_y_max
+                M['acc_freeze_threshold_y_min'] = rp.acc_freeze_threshold_y_min
+                M['acc_freeze_threshold_z'] = rp.acc_freeze_threshold_z
+                M['motor_freeze_threshold'] = rp.motor_freeze_threshold
                 M['PID_min_max'] = rp.PID_min_max
             if git_pull_timer.check():
                 unix(opjh('kzpy3/kzpy3_git_pull.sh'))

@@ -41,13 +41,13 @@ motor_gain = 0.6
 acc2rd_threshold = 150
 
 PID_min_max = [1.5,2.5]
-if False:
-	gyro_freeze_threshold = 500
-	acc_freeze_threshold_x = 12
-	acc_freeze_threshold_y = 12
-	acc_freeze_threshold_z = 12
-	acc_freeze_threshold_z_neg = -7
-	motor_freeze_threshold = 60
+
+gyro_freeze_threshold = 150
+acc_freeze_threshold_x = 5
+acc_freeze_threshold_y_max = 12
+acc_freeze_threshold_y_min = 5
+acc_freeze_threshold_z = 5
+motor_freeze_threshold = 60
 #
 ###################################################################
 
