@@ -320,7 +320,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
             M['smooth_write_str'] = d2n( '(', int(M['smooth_steer']), ',', int(M['smooth_motor']+10000), ')')
 
 
-            print(M['motor_percent'],M['motor_freeze_threshold'],np.array(M['encoder_lst'][0:5]).mean(),np.array(M['encoder_lst'][-5:]).mean(),M['current_state'].state_transition_timer.time())
+            print(M['motor_percent'],M['motor_freeze_threshold'],int(100*np.array(M['encoder_lst'][0:5]).mean()),int(100*np.array(M['encoder_lst'][-5:]).mean()),int(100*M['current_state'].state_transition_timer.time()))
                          
             freeze = False
             if M['current_state'] in [M['state_three'],M['state_five'],M['state_six'],M['state_seven']]:
