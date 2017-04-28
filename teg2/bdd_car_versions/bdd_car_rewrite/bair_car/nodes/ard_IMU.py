@@ -57,7 +57,7 @@ def run_loop(Arduinos,M):
                 else:
                     print '***'+read_str + "*** is not imu"
                     continue
-
+                print "******* HERE ********* "
                 if m == 'acc':
                     A = ['acc_x_lst','acc_y_lst','acc_z_lst']
                     B = ['acc_x_smooth','acc_y_smooth','acc_z_smooth']
