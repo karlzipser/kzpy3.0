@@ -17,9 +17,12 @@ zed_parameters = Zed_Parameter()
     
 limit_x_left = 0.0
 limit_x_right = 672 # half the pixel-width of the resolution used
+center_x = int(zed_parameters.cameraMatrix[0][2])
+center_y = int(zed_parameters.cameraMatrix[1][2])
+
 distance_to_image = zed_parameters.cameraMatrix[0][0]
-min_angle = np.arctan2(distance_to_image,limit_x_right)
-max_angle = np.arctan2(distance_to_image,limit_x_left)
+max_angle = np.arctan2(distance_to_image,center_x-limit_x_right)
+min_angle = np.arctan2(distance_to_image,center_x-limit_x_left)
 
    
 def get_boundary_angle_min_distance(cv_image, crop=False, max_distance_boundary=2.0):
@@ -282,8 +285,7 @@ def get_angle_to_center(marker):
 
     imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, zed_parameters.cameraMatrix, zed_parameters.distCoeffs);
     
-    center_x = int(zed_parameters.cameraMatrix[0][2])
-    center_y = int(zed_parameters.cameraMatrix[1][2])
+
     
     
     xy_marker_center = (int(imgpts[0][0][0]),int(imgpts[0][0][1]))
@@ -291,14 +293,15 @@ def get_angle_to_center(marker):
     # We ignore the y axis since our world is quasi 2-dimensional
     
     angle = np.arctan2(distance_to_image,center_x-xy_marker_center[0])
-    print("----")
-    shit(angle)
-    shit(min_angle)
-    shit(max_angle)
+    angle_range = max_angle-min_angle
+    angle_norm = (angle-min_angle)/angle_range
+    
+    # map the angle to -np.pi/2.0 and np.pi/2.0
+    
+    angle = angle_norm * np.pi - np.pi/2.0
+    
     return angle
 
-def shit(num):
-    print(np.rad2deg(num))
 
 def get_distance(marker):
     
