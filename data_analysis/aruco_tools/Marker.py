@@ -33,4 +33,4 @@ class Marker(object):
         '''
         Quick string out method
         '''
-        return str(self.id) + ","+str(self.confidence) + ","+str(self.corners_xy) + ","+str(self.angle_to_top_left) 
+        return str(self.marker_id) + ","+str(self.confidence) + ","+str(self.corners_xy) + ","+str(self.angle_to_top_left) 

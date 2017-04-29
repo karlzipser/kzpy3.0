@@ -6,8 +6,8 @@ Created on Apr 12, 2017
 import numpy as np
 import sys
 import cv2
-from Marker import Marker
-from Map import Map
+from aruco_tools.Marker import Marker
+
 
 
 class Area_Visualizer(object):
@@ -185,3 +185,48 @@ class Area_Visualizer(object):
         cv2.imshow('topView',img2)
         cv2.moveWindow('topView',700,0)
         '''
+
+    
+    def show_top_view(self, markers):
+        
+        #if hasattr(markers, "__iter__"):
+        #    print("Pling")
+        #else:
+        #    print("lpong")
+        '''marker_id = None
+        confidence = 1.0
+        corners_xy = []
+        angle_to_top_left = None
+        distance_to_left_side = None
+        '''
+        cv_image = np.ones((600,600,3), np.uint8)
+        
+        # Some arbitrary scaling parameters for visualisation are set
+        scale_factor = 300.0 * (1.0/8.0)
+        shift_factor = 300
+        turn_factor = np.pi/2.0 
+        
+        # Reduce confidence for each marker in the persistent list, if there are any yet
+        for marker_id in self.persistent_markers:
+            self.persistent_markers[marker_id].confidence = self.persistent_markers[marker_id].confidence-0.1
+        
+        # Add markers to list, overwriting old markers and thereby increasing confidence levels
+        for marker in markers:
+            self.persistent_markers[str(marker.marker_id)] = marker
+        
+        # Now draw lines onto new window
+        for marker_id in self.persistent_markers:
+            
+            marker = self.persistent_markers[marker_id] 
+            naiv_xy = cv2.polarToCart(marker.distance_to_left_side,marker.angle_to_top_left)
+            print(scale_factor*naiv_xy[0][0])
+            print(scale_factor*naiv_xy[1][0])
+            
+            cv2.circle(cv_image, (scale_factor*naiv_xy[0][0],scale_factor*naiv_xy[1][0]),2,(0,0,255),2)
+            
+            
+        cv2.imshow('topView',cv_image)
+        cv2.moveWindow('topView',700,0)
+        
+    
+#print("test")

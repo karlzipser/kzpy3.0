@@ -12,7 +12,6 @@ import numpy as np
 from cv2 import polarToCart
 import math
 from Marker import Marker
-from Map import Map
 from numpy import average
 import aruco_angle_retriever
 
@@ -21,7 +20,6 @@ import aruco_angle_retriever
 
 
 class Video_Marker(object):
-    map = Map()
     capture_device = None
     board = Board()
     markers = []

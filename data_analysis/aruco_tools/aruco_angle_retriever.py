@@ -11,7 +11,7 @@ angleListLength = 4
 
 zed_parameters = Zed_Parameter()
 
-def get_boundary_angle_min_distance(cv_image, crop = False, max_distance_boundary = 2):
+def get_boundary_angle_min_distance(cv_image, crop = False, max_distance_boundary = 2.0):
     '''
     Returns the average angle of the boundary next to the vehicle
     within the distance, defined by max_distance_boundary (in meter)
@@ -35,7 +35,7 @@ def get_boundary_angle_min_distance(cv_image, crop = False, max_distance_boundar
     marker_length = 0.2 # meter
     
     averageAngle = None
-    minDistance = 99.0
+    min_distance = 99.0
     
     try:
         rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
@@ -78,11 +78,10 @@ def get_boundary_angle_min_distance(cv_image, crop = False, max_distance_boundar
             
             # Angle averaging is difficult because of the change around 0 and 2*pi
             if distance_marker < max_distance_boundary:           
-                distCounter=distCounter + 1.0                
+                distCounter=distCounter + 1.0
+                #                
                 distance_norm = (max_distance_boundary-distance_marker)/max_distance_boundary
-                minDistance = min(minDistance, distance_marker)
-                
-                
+                min_distance = min(min_distance, distance_marker)
                 sum_sinuses = (sum_sinuses + np.sin(angle)) * distance_norm 
                 sum_cosinuses = (sum_cosinuses + np.cos(angle)) * distance_norm
                 
@@ -91,12 +90,11 @@ def get_boundary_angle_min_distance(cv_image, crop = False, max_distance_boundar
             markers.append(marker)
                 
         try:
-            averageAngle = np.arctan(sum_sinuses / sum_cosinuses)        
+            averageAngle = np.arctan(sum_sinuses / sum_cosinuses)[0]        
         except ZeroDivisionError:
             pass
 
-    
-    return averageAngle, minDistance, markers
+    return averageAngle, min_distance, markers
 
 
 def get_boundary_angles_distances(cv_image, crop = False):
@@ -122,8 +120,6 @@ def get_boundary_angles_distances(cv_image, crop = False):
     
     marker_length = 0.2 # meter
     
-    averageAngle = None
-        
     try:
         rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(corners, marker_length, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
     except:
@@ -159,14 +155,9 @@ def get_boundary_angles_distances(cv_image, crop = False):
             distance_marker = get_distance_of_line(0.2, top_left_corner, bottom_left_corner, zed_parameters.cameraMatrix, zed_parameters.distCoeffs)
             
             # add information as Marker
-            marker = Marker(ids[i],1.0,corners,angle,distance_marker)
+            marker = Marker(ids[i],1.0,corners,angle[0],distance_marker)
             markers.append(marker)
                 
-        try:
-            averageAngle = np.arctan(sum_sinuses / sum_cosinuses)        
-        except ZeroDivisionError:
-            pass
-    
     return markers
 
 def get_distance_of_line(real_line_length, (px, py), (px_, py_), camMat, camDist):

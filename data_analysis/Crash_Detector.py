@@ -7,14 +7,12 @@ import sys
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-import aruco_annotator
-
-from Video_Marker import Video_Marker
+import aruco_tools.aruco_annotator
+from aruco_tools.Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
-from visualization.Area_Visualizer import Area_Visualizer
-from aruco_angle_retriever import get_boundary_angles_distances
+from aruco_tools.aruco_angle_retriever import get_boundary_angle_min_distance
 
-class Marker_Handler:
+class Crash_Detector:
     
     detected_markers = {}
     area_visualizer = None # The choice if there is a visualizer or not is not yet implemented
@@ -22,31 +20,29 @@ class Marker_Handler:
     source_bagfile = True
     show_video = True
     crop = False # Should the input video be cropped to the left image input. If false this code might contain errors
-    
+    distance = None
     
     def __init__(self, arguments):
         
-        if(self.source_bagfile):
+        bagfile_path = arguments[1]
+        self.distance = arguments[2]
+        show_video = arguments[3]
+        if(show_video == "0"):
+            self.show_video = False
         
-            self.crop = False    
-            bagfile_handler = Bagfile_Handler(arguments[1])
-            image_marker = Video_Marker(bagfile_handler,None) 
-            self.area_visualizer = Area_Visualizer()
-            self.play_video(bagfile_handler,None,image_marker)
+        self.crop = False    
+        bagfile_handler = Bagfile_Handler(bagfile_path)
+        self.play_video(bagfile_handler, None)
+        
+    def detect_crash(self,cv_image,distance, bagfile_handler):
+        averageAngle, min_distance, markers = get_boundary_angle_min_distance(cv_image, False, distance)
+        if(min_distance < distance):
+            bagfile_handler.data_for_pickle_file.append(bagfile_handler.timestamp)
+            cv2.putText(cv_image, "BAAMM!", (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 4)
             
-        elif (self.source_local_camera):
-            
-            capture_device = cv2.VideoCapture(2)
-            if(capture_device == None):
-                print("Camera not found")
-                sys.exit(1)
-            image_marker = Video_Marker(None,capture_device) 
-            self.area_visualizer = Area_Visualizer()
-            self.play_video(None,capture_device,image_marker)
+        
 
-    
-
-    def play_video(self,bagfile_handler,capture_device,image_marker):
+    def play_video(self,bagfile_handler,capture_device):
           
         paused_video = False
         
@@ -59,11 +55,9 @@ class Marker_Handler:
                    
                 if cv_image is None:
                     print("Error reading cv_image! Wrong number of camera?")
-                
-                #DEBUG cv_image, markers, motor_cmd, steer_cmd, evasion_needed = image_marker.process_next_image(self.crop,None,cv_image) 
-                markers = get_boundary_angles_distances(cv_image)
-                
-                
+                else:
+                    self.detect_crash(cv_image, float(self.distance),bagfile_handler)
+                            
             if(self.show_video):
                 cv2.imshow('frame',cv_image)
                 key = cv2.waitKey(1000/30) & 0xFF
@@ -73,8 +67,6 @@ class Marker_Handler:
                     paused_video = not paused_video
                 if key == ord('w'):
                     bagfile_handler.fast_forward()
-                if not paused_video:
-                    self.area_visualizer.show_top_view(markers)
-            
+                
 
-Marker_Handler(sys.argv)
+Crash_Detector(sys.argv)
