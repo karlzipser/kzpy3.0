@@ -11,20 +11,20 @@ class Marker(object):
     marker_id = None
     confidence = 1.0
     corners_xy = []
-    angle_to_top_left = None
-    distance_to_left_side = None
+    rvec = None
+    tvec = None
     
     
 
-    def __init__(self,marker_id,confidence,corners_xy,angle_to_top_left,distance_to_left_side):
+    def __init__(self,marker_id,confidence,corners_xy,rvec,tvec):
         '''
         Constructor
         '''
         self.marker_id = marker_id
         self.confidence = confidence
         self.corners_xy = corners_xy
-        self.angle_to_top_left = angle_to_top_left
-        self.distance_to_left_side = distance_to_left_side
+        self.rvec = rvec
+        self.tvec = tvec
         
     
     
@@ -33,4 +33,4 @@ class Marker(object):
         '''
         Quick string out method
         '''
-        return str(self.marker_id) + ","+str(self.confidence) + ","+str(self.corners_xy) + ","+str(self.angle_to_top_left) 
+        return str(self.marker_id) + ","+str(self.confidence) + ","+str(self.corners_xy) 
