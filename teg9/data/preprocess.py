@@ -26,8 +26,8 @@ if False:
 #bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_4_car_24April2017'
 bag_folders_src_location = '/media/karlzipser/ExtraDrive4/Mr_Yellow_25April2017'
 bag_folders_src = opj(bag_folders_src_location,'new' )
-bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new/rgb_1to4')
-bag_folders_dst_meta_path = opjD('bair_car_data_new/meta_states_1_5_6_7_good')
+bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new_24April2017/rgb_1to4')
+bag_folders_dst_meta_path = opjD('bair_car_data_new_24April2017/meta_states_1_5_6_7_good')
 
 runs = sgg(opj(bag_folders_src,'*'))
 

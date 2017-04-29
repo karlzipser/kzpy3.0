@@ -31,43 +31,47 @@ Location =  'Fern' # 'local' #'Smyth_tape'
 
 solver_file_path = opjh("kzpy3/caf5/z2_color/solver_live.prototxt")
 #weights_file_path = opjh("kzpy3/caf5/z2_color/z2_color.caffemodel")
-#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_iter_16400000.caffemodel")
-weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco2_iter_1200000.caffemodel")
+#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco1_iter_16400000.caffemodel")
+#weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco2_iter_1200000.caffemodel")
+weights_file_path = opjh("kzpy3/caf7/z2_color/z2_color_aruco3_iter_11900000.caffemodel")
+
 
 verbose = False
 use_caffe = True
 steer_gain = 1.0
-motor_gain = 0.6
+motor_gain = 1.0
 acc2rd_threshold = 150
+
 PID_min_max = [1.5,2.5]
-if False:
-	gyro_freeze_threshold = 500
-	acc_freeze_threshold_x = 12
-	acc_freeze_threshold_y = 12
-	acc_freeze_threshold_z = 12
-	acc_freeze_threshold_z_neg = -7
-	motor_freeze_threshold = 60
+
+gyro_freeze_threshold = 150
+acc_freeze_threshold_x = 7
+acc_freeze_threshold_y_max = 15
+acc_freeze_threshold_y_min = 0
+acc_freeze_threshold_z = 7
+motor_freeze_threshold = 55
+n_avg_IMU = 10
 #
 ###################################################################
 
 ####################### specific car settings ################
 #
 if computer_name == 'Mr_Orange':
-	PID_min_max = [2.,3.]
+	#PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Silver':
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Blue':
-	PID_min_max = [1.5,2.5]
+	#PID_min_max = [1.5,2.5]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_Yellow':
 	#motor_gain = 0.9
 	pass
 if computer_name == 'Mr_Black':
-	PID_min_max = [1.,2.]
+	PID_min_max = [2.,3.]
 	#motor_gain = 1.0
 	pass
 if computer_name == 'Mr_White':

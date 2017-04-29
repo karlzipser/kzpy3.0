@@ -14,6 +14,8 @@ single_value_topics = ['steer','state','motor','encoder','GPS2_lat']
 vector3_topics = ['acc','gyro','gyro_heading']#,'gps']
 camera_sides = ['left','right']
 
+
+
 def multi_preprocess(A,bag_folder_path,bagfile_range=[]):
     bag_files = sorted(gg(opj(bag_folder_path,'*.bag')))
     if len(bagfile_range) > 0:
@@ -111,7 +113,14 @@ def graph_thread(A):
             xlim(t-20-steer[0,0],t-steer[0,0])
             motor = array(A['motor'])
             plot(motor[:,0]-motor[0,0],motor[:,1])
-            if hist_timer.check():
+            acc_x = array(A['acc_x'])
+            acc_y = array(A['acc_y'])
+            acc_z = array(A['acc_z'])
+            plot(acc_x[:,0]-acc_x[0,0],acc_x[:,1])
+            plot(acc_y[:,0]-acc_y[0,0],acc_y[:,1])
+            plot(acc_z[:,0]-acc_z[0,0],acc_z[:,1])
+            ylim(-15,105)
+            if False: #hist_timer.check():
                 figure('left_deltas')
                 left_deltas = array(A['left_deltas'])
                 hist(left_deltas[:,1])
@@ -128,8 +137,10 @@ def graph_thread(A):
 
 
 def animator_thread(A):
+    #lock = threading.Lock()
     while True:
         while A['STOP_ANIMATOR_THREAD'] == False:
+            #lock.acquire()
             if len(A['left_image']) < 2*30:
                 time.sleep(0.1)
                 continue
@@ -140,10 +151,23 @@ def animator_thread(A):
                 A['current_img_index'] = 0
             indx = int(A['current_img_index'])
             img = A['left_image'][indx]
-            aruco_img = ann.get_aruco_image(a[1],filled=False,color=(255,0,0))
-            mi_or_cv2(aruco_img,cv=True,delay=30,title='animate')
+            #lock.release()
+            #aruco_img = ann.get_aruco_image(img[1],filled=False,color=(255,0,0))
+            mi_or_cv2(img[1],cv=True,delay=30,title='animate')
         time.sleep(0.2)
 
+def d_index_up(A):
+    lock = threading.Lock()
+    lock.acquire()
+    A['d_indx'] += 0.2
+    lock.release()
+    print(d2s("A['d_indx'] =",A['d_indx']))
+def d_index_down(A):
+    lock = threading.Lock()
+    lock.acquire()
+    A['d_indx'] -= 0.2
+    lock.release()
+    print(d2s("A['d_indx'] =",A['d_indx']))
 
 def start_graph(A):
     A['STOP_GRAPH_THREAD'] = False
@@ -169,7 +193,7 @@ def get_new_A(_=None):
     return A
 
 def menu(A):
-    menu_functions = ['exit_menu','start_animation','start_graph','stop_animation','stop_graph','stop_loader','get_new_A']
+    menu_functions = ['exit_menu','start_animation','start_graph','stop_animation','stop_graph','stop_loader','get_new_A','d_index_up','d_index_down']
     while True:
         for i in range(len(menu_functions)):
             print(d2n(i,') ',menu_functions[i]))
@@ -187,11 +211,12 @@ def menu(A):
 
 
 if __name__ == '__main__':
-    bag_folder_path = argv[1]
-    hist_timer = Timer(5)
+    bag_folder_path = sys.argv[1]
+    bagfile_range=[int(sys.argv[2]),int(sys.argv[3])]
+    hist_timer = Timer(10)
     A = {}
-    A = get_new_A[A]
-    multi_preprocess(A,bag_folder_path)
+    A = get_new_A(A)
+    multi_preprocess(A,bag_folder_path,bagfile_range)
     threading.Thread(target=animator_thread,args=[A]).start()
     threading.Thread(target=graph_thread,args=[A]).start()
     menu(A)

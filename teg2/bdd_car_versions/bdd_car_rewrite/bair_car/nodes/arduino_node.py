@@ -25,11 +25,18 @@ reload_timer = Timer(30)
 
 M = {}
 M['acc2rd_threshold'] = rp.acc2rd_threshold
+M['gyro_freeze_threshold'] = rp.gyro_freeze_threshold
+M['acc_freeze_threshold_x'] = rp.acc_freeze_threshold_x
+M['acc_freeze_threshold_y_max'] = rp.acc_freeze_threshold_y_max
+M['acc_freeze_threshold_y_min'] = rp.acc_freeze_threshold_y_min
+M['acc_freeze_threshold_z'] = rp.acc_freeze_threshold_z
+M['motor_freeze_threshold'] = rp.motor_freeze_threshold
 M['steer_gain'] = rp.steer_gain
 M['motor_gain'] = rp.motor_gain
 M['Stop_Arduinos'] = False
 M['PID_min_max'] = rp.PID_min_max
 M['aruco_evasion_active'] = 0
+M['n_avg_IMU'] = rp.n_avg_IMU
 
 def caffe_steer_callback(msg):
     global M
@@ -62,6 +69,9 @@ M['encoder_pub'] = rospy.Publisher('encoder', std_msgs.msg.Float32, queue_size=5
 M['gyro_pub'] = rospy.Publisher('gyro', geometry_msgs.msg.Vector3, queue_size=100)
 M['gyro_heading_pub'] = rospy.Publisher('gyro_heading', geometry_msgs.msg.Vector3, queue_size=100)
 M['acc_pub'] = rospy.Publisher('acc', geometry_msgs.msg.Vector3, queue_size=100)
+
+
+
 
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)
@@ -96,14 +106,24 @@ def arduino_master_thread():
                 M['steer_gain'] = rp.steer_gain
                 M['motor_gain'] = rp.motor_gain
                 M['acc2rd_threshold'] = rp.acc2rd_threshold
+                M['gyro_freeze_threshold'] = rp.gyro_freeze_threshold
+                M['acc_freeze_threshold_x'] = rp.acc_freeze_threshold_x
+                M['acc_freeze_threshold_y_max'] = rp.acc_freeze_threshold_y_max
+                M['acc_freeze_threshold_y_min'] = rp.acc_freeze_threshold_y_min
+                M['acc_freeze_threshold_z'] = rp.acc_freeze_threshold_z
+                M['motor_freeze_threshold'] = rp.motor_freeze_threshold
                 M['PID_min_max'] = rp.PID_min_max
+                M['n_avg_IMU'] = rp.n_avg_IMU
+
             if git_pull_timer.check():
                 unix(opjh('kzpy3/kzpy3_git_pull.sh'))
                 git_pull_timer.reset()
 
+            #print M.keys()
             try:
-                
-                print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'])#,M['gyro'],M['head'],M['encoder'])
+                #pass
+                #print (shape(M['acc_lst']),M['acc_lst_mean'])
+                print(M['PID'],M['aruco_evasion_active'],int(M['caffe_steer_pwm']),M['current_state'].name,M['steer_pwm_lst'][-1],M['steer_percent'],M['motor_percent'],M['acc'],M['gyro'],M['head'])#,M['gyro'],M['head'],M['encoder'])
             except:
                 pass
 
