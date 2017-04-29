@@ -285,9 +285,6 @@ def get_angle_to_center(marker):
 
     imgpts, jac = cv2.projectPoints(axisPoints, rvec, tvec, zed_parameters.cameraMatrix, zed_parameters.distCoeffs);
     
-
-    
-    
     xy_marker_center = (int(imgpts[0][0][0]),int(imgpts[0][0][1]))
     
     # We ignore the y axis since our world is quasi 2-dimensional
