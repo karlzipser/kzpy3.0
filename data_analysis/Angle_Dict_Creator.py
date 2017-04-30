@@ -11,7 +11,7 @@ import aruco_tools.aruco_annotator
 from aruco_tools.Video_Marker import Video_Marker
 from Bagfile_Handler import Bagfile_Handler
 from aruco_tools.aruco_angle_retriever import *
-
+from kzpy3.utils import *
 
 
 def get_angles_and_distance(cv_image, crop=False):
@@ -43,6 +43,7 @@ class Angle_Dict_Creator:
         
         bagfile_path = arguments[1]
         show_video = arguments[2]
+
         if(show_video == "0"):
             self.show_video = False
         
@@ -73,7 +74,10 @@ class Angle_Dict_Creator:
                 cv2.putText(cv_image, self.beautify_string(angles_to_center[marker_id],True), xy1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 255), 1)
                 cv2.putText(cv_image, self.beautify_string(angles_surfaces[marker_id],True), xy2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
                 cv2.putText(cv_image, self.beautify_string(distances_marker[marker_id],False), xy3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 200, 200), 1)
-        
+                if True:
+                    from kzpy3.utils import *
+                    import math
+                    print(d2s(marker_id,dp(math.degrees(angles_to_center[marker_id]),2),dp(math.degrees(angles_surfaces[marker_id]),2),dp(distances_marker[marker_id],2)))
         return marker_dict
        
             

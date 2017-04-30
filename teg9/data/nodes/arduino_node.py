@@ -35,10 +35,12 @@ def caffe_motor_callback(msg):
     global M
     M['caffe_motor'] = msg.data
 
-
+print "here!"
+"""
 rospy.init_node('run_arduino',anonymous=True)
 rospy.Subscriber('cmd/steer', std_msgs.msg.Int32, callback=caffe_steer_callback)
 rospy.Subscriber('cmd/motor', std_msgs.msg.Int32, callback=caffe_motor_callback)
+
 M['state_pub'] = rospy.Publisher('state', std_msgs.msg.Int32, queue_size=5) 
 M['steer_pub'] = rospy.Publisher('steer', std_msgs.msg.Int32, queue_size=5) 
 M['motor_pub'] = rospy.Publisher('motor', std_msgs.msg.Int32, queue_size=5) 
@@ -46,7 +48,7 @@ M['encoder_pub'] = rospy.Publisher('encoder', std_msgs.msg.Float32, queue_size=5
 M['gyro_pub'] = rospy.Publisher('gyro', geometry_msgs.msg.Vector3, queue_size=100)
 M['gyro_heading_pub'] = rospy.Publisher('gyro_heading', geometry_msgs.msg.Vector3, queue_size=100)
 M['acc_pub'] = rospy.Publisher('acc', geometry_msgs.msg.Vector3, queue_size=100)
-
+"""
 def arduino_mse_thread():
     ard_MSE.run_loop(Arduinos,M)
 
@@ -71,10 +73,10 @@ def arduino_master_thread():
             M['motor_gain'] = rp.motor_gain
             M['acc2rd_threshold'] = rp.acc2rd_threshold
             M['PID_min_max'] = rp.PID_min_max
-        
-        if 'steer_percent' in M and 'motor_percent' in M and 'current_state' in M:
-            if M['current_state'] != None:
-                print(M['steer_percent'],M['motor_percent'],M['current_state'].name)
+        print query_states()
+        #if 'steer_percent' in M and 'motor_percent' in M and 'current_state' in M:
+        #    if M['current_state'] != None:
+        #       print(M['steer_percent'],M['motor_percent'],M['current_state'].name)
         time.sleep(0.5)
 
 def query_states():
@@ -86,9 +88,9 @@ def query_states():
 
 ard_MSE.setup(M,Arduinos)
 threading.Thread(target=arduino_mse_thread).start()
-threading.Thread(target=arduino_master_thread).start()
+#threading.Thread(target=arduino_master_thread).start()
 
-
+"""
 q = raw_input('')
 while q not in ['q','Q']:
     q = raw_input('')
@@ -98,3 +100,4 @@ os.environ['STOP_ARDUINOS'] = 'True'
 
 print("exiting 'arduino_node.py'")
 
+"""

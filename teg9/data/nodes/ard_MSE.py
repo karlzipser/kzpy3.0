@@ -21,9 +21,9 @@ def mse_write_publish(M,Arduinos,steer_pwm,motor_pwm):
     Arduinos['MSE'].write(write_str)
     steer_percent = pwm_to_percent(M,M['steer_null'],steer_pwm,M['steer_max'],M['steer_min'])
     motor_percent = pwm_to_percent(M,M['motor_null'],motor_pwm,M['motor_max'],M['motor_min'])
-    M['steer_pub'].publish(std_msgs.msg.Int32(steer_percent))
-    M['motor_pub'].publish(std_msgs.msg.Int32(motor_percent))
-    M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+    #M['steer_pub'].publish(std_msgs.msg.Int32(steer_percent))
+    #M['motor_pub'].publish(std_msgs.msg.Int32(motor_percent))
+    #M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
 
 class State():
     def __init__(self,name,number,button_pwm_peak,M,Arduinos):
@@ -195,7 +195,7 @@ def buttons_to_state(Arduinos,M,BUTTON_DELTA):
 ##############################################################3
 #
 def setup(M,Arduinos):
-
+    print('def setup(M,Arduinos):')
     #M['state_transition_timer'] = Timer(0)
     M['n_avg_steer'] = 20
     M['n_avg_motor'] = 20
@@ -269,6 +269,7 @@ def setup(M,Arduinos):
     M['motor_gain'] = motor_gain
     M['acc2rd_threshold'] = acc2rd_threshold
     print("MSE setup")
+    print('exit def setup(M,Arduinos):')
 
 calibration_signal_timer = Timer(0.01)
 #        
@@ -277,7 +278,7 @@ calibration_signal_timer = Timer(0.01)
 
 def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
-    
+    print('def run_loop(Arduinos,M,BUTTON_DELTA=50,):')
     lock = threading.Lock()
     if 'MSE' not in Arduinos:
         M['Stop_Arduinos'] = True
@@ -372,7 +373,7 @@ def run_loop(Arduinos,M,BUTTON_DELTA=50,):
 
         M['current_state'].process()
 
-        M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
+        #M['state_pub'].publish(std_msgs.msg.Int32(M['current_state'].number))
 
         """
 

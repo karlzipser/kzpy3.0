@@ -43,6 +43,7 @@ def assign_serial_connections(sers):
             print('Is transmitter turned on?')
             print('Is MSE battery plugged in?')
             #M['Stop_Arduinos'] = True
+    print("Exiting def assign_serial_connections(sers):")
     return Arduinos
 
 

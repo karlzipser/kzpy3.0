@@ -14,36 +14,31 @@ if False:
 		backup_locations.append(opj('/media',username,'bair_car_data_'+str(i)))
 
 
-#
-#
-
-
-
-#bag_folders_src_location = opj('/media',username,'rosbags')
-#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Blue/Mr_Blue_4_car_24April2017'
-#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Black/Mr_Black_4_car_24April2017'
-#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Orange/Mr_Orange_4_car_24April2017'
-#bag_folders_src_location = '/media/karlzipser/ExtraDrive3/from_Mr_Yellow/Mr_Yellow_4_car_24April2017'
-bag_folders_src_location = '/media/karlzipser/ExtraDrive4/Mr_Yellow_25April2017'
+bag_folders_src_location = '/media/karlzipser/rosbags/Mr_Silver_20to25April2017'
 bag_folders_src = opj(bag_folders_src_location,'new' )
-bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new_24April2017/rgb_1to4')
-bag_folders_dst_meta_path = opjD('bair_car_data_new_24April2017/meta_states_1_5_6_7_good')
+#bag_folders_dst_rgb1to4_path = opjD('bair_car_data_new_24April2017/rgb_1to4')
+#bag_folders_dst_meta_path = opjD('bair_car_data_new_24April2017/meta_states_1_5_6_7_good')
+bag_folders_dst_rgb1to4_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017/rgb_1to4'
+bag_folders_dst_meta_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017/meta'
 
 runs = sgg(opj(bag_folders_src,'*'))
 
 cprint('Preliminary check of '+bag_folders_src)
 cprint("	checking bag file sizes and run durations")
+
+
 for r in runs:
 	bags = sgg(opj(r,'*.bag'))
 	cprint(d2s(tb,fname(r),len(bags)))
 	mtimes = []
 	for b in bags:
 		bag_size = os.path.getsize(b)
-		mtimes.append(os.path.getmtime(b))
 		#cprint(d2s(tb,tb,fname(b),bag_size))
+		mtimes.append(os.path.getmtime(b))
 		if bag_size < 0.99 * 1074813904:
 			cprint(d2s('Bagfile',b,'has size',bag_size,'which is below full size.'),'red')
-			assert(False)
+			unix('mv '+b+' '+b+'.too_small') #assert(False)
+		
 	mtimes = sorted(mtimes)
 	run_duration = mtimes[-1]-mtimes[0]
 	print run_duration

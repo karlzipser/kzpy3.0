@@ -31,7 +31,7 @@ averaged over 10000 iterations.
 
 USE_GPU = True
 if USE_GPU:
-	caffe.set_device(0)
+	caffe.set_device(1)
 	caffe.set_mode_gpu()
 
 if True:
@@ -48,6 +48,7 @@ if True:
 	pb.animate(len(Segment_Data['run_codes']))
 
 if True:
+	bair_car_data_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017'
 	print('loading low_steer... (takes awhile)')
 	low_steer = load_obj(opj(bair_car_data_path,'hdf5/segment_metadata/low_steer'))
 	print('\nloading high_steer... (takes awhile)')
@@ -59,13 +60,14 @@ if True:
 	ctr_high = -1
 
 if True:
-	solver = setup_solver(opjh('kzpy3/caf7/z2_color/solver.prototxt'))
+	solver = setup_solver(opjh('kzpy3/caf7/z2_color/solver_aruco_from_scratch.prototxt'))
 	#weights_file_path = opjh('kzpy3/caf5/z2_color/z2_color.caffemodel')
 	#weights_file_path = opjD('z2_color_aruco_boundary_1st_pass/z2_color_iter_22600000.caffemodel')
 	#weights_file_path = opjD('z2_color/z2_color_iter_100000.caffemodel')
-	weights_file_path = opjD('z2_color_aruco_boundary_1st_pass/z2_color_iter_22600000.caffemodel')
-	solver.net.copy_from(weights_file_path)
-	cprint('Loaded weights from '+weights_file_path)
+	#weights_file_path = '/home/karlzipser/Desktop/z2_color_aruco3/z2_color_iter_11900000.caffemodel'
+	#weights_file_path = '/home/karlzipser/Desktop/z2_color/z2_color_iter_100000.caffemodel'
+	#solver.net.copy_from(weights_file_path)
+	#cprint('Loaded weights from '+weights_file_path)
 	N_FRAMES = 2 # how many timesteps with images.
 	N_STEPS = 10 # how many timestamps with non-image data
 	ignore=[reject_run,left,out1_in2] # runs with these labels are ignored

@@ -6,7 +6,9 @@ import cv2
 from cv_bridge import CvBridge,CvBridgeError
 import threading
 import kzpy3.data_analysis.aruco_annotator as ann
+import kzpy3.teg9.data.nodes.arduino_node as ard
 
+#face_cascade = cv2.CascadeClassifier('cars.xml')
 bridge = CvBridge()
 
 image_topics = ['left_image','right_image']
@@ -113,12 +115,36 @@ def graph_thread(A):
             xlim(t-20-steer[0,0],t-steer[0,0])
             motor = array(A['motor'])
             plot(motor[:,0]-motor[0,0],motor[:,1])
+
+            N = 30
             acc_x = array(A['acc_x'])
             acc_y = array(A['acc_y'])
             acc_z = array(A['acc_z'])
-            plot(acc_x[:,0]-acc_x[0,0],acc_x[:,1])
-            plot(acc_y[:,0]-acc_y[0,0],acc_y[:,1])
-            plot(acc_z[:,0]-acc_z[0,0],acc_z[:,1])
+
+            
+            acc_x_smooth = 1.*acc_x
+            for i in range(N,len(acc_x)):
+                acc_x_smooth[i,1] = acc_x[i-N:i,1].mean()
+            acc_y_smooth = 1.*acc_x
+            for i in range(N,len(acc_y)):
+                acc_y_smooth[i,1] = acc_y[i-N:i,1].mean()
+            acc_z_smooth = 1.*acc_z
+            for i in range(N,len(acc_z)):
+                acc_z_smooth[i,1] = acc_z[i-N:i,1].mean()
+
+            #acc_x_smooth[:,1] -= acc_x[:,1].mean()
+            #acc_y_smooth[:,1] -= acc_y[:,1].mean()
+            #acc_z_smooth[:,1] -= acc_z[:,1].mean()
+            acc_xyz = 1.*acc_x_smooth
+            acc_xyz[:,1] = sqrt(acc_x_smooth[:,1]**2+acc_z_smooth[:,1]**2)
+
+            plot(acc_x_smooth[:,0]-acc_x_smooth[0,0],acc_x_smooth[:,1])
+            plot(acc_y_smooth[:,0]-acc_y_smooth[0,0],acc_y_smooth[:,1])
+            plot(acc_z_smooth[:,0]-acc_z_smooth[0,0],acc_z_smooth[:,1])
+            plot(acc_xyz[:,0]-acc_z_smooth[0,0],acc_xyz[:,1])
+
+            #plot(acc_y[:,0]-acc_y[0,0],acc_y[:,1])
+            #plot(acc_z[:,0]-acc_z[0,0],acc_z[:,1])
             ylim(-15,105)
             if False: #hist_timer.check():
                 figure('left_deltas')
@@ -138,22 +164,57 @@ def graph_thread(A):
 
 def animator_thread(A):
     #lock = threading.Lock()
+    q_lst = []
     while True:
         while A['STOP_ANIMATOR_THREAD'] == False:
             #lock.acquire()
             if len(A['left_image']) < 2*30:
+                #print(d2n("len(A['left_image']) =",len(A['left_image'])))
                 time.sleep(0.1)
                 continue
+            states = ard.query_states()
+            s = 0
+            q = 0
+            
+            if states != None:
+                #print states[0]
+                q = 1.0-states[0]/99.
+                q_lst.append(q)
+                if len(q_lst) > 15:
+                    q_lst = q_lst[-10:]
+                q = array(q_lst[-10:]).mean()
+                s = (states[1] - 49.0)
+                if abs(s) < 2:
+                    s = 0.0
+                s = s/10.0+1
+                if abs(s) > 3:
+                    s *= 2
+                A['d_indx'] = s
             A['current_img_index'] += A['d_indx']
             if A['current_img_index'] >= len(A['left_image']):
                 A['current_img_index'] = len(A['left_image'])-1
             elif A['current_img_index'] < 0:
                 A['current_img_index'] = 0
             indx = int(A['current_img_index'])
-            img = A['left_image'][indx]
-            #lock.release()
-            #aruco_img = ann.get_aruco_image(img[1],filled=False,color=(255,0,0))
-            mi_or_cv2(img[1],cv=True,delay=30,title='animate')
+            img = A['left_image'][indx][1]
+            p = int(q*shape(img)[1])
+            if p < 0:
+                p = 0
+            elif p >= shape(img)[1]:
+                p = shape(img)[1]-1
+            if abs(q-0.5) >0: # 0.1:
+                img[:,p,:] = 255
+            cv2.imshow('animate',cv2.cvtColor(img,cv2.COLOR_RGB2BGR))
+            k = cv2.waitKey(33)
+
+            if k == 119:
+                print("car ahead")
+            if k == 97:
+                print("car left")
+            if k == 100:
+                print("car right")
+
+            #mi_or_cv2(img[1],cv=True,delay=30,title='animate')
         time.sleep(0.2)
 
 def d_index_up(A):
@@ -218,7 +279,7 @@ if __name__ == '__main__':
     A = get_new_A(A)
     multi_preprocess(A,bag_folder_path,bagfile_range)
     threading.Thread(target=animator_thread,args=[A]).start()
-    threading.Thread(target=graph_thread,args=[A]).start()
+    #threading.Thread(target=graph_thread,args=[A]).start()
     menu(A)
 
 

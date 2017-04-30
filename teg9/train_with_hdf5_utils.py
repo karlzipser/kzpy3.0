@@ -15,12 +15,15 @@ for q in i_variables + i_labels:
 	exec(d2n(q,' = ',"\'",q,"\'")) # I use leading underscore because this facilitates auto completion in ipython
 
 
-
+print("WARNING, MAKE SURE PATHS ARE SET CORRECTLY IN train_with_hdf5_utils.py")
 bair_car_data_path = opjD('bair_car_data_new')
+#bair_car_data_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017'
 
 Segment_Data = {} # main data dictionary for segments
 hdf5_runs_path = opj(bair_car_data_path,'hdf5/runs') # large hdf5 files for runs
 hdf5_segment_metadata_path = opj(bair_car_data_path,'hdf5/segment_metadata') # metatdata associated with runs
+#hdf5_runs_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017/hdf5/runs'
+#hdf5_segment_metadata_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017/hdf5/segment_metadata'
 
 
 def function_load_hdf5(path):

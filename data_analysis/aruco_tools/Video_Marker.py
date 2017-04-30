@@ -7,7 +7,7 @@ import cv2
 import cv2.aruco as aruco
 from Board import Board
 import sys
-from zed_parameter import Zed_Parameter
+from kzpy3.data_analysis.zed_parameter import Zed_Parameter
 import numpy as np
 from cv2 import polarToCart
 import math

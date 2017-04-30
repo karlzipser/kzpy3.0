@@ -81,8 +81,8 @@ i_label_abbreviations = {aruco_ring:'ar_r',mostly_human:'mH',mostly_caffe:'mC',o
 
 I = {}
 
-bair_car_data_path = opjD('bair_car_data_new')
-
+#bair_car_data_path = opjD('bair_car_data_new')
+bair_car_data_path = '/media/karlzipser/ExtraDrive4/bair_car_data_new_28April2017'
 
 
 
@@ -722,6 +722,13 @@ if False:
 			S5(i,flip=False)
 			S5(flip=True)
 
+if False
+	for i in range(len(I[runs])):
+		if I[run_labels][I[runs][i]][reject_run] == False:
+			print i
+			S5(i,flip=False)
+			S5(flip=True)
+
 	if True:
 		hdf5s = sgg(opj(bair_car_data_path,'hdf5/runs/*.hdf5'))
 		ctr = 0
@@ -771,3 +778,14 @@ if False:
 			save_obj(high_steer,opj(bair_car_data_path,'hdf5/segment_metadata/high_steer'))
 
 
+if False:
+	for l in I[run_labels]:
+		print I[run_labels][l]['reject_run']
+		if I[run_labels][l]['reject_run'] == False:
+			I[run_labels][l][aruco_ring] = True
+			I[run_labels][l][direct] = True
+
+if False:
+	for i in range(len(I[runs])):
+		if I[run_labels][I[runs][i]][reject_run] == True:
+			print i
