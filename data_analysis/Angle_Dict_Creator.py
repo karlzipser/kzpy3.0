@@ -37,13 +37,12 @@ class Angle_Dict_Creator:
     source_bagfile = True
     show_video = True
     crop = False # Should the input video be cropped to the left image input. If false this code might contain errors
-    distance = None
+
     
     def __init__(self, arguments):
         
         bagfile_path = arguments[1]
-        self.distance = arguments[2]
-        show_video = arguments[3]
+        show_video = arguments[2]
         if(show_video == "0"):
             self.show_video = False
         
